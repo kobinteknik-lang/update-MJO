@@ -919,35 +919,6 @@ document.getElementById("jobForm").addEventListener("submit", async function(e) 
     // ------------------------------------
 });
 /* =========================
-   EDIT DATA
-========================= */
-
-async function editData(id) {
-
-    const response = await fetch(WEBAPP_URL);
-    const result = await response.json();
-
-    const item = (result.data || []).find(x => x.id == id);
-    if (!item) return;
-
-    currentId = id;
-
-    document.getElementById("tanggal").value = item.tanggal;
-
-    const waktu = (item.jam || "00:00").split(":");
-    document.getElementById("jam").value = waktu[0];
-    document.getElementById("menit").value = waktu[1];
-
-    document.getElementById("requestor").value = item.requestor;
-    document.getElementById("deskripsi").value = item.deskripsi;
-    document.getElementById("area").value = item.area;
-    document.getElementById("status").value = item.status;
-    document.getElementById("keterangan").value = item.keterangan || "";
-
-    document.getElementById("submitBtn").classList.add("hidden");
-    document.getElementById("updateBtn").classList.remove("hidden");
-}
-/* =========================
    UPDATE DATA
 ========================= */
 
