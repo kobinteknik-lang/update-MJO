@@ -3,17 +3,65 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Work Request System</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-.hidden{display:none;}
-.card{border:none;box-shadow:0 2px 10px rgba(0,0,0,.1);}
-.status-badge{padding:6px 10px;border-radius:8px;font-weight:600;}
-.bg-soft-danger{background:#fee2e2;}
-.bg-soft-warning{background:#fef9c3;}
-.bg-soft-success{background:#dcfce7;}
+body{
+    background:#f4f6f9;
+}
+
+.card{
+    border:none;
+    box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+.hidden{
+    display:none;
+}
+
+.row-open{
+    border-left:5px solid #dc3545;
+    background:#fff5f5;
+}
+
+.row-progress{
+    border-left:5px solid #ffc107;
+    background:#fffbe6;
+}
+
+.row-done{
+    border-left:5px solid #198754;
+    background:#f1fff5;
+}
+
+.form-label{
+    font-weight:600;
+}
+
+.table th{
+    white-space:nowrap;
+}
+
+.ticket-badge{
+    font-size:12px;
+    background:#212529;
+    color:white;
+    padding:4px 8px;
+    border-radius:6px;
+}
+.bg-soft-danger { background-color: #fee2e2 !important; }
+    .bg-soft-warning { background-color: #fef9c3 !important; }
+    .bg-soft-success { background-color: #dcfce7 !important; }
+	.bg-soft-success { background-color: #dcfce7 !important; }
+	.status-badge{
+    font-size:14px;
+    padding:8px 14px;
+    border-radius:8px;
+    font-weight:600;
+}
 </style>
 </head>
 
@@ -22,235 +70,942 @@
 <div class="container mt-4">
 
 <!-- LOGIN -->
-<div id="loginSection" class="card p-4 mx-auto" style="max-width:400px;">
-<h4 class="text-center">Login</h4>
+<div id="loginSection"
+     class="card p-4 mb-4 mx-auto"
+     style="max-width:400px">
 
-<input id="username" class="form-control mb-2" placeholder="Username">
-<input id="password" type="password" class="form-control mb-3" placeholder="Password">
+    <h4 class="text-center mb-3">
+        Login System
+    </h4>
 
-<button class="btn btn-primary w-100" onclick="handleLogin()">Login</button>
+    <input
+        id="username"
+        class="form-control mb-2"
+        placeholder="Username">
+
+    <input
+        id="password"
+        type="password"
+        class="form-control mb-3"
+        placeholder="Password">
+
+    <button
+        class="btn btn-primary w-100"
+        onclick="handleLogin()">
+        Login
+    </button>
+
 </div>
 
 <!-- APP -->
 <div id="appSection" class="hidden">
 
-<div class="d-flex justify-content-between mb-3">
-<h4>Work Request</h4>
-<button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <h4>
+            Work Request Dashboard
+        </h4>
+
+        <button
+            class="btn btn-outline-danger btn-sm"
+            onclick="logout()">
+            Logout
+        </button>
+
+    </div>
+
+    <div class="text-center mb-3">
+        <h6 id="clockIndo"></h6>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="row mb-4 text-center">
+
+        <div class="col">
+            <div class="card p-2 bg-danger text-white">
+                OPEN
+                <h4 id="openCount">0</h4>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card p-2 bg-warning">
+                PROGRESS
+                <h4 id="progressCount">0</h4>
+            </div>
+        </div>
+
+        <div class="col" id="doneCard">
+            <div class="card p-2 bg-success text-white">
+                DONE
+                <h4 id="doneCount">0</h4>
+            </div>
+        </div>
+
+    </div>
+	    <!-- FORM WORK REQUEST -->
+    <div class="card mb-4">
+
+        <div class="card-header bg-success text-white">
+            FORM INPUT WORK REQUEST
+        </div>
+
+        <div class="card-body">
+
+            <form id="jobForm">
+
+                <div class="row">
+
+                    <!-- TANGGAL -->
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Tanggal
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <input
+                            type="date"
+                            id="tanggal"
+                            class="form-control"
+                            required>
+
+                    </div>
+
+                    <!-- WAKTU -->
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Waktu
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <div class="d-flex gap-2">
+
+                            <select
+                                id="jam"
+                                class="form-select">
+                            </select>
+
+                            <select
+                                id="menit"
+                                class="form-select">
+                            </select>
+
+                            <button
+                                type="button"
+                                class="btn btn-info"
+                                onclick="setJamSekarang()">
+                                Sekarang
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <!-- REQUESTOR -->
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Requestor
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="requestor"
+                            class="form-control"
+                            placeholder="Nama Requestor"
+                            required>
+
+                    </div>
+
+                    <!-- AREA -->
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Area Kerja
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <select
+                            id="area"
+                            class="form-select"
+                            required>
+
+                            <option value="">
+                                -- Pilih Area --
+                            </option>
+							<option value="LINE 1A">LINE 1A</option>
+							<option value="LINE 1B">LINE 1B</option>
+							<option value="LINE 1C">LINE 1C</option>
+							<option value="LINE 2A">LINE 2A</option>
+							<option value="LINE 2B">LINE 2B</option>
+							<option value="LINE 2C">LINE 2C</option>
+                            <option value="PRESS01 PN1">PRESS01 PN1</option>
+                            <option value="PRESS02 PN1">PRESS02 PN1</option>
+                            <option value="PRESS03 PN1">PRESS03 PN1</option>
+                            <option value="PRESS05 PN1">PRESS05 PN1</option>
+                            <option value="PRESS10 PN1C">PRESS10 PN1C</option>
+                            <option value="PRESS12 PN1C">PRESS12 PN1C</option>
+							<option value="PRESS11">PRESS11</option>
+							<option value="PRESS01 PN2B">PRESS01 PN2B</option>
+                            <option value="PRESS02 PN2A">PRESS02 PN2A</option>
+                            <option value="PRESS03 PN2C">PRESS03 PN2C</option>
+							<option value="PRESS02 PN2B">PRESS02 PN2B</option>
+							<option value=" SQUARING 1C">SQUARING 1C</option>
+							<option value=" POLESHING 1C">POLESHING 1C</option>
+							<option value=" PACKING 1A">PACKING 1A</option>
+							<option value=" PACKING 1B">PACKING 1B</option>
+							<option value=" PACKING 1C">PACKING 1C</option>
+							<option value=" PACKING 2A">PACKING 2A</option>
+							<option value=" PACKING 2B">PACKING 2B</option>
+							<option value=" PACKING 2C">PACKING 2C</option>
+							<option value=" KILN 1A">KILN 1A</option>
+							<option value=" KILN 1B">KILN 1B</option>
+							<option value=" KILN 1C">KILN 1C</option>
+							<option value=" KILN 2A">KILN 2A</option>
+							<option value=" KILN 2B">KILN 2B</option>
+							<option value=" KILN 2C">KILN 2C</option>
+							<option value=" HD 1A">HD 1A</option>
+							<option value=" HD 1B">HD 1B</option>
+							<option value=" HD 1C">HD 1C</option>
+							<option value=" HD 2A">HD 2A</option>
+							<option value=" HD 2B">HD 2B</option>
+							<option value=" HD 2C">HD 2C</option>
+							<option value=" DRYER 1A">DRYER 1A</option>
+							<option value=" DRYER 1B">DRYER 1B</option>
+							<option value=" DRYER 1C">DRYER 1C</option>
+							<option value=" DRYER 2A">DRYER 2A</option>
+							<option value=" DRYER 2B">DRYER 2B</option>
+							<option value=" DRYER 2C">DRYER 2C</option>
+							<option value=" PRINT ROTOCOLOR PN1">PRINT ROTOCOLOR PN1</option>
+							<option value=" PRINT ROTOCOLOR PN2">PRINT ROTOCOLOR PN2</option>
+							<option value=" BMSD">BMSD</option>
+							<option value=" ATM 10000A">ATM 10000A</option>
+							<option value=" ATM 10000B">ATM 10000B</option>
+							<option value=" ATM 7000">ATM 7000</option>
+							<option value=" GLAZE MOLEN PN1">GLAZE MOLEN PN1</option>
+							<option value=" GALZE MOLEN PN2">GLAZE MOLEN PN2</option>
+							<option value=" DP 1A">DP 1A</option>
+							<option value=" DP 1B">DP 1B</option>
+							<option value=" DP 1C">DP 1C</option>
+							<option value=" DP 2A">DP 2A</option>
+							<option value=" DP 2B">DP 2B</option>
+							<option value=" DP 2C">DP 2C</option>
+							<option value=" TANGKI WATERGLAZE">TANGKI WATERGLAZE</option>
+							<option value=" GLAZING LINE 1A">GLAZING LINE 1A</option>
+							<option value=" GLAZING LINE 1B">GLAZING LINE 1B</option>
+							<option value=" GLAZING LINE 1C">GLAZING LINE 1C</option>
+							<option value=" GLAZING LINE 2A">GLAZING LINE 2A</option>
+							<option value=" GLAZING LINE 2B">GLAZING LINE 2B</option>
+							<option value=" GLAZING LINE 2C">GLAZING LINE 2C</option>
+							<option value=" GENSET PN1">GENSET PN1</option>
+							<option value=" GENSET PN2">GENSET PN2</option>
+							<option value=" KOMPRESSOR PN1">KOMPRESSOR PN1</option>
+							<option value=" KOMPRESSOR PN2">KOMPRESSOR PN2</option>
+							<option value="WORKSHOP">WORKSHOP</option>
+							<option value="UTILITY">UTILITY</option>
+							<option value="PRODUKSI">PRODUKSI</option>
+							<option value="WHFG">WHFG</option>
+							<option value="WHRM">WHRM</option>
+							<option value="WHSP">WHSP</option>
+							<option value="GA">GA</option>
+							<option value="RND">RND</option>
+							<option value="PROYEK">PROYEK</option>
+                            <option value="OFFICE">OFFICE</option>
+							<option value="ENGINEERING">ENGINEERING</option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- DESKRIPSI -->
+                    <div class="col-12 mb-3">
+
+                        <label class="form-label">
+                            Deskripsi Pekerjaan
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <textarea
+                            id="deskripsi"
+                            rows="4"
+                            class="form-control"
+                            placeholder="Masukkan deskripsi pekerjaan"
+                            required></textarea>
+
+                    </div>
+
+                    <!-- STATUS -->
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Status
+                        </label>
+
+                        <select
+                            id="status"
+                            class="form-select">
+
+                            <option value="Open">
+                                Open
+                            </option>
+
+                            <option value="Progress">
+                                Progress
+                            </option>
+
+                            <option value="Done">
+                                Done
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- KETERANGAN -->
+                    <div
+                        class="col-md-6 mb-3"
+                        id="keteranganGroup">
+
+                        <label class="form-label">
+                            Keterangan
+                        </label>
+
+                        <input
+                            type="text"
+                            id="keterangan"
+                            class="form-control"
+                            placeholder="Tambahkan keterangan">
+
+                    </div>
+
+                </div>
+
+                <div class="mt-2">
+
+                    <button
+                        type="submit"
+                        id="submitBtn"
+                        class="btn btn-success">
+                        Simpan Data
+                    </button>
+
+                    <button
+                        type="button"
+                        id="updateBtn"
+                        class="btn btn-warning hidden"
+                        onclick="updateData()">
+                        Update Data
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        onclick="resetForm()">
+                        Reset
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+    <!-- HISTORY DATA -->
+    <div class="card">
+
+        <div class="card-header bg-dark text-white">
+            HISTORY DATA
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-light border">
+
+                <strong>Keterangan Status :</strong>
+                <br>
+
+                🔴 Open = Permintaan baru masuk
+                <br>
+
+                🟡 Progress = Sedang dikerjakan
+                <br>
+
+                🟢 Done = Pekerjaan selesai
+
+            </div>
+
+            <!-- SEARCH -->
+
+            <div class="row mb-3">
+
+                <div class="col-md-4">
+
+                    <input
+                        type="text"
+                        id="searchHistory"
+                        class="form-control"
+                        placeholder="Cari data..."
+                        onkeyup="filterHistory()">
+
+                </div>
+
+            </div>
+
+            <!-- TABLE -->
+
+            <div class="table-responsive">
+
+                <table
+                    class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-dark">
+
+                        <tr>
+
+                            <th>ID Tiket</th>
+
+                            <th>No</th>
+
+                            <th>Tanggal</th>
+
+                            <th>Jam</th>
+
+                            <th>Deskripsi</th>
+
+                            <th>Requestor</th>
+
+                            <th>Area</th>
+
+                            <th>Status</th>
+
+                            <th id="headerKeterangan">
+                                Keterangan
+                            </th>
+							
+                            <th>Aksi</th>
+							
+							<th id="headerLastEdit">Last Edit</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="historyTable">
+
+                        <tr>
+
+                            <td colspan="10"
+                                class="text-center">
+
+                                Memuat data...
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
-
-<h6 id="clockIndo"></h6>
-
-<!-- FORM -->
-<div class="card p-3 mb-3">
-
-<form id="jobForm">
-
-<input type="date" id="tanggal" class="form-control mb-2">
-
-<div class="d-flex gap-2 mb-2">
-<select id="jam" class="form-select"></select>
-<select id="menit" class="form-select"></select>
-</div>
-
-<input id="requestor" class="form-control mb-2" placeholder="Requestor">
-
-<select id="area" class="form-select mb-2">
-<option>OFFICE</option>
-<option>PRODUKSI</option>
-<option>WAREHOUSE</option>
-</select>
-
-<textarea id="deskripsi" class="form-control mb-2" placeholder="Deskripsi"></textarea>
-
-<select id="status" class="form-select mb-2">
-<option>Open</option>
-<option>Progress</option>
-<option>Done</option>
-</select>
-
-<input id="keterangan" class="form-control mb-2" placeholder="Keterangan">
-
-<button class="btn btn-success w-100" type="submit" id="submitBtn">Simpan</button>
-
-</form>
-</div>
-
-<!-- TABLE -->
-<table class="table table-bordered">
-<thead>
-<tr>
-<th>ID</th><th>Tanggal</th><th>Jam</th><th>Deskripsi</th><th>Status</th><th>Aksi</th>
-</tr>
-</thead>
-<tbody id="historyTable"></tbody>
-</table>
+<!-- END APP -->
 
 </div>
-</div>
-
+<!-- END CONTAINER -->
 <script>
-	let currentRole = "";
+
+let currentRole = "";
 let currentUser = "";
 let currentId = null;
 let allData = [];
 
-const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzApIiUbjDyTYkaJh5EmotOgyY7OwoxMzA_7HlQ9cf_L6GyZ7A1I_fMDszyKebfSolvAQ/exec";
+const WEBAPP_URL =
+"https://script.google.com/macros/s/AKfycbzApIiUbjDyTYkaJh5EmotOgyY7OwoxMzA_7HlQ9cf_L6GyZ7A1I_fMDszyKebfSolvAQ/exec";
 
 const USERS = [
-{username:"admin",password:"190626",role:"admin"},
-{username:"karupn1",password:"krpn1",role:"requestor"}
+    {
+        username:"admin",
+        password:"190626",
+        role:"admin"
+    },
+    {
+        username:"karupn1",
+        password:"krpn1",
+        role:"requestor"
+    },
+    {
+        username:"karupn2",
+        password:"krpn2",
+        role:"requestor"
+    }
 ];
 
 document.addEventListener("DOMContentLoaded",()=>{
-populateTime();
-setClock();
-setInterval(setClock,1000);
 
-if(sessionStorage.getItem("role")){
-currentRole = sessionStorage.getItem("role");
-currentUser = sessionStorage.getItem("user");
-showApp();
-}
+    populateTime();
+
+    setJamSekarang();
+
+    updateClock();
+
+    setInterval(updateClock,1000);
+
+    if(sessionStorage.getItem("role")){
+
+        currentRole =
+        sessionStorage.getItem("role");
+
+        currentUser =
+        sessionStorage.getItem("user");
+
+        showApp();
+    }
+
 });
 
+function populateTime(){
+
+    const jamSelect =
+    document.getElementById("jam");
+
+    const menitSelect =
+    document.getElementById("menit");
+
+    for(let i=0;i<24;i++){
+
+        jamSelect.innerHTML += `
+            <option value="${String(i).padStart(2,'0')}">
+                ${String(i).padStart(2,'0')}
+            </option>
+        `;
+    }
+
+    for(let i=0;i<60;i++){
+
+        menitSelect.innerHTML += `
+            <option value="${String(i).padStart(2,'0')}">
+                ${String(i).padStart(2,'0')}
+            </option>
+        `;
+    }
+}
+
+function setJamSekarang(){
+
+    const now = new Date();
+
+    document.getElementById("tanggal").value =
+    now.toISOString().split("T")[0];
+
+    document.getElementById("jam").value =
+    String(now.getHours()).padStart(2,"0");
+
+    document.getElementById("menit").value =
+    String(now.getMinutes()).padStart(2,"0");
+}
+
+function updateClock(){
+
+    document.getElementById("clockIndo")
+    .innerText =
+    new Date().toLocaleString("id-ID");
+}
+
 function handleLogin(){
-const u = username.value;
-const p = password.value;
 
-const user = USERS.find(x=>x.username===u && x.password===p);
+    const u =
+    document.getElementById("username").value;
 
-if(!user){return alert("Login gagal");}
+    const p =
+    document.getElementById("password").value;
 
-sessionStorage.setItem("role",user.role);
-sessionStorage.setItem("user",user.username);
-location.reload();
+    const user =
+    USERS.find(
+        x =>
+        x.username===u &&
+        x.password===p
+    );
+
+    if(!user){
+
+        alert(
+            "Username atau Password salah!"
+        );
+
+        return;
+    }
+
+    sessionStorage.setItem(
+        "role",
+        user.role
+    );
+
+    sessionStorage.setItem(
+        "user",
+        user.username
+    );
+
+    location.reload();
 }
 
 function logout(){
-sessionStorage.clear();
-location.reload();
+
+    sessionStorage.clear();
+
+    location.reload();
 }
 
 function showApp(){
-loginSection.classList.add("hidden");
-appSection.classList.remove("hidden");
 
-if(currentRole==="requestor"){
-requestor.value = currentUser;
-requestor.readOnly = true;
+    document
+    .getElementById("loginSection")
+    .classList.add("hidden");
+
+    document
+    .getElementById("appSection")
+    .classList.remove("hidden");
+
+    if(currentRole==="requestor"){
+
+    document.getElementById("requestor").value =
+    currentUser;
+
+    document.getElementById("requestor").readOnly = true;
+
+    document.getElementById("status").disabled = true;
+
+    document.getElementById("keterangan").disabled = true;
+
+    document.getElementById("keteranganGroup").style.display = "none";
+
+    document.getElementById("headerKeterangan").style.display = "none";
+
+    document.getElementById("headerLastEdit").style.display = "none";
+
+    document.getElementById("doneCard").style.display = "none";
 }
 
-loadData();
-}
-	async function loadData(){
-try{
-const res = await fetch(WEBAPP_URL);
-const json = await res.json();
-
-allData = json.data || [];
-renderTable(allData);
-
-}catch(e){
-console.log(e);
-}
+    loadData();
 }
 
-function renderTable(data){
-historyTable.innerHTML = data.map(x=>`
-<tr>
-<td>${x.id}</td>
-<td>${x.tanggal}</td>
-<td>${x.jam}</td>
-<td>${x.deskripsi}</td>
-<td>${x.status}</td>
+async function loadData() {
+    try {
+        const response = await fetch(WEBAPP_URL);
+        const result = await response.json();
+
+        let data = result.data || [];
+
+        if (currentRole === "requestor") {
+            data = data.filter(x => x.status !== "Done");
+        }
+
+        allData = [...data].reverse();
+
+        renderTable(allData);
+        renderDashboard(allData);
+
+    } catch (error) {
+        console.error(error);
+
+        document.getElementById("historyTable").innerHTML = `
+            <tr>
+                <td colspan="10" class="text-danger text-center">
+                    Gagal memuat data
+                </td>
+            </tr>
+        `;
+    }
+}
+
+/* =========================
+   GENERATE ID TIKET
+   Format : YYMMDD001
+========================= */
+
+function generateTicketId() {
+  const sheet = getSheet();
+  const data = sheet.getDataRange().getValues();
+
+  const now = new Date();
+  const yy = String(now.getFullYear()).slice(-2);
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+
+  const prefix = `${yy}${mm}${dd}`;
+
+  let maxCounter = 0;
+
+  for (let i = 1; i < data.length; i++) {
+    const id = String(data[i][0] || "");
+
+    if (id.length >= 9) {
+      const counter = parseInt(id.slice(-3), 10);
+
+      if (!isNaN(counter) && counter > maxCounter) {
+        maxCounter = counter;
+      }
+    }
+  }
+
+  return prefix + String(maxCounter + 1).padStart(3, "0");
+}
+function renderDashboard(data){
+
+    document
+    .getElementById("openCount")
+    .innerText =
+    data.filter(
+        x=>x.status==="Open"
+    ).length;
+
+    document
+    .getElementById("progressCount")
+    .innerText =
+    data.filter(
+        x=>x.status==="Progress"
+    ).length;
+
+    document
+    .getElementById("doneCount")
+    .innerText =
+    data.filter(
+        x=>x.status==="Done"
+    ).length;
+}
+
+function filterHistory(){
+
+    const keyword =
+    document
+    .getElementById("searchHistory")
+    .value
+    .toLowerCase();
+
+    const filtered =
+    allData.filter(item=>
+
+        JSON.stringify(item)
+        .toLowerCase()
+        .includes(keyword)
+
+    );
+
+    renderTable(filtered);
+}
+function renderTable(data) {
+    const isRequestor = currentRole === "requestor";
+
+    if (!data.length) {
+        document.getElementById("historyTable").innerHTML = `
+            <tr>
+                <td colspan="${isRequestor ? 9 : 10}" class="text-center p-4">Tidak ada data</td>
+            </tr>`;
+        return;
+    }
+
+    document.getElementById("historyTable").innerHTML = data.map((item, index) => {
+        // Tentukan kelas warna soft berdasarkan status
+        let rowClass = "";
+        if (item.status === "Open") rowClass = "bg-soft-danger";
+        else if (item.status === "Progress") rowClass = "bg-soft-warning";
+        else if (item.status === "Done") rowClass = "bg-soft-success";
+
+        return `
+        <tr class="${rowClass}">
+            <td>
+                <span class="badge bg-dark">${item.id}</span>
+            </td>
+
+            <td>${index + 1}</td>
+
+            <td>${item.tanggal || "-"}</td>
+
+            <td>${item.jam || "-"}</td>
+
+            <td>${item.deskripsi || "-"}</td>
+
+            <td>${item.requestor || "-"}</td>
+
+            <td>${item.area || "-"}</td>
+
+            <td>
+			${
+			item.status === "Open"
+			? '<span class="badge bg-danger status-badge">Open</span>'
+			: item.status === "Progress"
+			? '<span class="badge bg-warning text-dark status-badge">Progress</span>'
+			: '<span class="badge bg-success status-badge">Done</span>'
+			}
+			</td>
+
+${!isRequestor ? `<td>${item.keterangan || "-"}</td>` : ""}
+
 <td>
-<button onclick="editData('${x.id}')">Edit</button>
-<button onclick="deleteData('${x.id}')">Hapus</button>
+   ${
+      currentRole==="admin"
+      ?
+      `
+      <button class="btn btn-warning btn-sm"
+      onclick="editData('${item.id}')">
+      Edit
+      </button>
+
+      <button class="btn btn-danger btn-sm"
+      onclick="deleteData('${item.id}')">
+      Hapus
+      </button>
+      `
+      :
+      "-"
+   }
 </td>
-</tr>
-`).join("");
+
+${!isRequestor ? `<td>${item.lastEdit || "-"}</td>` : ""}
+        </tr>`;
+    }).join("");
 }
-	jobForm.addEventListener("submit", async (e)=>{
-e.preventDefault();
 
-const payload = {
-action: currentId ? "update":"add",
-id: currentId,
-tanggal: tanggal.value,
-jam: jam.value+":"+menit.value,
-requestor: requestor.value,
-deskripsi: deskripsi.value,
-area: area.value,
-status: status.value,
-keterangan: keterangan.value
-};
+/* =========================
+   SUBMIT DATA (FIXED)
+========================= */
+document.getElementById("jobForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
 
-const res = await fetch(WEBAPP_URL,{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify(payload)
+    try {
+
+        const formData = new FormData();
+
+        formData.append("action", currentId ? "update" : "add");
+        formData.append("id", currentId || "");
+        formData.append("tanggal", document.getElementById("tanggal").value);
+        formData.append("jam", document.getElementById("jam").value + ":" + document.getElementById("menit").value);
+        formData.append("requestor", document.getElementById("requestor").value);
+        formData.append("deskripsi", document.getElementById("deskripsi").value);
+        formData.append("area", document.getElementById("area").value);
+        formData.append("status", document.getElementById("status").value);
+        formData.append("keterangan", document.getElementById("keterangan").value);
+
+        const response = await fetch(WEBAPP_URL, {
+            method: "POST",
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert(currentId ? "Update berhasil" : "Data tersimpan");
+            resetForm();
+            loadData();
+        } else {
+            alert("Gagal: " + (result.message || "Terjadi kesalahan pada server"));
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Error: " + err.message);
+    }
 });
+/* =========================
+   EDIT DATA
+========================= */
 
-const json = await res.json();
+async function editData(id) {
 
-if(json.success){
-resetForm();
-loadData();
+    const response = await fetch(WEBAPP_URL);
+    const result = await response.json();
+
+    const item = (result.data || []).find(x => x.id == id);
+    if (!item) return;
+
+    currentId = id;
+
+    document.getElementById("tanggal").value = item.tanggal;
+
+    const waktu = (item.jam || "00:00").split(":");
+    document.getElementById("jam").value = waktu[0];
+    document.getElementById("menit").value = waktu[1];
+
+    document.getElementById("requestor").value = item.requestor;
+    document.getElementById("deskripsi").value = item.deskripsi;
+    document.getElementById("area").value = item.area;
+    document.getElementById("status").value = item.status;
+    document.getElementById("keterangan").value = item.keterangan || "";
+
+    document.getElementById("submitBtn").classList.add("hidden");
+    document.getElementById("updateBtn").classList.remove("hidden");
 }
-});
+/* =========================
+   UPDATE DATA
+========================= */
 
-function editData(id){
-const d = allData.find(x=>x.id==id);
-currentId = id;
+function updateData() {
+    document.getElementById("jobForm").requestSubmit();
+}
+/* =========================
+   DELETE DATA
+========================= */
 
-tanggal.value = d.tanggal;
-requestor.value = d.requestor;
-area.value = d.area;
-deskripsi.value = d.deskripsi;
-status.value = d.status;
-keterangan.value = d.keterangan;
+async function deleteData(id) {
+
+    if (!confirm("Yakin hapus data ini?")) return;
+
+    try {
+        const response = await fetch(WEBAPP_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                action: "delete",
+                id: id
+            })
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            alert(result.message || "Gagal hapus data");
+            return;
+        }
+
+        loadData();
+
+    } catch (err) {
+        console.error(err);
+        alert("Error hapus data");
+    }
 }
 
-async function deleteData(id){
-await fetch(WEBAPP_URL,{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({action:"delete",id})
-});
+/* =========================
+   RESET FORM
+========================= */
 
-loadData();
-}
-	function generateTicket(){
-const now = new Date();
-const y = String(now.getFullYear()).slice(2);
-const m = String(now.getMonth()+1).padStart(2,"0");
-const d = String(now.getDate()).padStart(2,"0");
+function resetForm() {
+    document.getElementById("jobForm").reset();
 
-const counter = Math.floor(Math.random()*900+100);
+    currentId = null;
 
-return y+m+d+counter;
-}
+    document.getElementById("submitBtn").classList.remove("hidden");
+    document.getElementById("updateBtn").classList.add("hidden");
 
-function resetForm(){
-jobForm.reset();
-currentId = null;
-submitBtn.innerText = "Simpan";
-setClock();
+    setJamSekarang();
+
+    if (currentRole === "requestor") {
+        document.getElementById("requestor").value = currentUser;
+    }
 }
 
-function setClock(){
-clockIndo.innerText = new Date().toLocaleString("id-ID");
-}
+</script>
 
-function populateTime(){
-for(let i=0;i<24;i++){
-jam.innerHTML += `<option>${String(i).padStart(2,'0')}</option>`;
-}
-for(let i=0;i<60;i++){
-menit.innerHTML += `<option>${String(i).padStart(2,'0')}</option>`;
-}
-}
-	</script>
 </body>
 </html>
