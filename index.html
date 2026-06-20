@@ -876,34 +876,31 @@ ${!isRequestor ? `<td>${item.lastEdit || "-"}</td>` : ""}
 }
 
 /* =========================
-   SUBMIT DATA
+   SUBMIT DATA (FIXED)
 ========================= */
 document.getElementById("jobForm").addEventListener("submit", async function(e) {
     e.preventDefault();
 
-    const payload = {
-        action: currentId ? "update" : "add",
-        id: currentId,
-        tanggal: document.getElementById("tanggal").value,
-        jam: document.getElementById("jam").value + ":" + document.getElementById("menit").value,
-        requestor: document.getElementById("requestor").value,
-        deskripsi: document.getElementById("deskripsi").value,
-        area: document.getElementById("area").value,
-        status: document.getElementById("status").value,
-        keterangan: document.getElementById("keterangan").value
-    };
-
-    // --- POSISI KODE ANDA ADA DI SINI ---
     try {
+
+        const formData = new FormData();
+
+        formData.append("action", currentId ? "update" : "add");
+        formData.append("id", currentId || "");
+        formData.append("tanggal", document.getElementById("tanggal").value);
+        formData.append("jam", document.getElementById("jam").value + ":" + document.getElementById("menit").value);
+        formData.append("requestor", document.getElementById("requestor").value);
+        formData.append("deskripsi", document.getElementById("deskripsi").value);
+        formData.append("area", document.getElementById("area").value);
+        formData.append("status", document.getElementById("status").value);
+        formData.append("keterangan", document.getElementById("keterangan").value);
+
         const response = await fetch(WEBAPP_URL, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
+            body: formData
         });
 
-        const result = await response.json(); 
+        const result = await response.json();
 
         if (result.success) {
             alert(currentId ? "Update berhasil" : "Data tersimpan");
@@ -912,11 +909,11 @@ document.getElementById("jobForm").addEventListener("submit", async function(e) 
         } else {
             alert("Gagal: " + (result.message || "Terjadi kesalahan pada server"));
         }
+
     } catch (err) {
         console.error(err);
-        alert("Error: Pastikan URL Deployment sudah benar dan diset 'Anyone'");
+        alert("Error: " + err.message);
     }
-    // ------------------------------------
 });
 /* =========================
    UPDATE DATA
