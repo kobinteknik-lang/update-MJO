@@ -624,40 +624,40 @@ function updateClock(){
 function handleLogin(){
 
     const u =
-    document.getElementById("username").value;
+    document.getElementById("username").value.trim();
 
     const p =
-    document.getElementById("password").value;
+    document.getElementById("password").value.trim();
 
     const user =
     USERS.find(
         x =>
-        x.username===u &&
-        x.password===p
+        x.username === u &&
+        x.password === p
     );
 
     if(!user){
 
-        alert(
-            "Username atau Password salah!"
-        );
+        alert("Username atau Password salah");
 
         return;
     }
 
+    currentRole = user.role;
+    currentUser = user.username;
+
     sessionStorage.setItem(
         "role",
-        user.role
+        currentRole
     );
 
     sessionStorage.setItem(
         "user",
-        user.username
+        currentUser
     );
 
-    location.reload();
+    showApp();
 }
-
 function logout(){
 
     sessionStorage.clear();
@@ -699,66 +699,58 @@ function showApp(){
 }
 
 async function loadData() {
+
     try {
-        const response = await fetch(WEBAPP_URL);
-        const result = await response.json();
 
-        let data = result.data || [];
+        const response =
+        await fetch(WEBAPP_URL);
 
-        if (currentRole === "requestor") {
-            data = data.filter(x => x.status !== "Done");
+        if(!response.ok){
+
+            throw new Error(
+                "Gagal koneksi ke server"
+            );
         }
 
-        allData = [...data].reverse();
+        const result =
+        await response.json();
+
+        let data =
+        result.data || [];
+
+        if(currentRole==="requestor"){
+
+            data =
+            data.filter(
+                x =>
+                (x.status || "")
+                .toLowerCase() !== "done"
+            );
+        }
+
+        allData =
+        [...data].reverse();
 
         renderTable(allData);
+
         renderDashboard(allData);
 
-    } catch (error) {
+    } catch(error){
+
         console.error(error);
 
-        document.getElementById("historyTable").innerHTML = `
-            <tr>
-                <td colspan="10" class="text-danger text-center">
-                    Gagal memuat data
-                </td>
-            </tr>
-        `;
+        document.getElementById(
+            "historyTable"
+        ).innerHTML = `
+        <tr>
+            <td colspan="11"
+            class="text-danger text-center">
+            Gagal memuat data
+            </td>
+        </tr>`;
     }
 }
 
-/* =========================
-   GENERATE ID TIKET
-   Format : YYMMDD001
-========================= */
-
-function generateTicketId() {
-  const sheet = getSheet();
-  const data = sheet.getDataRange().getValues();
-
-  const now = new Date();
-  const yy = String(now.getFullYear()).slice(-2);
-  const mm = String(now.getMonth() + 1).padStart(2, "0");
-  const dd = String(now.getDate()).padStart(2, "0");
-
-  const prefix = `${yy}${mm}${dd}`;
-
-  let maxCounter = 0;
-
-  for (let i = 1; i < data.length; i++) {
-    const id = String(data[i][0] || "");
-
-    if (id.length >= 9) {
-      const counter = parseInt(id.slice(-3), 10);
-
-      if (!isNaN(counter) && counter > maxCounter) {
-        maxCounter = counter;
-      }
-    }
-  }
-
-  return prefix + String(maxCounter + 1).padStart(3, "0");
-}
 function renderDashboard(data){
 
     document
@@ -801,6 +793,20 @@ function filterHistory(){
     );
 
     renderTable(filtered);
+}
+function escapeHtml(text){
+
+    if(text == null){
+
+        return "-";
+    }
+
+    const div =
+    document.createElement("div");
+
+    div.innerText = text;
+
+    return div.innerHTML;
 }
 function renderTable(data) {
     const isRequestor = currentRole === "requestor";
@@ -878,41 +884,112 @@ ${!isRequestor ? `<td>${item.lastEdit || "-"}</td>` : ""}
 /* =========================
    SUBMIT DATA (FIXED)
 ========================= */
-document.getElementById("jobForm").addEventListener("submit", async function(e) {
+document
+.getElementById("jobForm")
+.addEventListener(
+"submit",
+async function(e){
+
     e.preventDefault();
+
+    const payload = {
+
+        action:
+        currentId
+        ? "update"
+        : "add",
+
+        id:
+        currentId || "",
+
+        tanggal:
+        document.getElementById(
+        "tanggal"
+        ).value,
+
+        jam:
+        document.getElementById(
+        "jam"
+        ).value
+        + ":" +
+        document.getElementById(
+        "menit"
+        ).value,
+
+        requestor:
+        document.getElementById(
+        "requestor"
+        ).value,
+
+        deskripsi:
+        document.getElementById(
+        "deskripsi"
+        ).value,
+
+        area:
+        document.getElementById(
+        "area"
+        ).value,
+
+        status:
+        document.getElementById(
+        "status"
+        ).value,
+
+        keterangan:
+        document.getElementById(
+        "keterangan"
+        ).value
+    };
 
     try {
 
-        const formData = new FormData();
+        const response =
+        await fetch(
+            WEBAPP_URL,
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":
+                    "application/json"
+                },
+                body:
+                JSON.stringify(
+                    payload
+                )
+            }
+        );
 
-        formData.append("action", currentId ? "update" : "add");
-        formData.append("id", currentId || "");
-        formData.append("tanggal", document.getElementById("tanggal").value);
-        formData.append("jam", document.getElementById("jam").value + ":" + document.getElementById("menit").value);
-        formData.append("requestor", document.getElementById("requestor").value);
-        formData.append("deskripsi", document.getElementById("deskripsi").value);
-        formData.append("area", document.getElementById("area").value);
-        formData.append("status", document.getElementById("status").value);
-        formData.append("keterangan", document.getElementById("keterangan").value);
+        const result =
+        await response.json();
 
-        const response = await fetch(WEBAPP_URL, {
-            method: "POST",
-            body: formData
-        });
+        if(result.success){
 
-        const result = await response.json();
+            alert(
+                currentId
+                ? "Update berhasil"
+                : "Data berhasil disimpan"
+            );
 
-        if (result.success) {
-            alert(currentId ? "Update berhasil" : "Data tersimpan");
             resetForm();
+
             loadData();
-        } else {
-            alert("Gagal: " + (result.message || "Terjadi kesalahan pada server"));
+
+        }else{
+
+            alert(
+                result.message ||
+                "Gagal menyimpan data"
+            );
         }
 
-    } catch (err) {
+    } catch(err){
+
         console.error(err);
-        alert("Error: " + err.message);
+
+        alert(
+            "Koneksi ke Apps Script gagal"
+        );
     }
 });
 /* =========================
@@ -955,37 +1032,109 @@ function updateData() {
    DELETE DATA
 ========================= */
 
-async function deleteData(id) {
+async function deleteData(id){
 
-    if (!confirm("Yakin hapus data ini?")) return;
+    if(
+        !confirm(
+            "Yakin hapus data ini?"
+        )
+    ){
+        return;
+    }
 
-    try {
-        const response = await fetch(WEBAPP_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                action: "delete",
-                id: id
-            })
-        });
+    try{
 
-        const result = await response.json();
+        const response =
+        await fetch(
+            WEBAPP_URL,
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":
+                    "application/json"
+                },
+                body:
+                JSON.stringify({
+                    action:"delete",
+                    id:id
+                })
+            }
+        );
 
-        if (!result.success) {
-            alert(result.message || "Gagal hapus data");
-            return;
+        const result =
+        await response.json();
+
+        if(result.success){
+
+            loadData();
+
+        }else{
+
+            alert(
+                result.message
+            );
         }
 
-        loadData();
+    }catch(err){
 
-    } catch (err) {
         console.error(err);
-        alert("Error hapus data");
+
+        alert(
+            "Gagal menghapus data"
+        );
+    }
+}async function deleteData(id){
+
+    if(
+        !confirm(
+            "Yakin hapus data ini?"
+        )
+    ){
+        return;
+    }
+
+    try{
+
+        const response =
+        await fetch(
+            WEBAPP_URL,
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":
+                    "application/json"
+                },
+                body:
+                JSON.stringify({
+                    action:"delete",
+                    id:id
+                })
+            }
+        );
+
+        const result =
+        await response.json();
+
+        if(result.success){
+
+            loadData();
+
+        }else{
+
+            alert(
+                result.message
+            );
+        }
+
+    }catch(err){
+
+        console.error(err);
+
+        alert(
+            "Gagal menghapus data"
+        );
     }
 }
-
 /* =========================
    RESET FORM
 ========================= */
