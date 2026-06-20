@@ -903,11 +903,14 @@ document.getElementById("jobForm").addEventListener("submit", async function(e) 
         const result = await response.json();
 
         if (result.success) {
+
             alert(currentId ? "Update berhasil" : "Data tersimpan");
+
             resetForm();
             loadData();
+
         } else {
-            alert("Gagal: " + (result.message || "Terjadi kesalahan pada server"));
+            alert(result.message || "Gagal simpan data");
         }
 
     } catch (err) {
@@ -915,6 +918,34 @@ document.getElementById("jobForm").addEventListener("submit", async function(e) 
         alert("Error: " + err.message);
     }
 });
+	function editData(id) {
+
+    const data = allData.find(x => x.id == id);
+
+    if (!data) {
+        alert("Data tidak ditemukan");
+        return;
+    }
+
+    currentId = id;
+
+    document.getElementById("tanggal").value = data.tanggal || "";
+    
+    if (data.jam) {
+        const [jam, menit] = data.jam.split(":");
+        document.getElementById("jam").value = jam;
+        document.getElementById("menit").value = menit;
+    }
+
+    document.getElementById("requestor").value = data.requestor || "";
+    document.getElementById("area").value = data.area || "";
+    document.getElementById("deskripsi").value = data.deskripsi || "";
+    document.getElementById("status").value = data.status || "";
+    document.getElementById("keterangan").value = data.keterangan || "";
+
+    // optional UX
+    document.getElementById("submitBtn").innerText = "Update Data";
+}
 /* =========================
    UPDATE DATA
 ========================= */
@@ -931,43 +962,42 @@ async function deleteData(id) {
     if (!confirm("Yakin hapus data ini?")) return;
 
     try {
+
+        const formData = new FormData();
+        formData.append("action", "delete");
+        formData.append("id", id);
+
         const response = await fetch(WEBAPP_URL, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                action: "delete",
-                id: id
-            })
+            body: formData
         });
 
         const result = await response.json();
 
-        if (!result.success) {
+        if (result.success) {
+            alert("Data berhasil dihapus");
+            loadData();
+        } else {
             alert(result.message || "Gagal hapus data");
-            return;
         }
-
-        loadData();
 
     } catch (err) {
         console.error(err);
         alert("Error hapus data");
     }
 }
-
 /* =========================
    RESET FORM
 ========================= */
 
 function resetForm() {
+    function resetForm() {
+
     document.getElementById("jobForm").reset();
 
     currentId = null;
 
-    document.getElementById("submitBtn").classList.remove("hidden");
-    document.getElementById("updateBtn").classList.add("hidden");
+    document.getElementById("submitBtn").innerText = "Simpan";
 
     setJamSekarang();
 
