@@ -670,8 +670,8 @@ function renderTable() {
         <tr>
             <td><span class="ticket-badge">${item[0] || ""}</span></td>
             <td>${start + index + 1}</td>
-            <td>${item[1] || ""}</td>
-            <td>${item[2] || ""}</td>
+            <td>${formatTanggal(item[1])}</td>
+			<td>${formatJam(item[2])}</td>
             <td>${item[5] || ""}</td>
             <td>${item[3] || ""}</td>
             <td>${item[4] || ""}</td>
@@ -808,6 +808,29 @@ function populateTimeSelects() {
     for (let i = 0; i < 60; i += 5) {
         menit.innerHTML += `<option>${String(i).padStart(2, "0")}</option>`;
     }
+}
+function formatTanggal(val) {
+    if (!val) return "";
+
+    const d = new Date(val);
+    if (isNaN(d)) return val;
+
+    return d.toLocaleDateString("id-ID");
+}
+function formatJam(val) {
+    if (!val) return "";
+
+    // kalau format Google Sheets TIME (1899 case)
+    const d = new Date(val);
+
+    if (!isNaN(d)) {
+        return d.toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+    }
+
+    return val;
 }
 </script>
 
