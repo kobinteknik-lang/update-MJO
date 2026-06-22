@@ -539,72 +539,153 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- FUNGSI GOOGLE SHEETS ---
 async function loadData() {
-    try {
-        const res = await fetch(SCRIPT_URL);
-        const data = await res.json();
-        // Asumsi data.slice(1) adalah data mentah dari Sheets
-        renderTable(data.slice(1)); 
-    } catch (err) {
-        console.error("Gagal memuat data", err);
+try {
+const res = await fetch(SCRIPT_URL);
+
+    if (!res.ok) {
+        throw new Error(`HTTP Error ${res.status}`);
     }
+
+    const result = await res.json();
+
+    console.log("Response Apps Script:", result);
+
+    if (!result.success) {
+        throw new Error(result.message || "Gagal mengambil data");
+    }
+
+    // Buang header baris pertama
+    const rows = result.data.slice(1);
+
+    renderTable(rows);
+
+} catch (err) {
+    console.error("Gagal memuat data:", err);
+
+    const tbody = document.getElementById('historyTable');
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="11" style="text-align:center;color:red">
+                Gagal memuat data: ${err.message}
+            </td>
+        </tr>
+    `;
+}
+
 }
 
 async function kirimData(action, obj = {}) {
-    try {
-        const res = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: action, ...obj })
-        });
-        const result = await res.text();
-        alert("Status: " + result);
-        resetForm();
-        loadData();
-    } catch (err) {
-        alert("Terjadi kesalahan koneksi.");
-    }
-}
+try {
 
-// --- RENDER & LOGIKA TAMPILAN ---
-function renderTable(data) {
-    const role = localStorage.getItem('userRole');
-    const tbody = document.getElementById('historyTable');
-    tbody.innerHTML = '';
-    
-    let stats = { OPEN: 0, PROGRESS: 0, DONE: 0 };
-
-    data.forEach((item, index) => {
-        // item mapping: 0:ID, 1:Tgl, 2:Jam, 3:Req, 4:Area, 5:Desk, 6:Stat, 7:Ket, 8:LastEdit
-        if (stats.hasOwnProperty(item[6])) stats[item[6]]++;
-
-        // Filter tampilan untuk User
-        if (role === 'requestor' && item[6] === 'DONE') return;
-
-        tbody.innerHTML += `
-            <tr>
-                <td><span class="badge">${item[0]}</span></td>
-                <td>${index + 1}</td>
-                <td>${item[1]}</td>
-                <td>${item[2]}</td>
-                <td>${item[5]}</td>
-                <td>${item[3]}</td>
-                <td>${item[4]}</td>
-                <td><strong>${item[6]}</strong></td>
-                <td>${item[7] || '-'}</td>
-                ${role === 'admin' ? `
-                    <td>
-                        <button class="btn btn-warning btn-sm" onclick="prepareEdit('${item[0]}','${item[1]}','${item[2]}','${item[3]}','${item[4]}','${item[5]}','${item[6]}','${item[7]}')">Edit</button>
-                        <button class="btn btn-danger btn-sm" onclick="hapusData('${item[0]}')">Hapus</button>
-                    </td>` : '<td>Restricted</td>'
-                }
-                <td>${item[8] || '-'}</td>
-            </tr>`;
+    const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify({
+            action,
+            ...obj
+        })
     });
 
-    // Update Counter
-    document.getElementById('openCount').innerText = stats.OPEN;
-    document.getElementById('progressCount').innerText = stats.PROGRESS;
-    document.getElementById('doneCount').innerText = stats.DONE;
+    const result = await res.json();
+
+    console.log("POST Result:", result);
+
+    if (!result.success) {
+        throw new Error(result.message);
+    }
+
+    alert(result.message);
+
+    resetForm();
+    loadData();
+
+} catch (err) {
+
+    console.error(err);
+
+    alert("Terjadi kesalahan: " + err.message);
 }
+
+}
+// --- RENDER & LOGIKA TAMPILAN ---
+function renderTable(data) {
+
+```
+const role = localStorage.getItem('userRole');
+const tbody = document.getElementById('historyTable');
+
+tbody.innerHTML = '';
+
+let stats = {
+    OPEN: 0,
+    PROGRESS: 0,
+    DONE: 0
+};
+
+data.forEach((item, index) => {
+
+    const status = String(item[6] || '')
+        .trim()
+        .toUpperCase();
+
+    if (stats.hasOwnProperty(status)) {
+        stats[status]++;
+    }
+
+    if (role === 'requestor' && status === 'DONE') {
+        return;
+    }
+
+    tbody.innerHTML += `
+        <tr>
+            <td><span class="badge">${item[0] || ''}</span></td>
+            <td>${index + 1}</td>
+            <td>${item[1] || ''}</td>
+            <td>${item[2] || ''}</td>
+            <td>${item[5] || ''}</td>
+            <td>${item[3] || ''}</td>
+            <td>${item[4] || ''}</td>
+            <td><strong>${status}</strong></td>
+            <td>${item[7] || '-'}</td>
+
+            ${role === 'admin'
+                ? `<td>
+                    <button class="btn btn-warning btn-sm"
+                        onclick="prepareEdit(
+                            '${item[0] || ''}',
+                            '${item[1] || ''}',
+                            '${item[2] || ''}',
+                            '${item[3] || ''}',
+                            '${item[4] || ''}',
+                            '${item[5] || ''}',
+                            '${item[6] || ''}',
+                            '${item[7] || ''}'
+                        )">
+                        Edit
+                    </button>
+
+                    <button class="btn btn-danger btn-sm"
+                        onclick="hapusData('${item[0] || ''}')">
+                        Hapus
+                    </button>
+                </td>`
+                : '<td>Restricted</td>'
+            }
+
+            <td>${item[8] || '-'}</td>
+        </tr>
+    `;
+});
+
+document.getElementById('openCount').innerText = stats.OPEN;
+document.getElementById('progressCount').innerText = stats.PROGRESS;
+document.getElementById('doneCount').innerText = stats.DONE;
+```
+
+}
+
 
 // --- FORM HANDLER ---
 document.getElementById('jobForm').onsubmit = function(e) {
