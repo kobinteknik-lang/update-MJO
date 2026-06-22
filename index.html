@@ -523,637 +523,164 @@ body{
 </div>
 <!-- END CONTAINER -->
 <script>
+// --- KONFIGURASI ---
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzApIiUbjDyTYkaJh5EmotOgyY7OwoxMzA_7HlQ9cf_L6GyZ7A1I_fMDszyKebfSolvAQ/exec";
+let editId = null;
 
-let currentRole = "";
-let currentUser = "";
-let currentId = null;
-let allData = [];
-
-const WEBAPP_URL =
-"https://script.google.com/macros/s/AKfycbzApIiUbjDyTYkaJh5EmotOgyY7OwoxMzA_7HlQ9cf_L6GyZ7A1I_fMDszyKebfSolvAQ/exec";
-
-const USERS = [
-    {
-        username:"admin",
-        password:"190626",
-        role:"admin"
-    },
-    {
-        username:"karupn1",
-        password:"krpn1",
-        role:"requestor"
-    },
-    {
-        username:"karupn2",
-        password:"krpn2",
-        role:"requestor"
+// --- INITIALIZATION ---
+document.addEventListener('DOMContentLoaded', () => {
+    populateTimeSelects();
+    checkAuth();
+    if (localStorage.getItem('isLoggedIn') === 'true') {
+        loadData();
     }
-];
-
-document.addEventListener("DOMContentLoaded",()=>{
-
-    populateTime();
-
-    setJamSekarang();
-
-    updateClock();
-
-    setInterval(updateClock,1000);
-
-    if(sessionStorage.getItem("role")){
-
-        currentRole =
-        sessionStorage.getItem("role");
-
-        currentUser =
-        sessionStorage.getItem("user");
-
-        showApp();
-    }
-
+    setInterval(updateClock, 1000);
 });
 
-function populateTime(){
-
-    const jamSelect =
-    document.getElementById("jam");
-
-    const menitSelect =
-    document.getElementById("menit");
-
-    for(let i=0;i<24;i++){
-
-        jamSelect.innerHTML += `
-            <option value="${String(i).padStart(2,'0')}">
-                ${String(i).padStart(2,'0')}
-            </option>
-        `;
-    }
-
-    for(let i=0;i<60;i++){
-
-        menitSelect.innerHTML += `
-            <option value="${String(i).padStart(2,'0')}">
-                ${String(i).padStart(2,'0')}
-            </option>
-        `;
-    }
-}
-
-function setJamSekarang(){
-
-    const now = new Date();
-
-    document.getElementById("tanggal").value =
-    now.toISOString().split("T")[0];
-
-    document.getElementById("jam").value =
-    String(now.getHours()).padStart(2,"0");
-
-    document.getElementById("menit").value =
-    String(now.getMinutes()).padStart(2,"0");
-}
-
-function updateClock(){
-
-    document.getElementById("clockIndo")
-    .innerText =
-    new Date().toLocaleString("id-ID");
-}
-
-function handleLogin(){
-
-    const u =
-    document.getElementById("username").value.trim();
-
-    const p =
-    document.getElementById("password").value.trim();
-
-    const user =
-    USERS.find(
-        x =>
-        x.username === u &&
-        x.password === p
-    );
-
-    if(!user){
-
-        alert("Username atau Password salah");
-
-        return;
-    }
-
-    currentRole = user.role;
-    currentUser = user.username;
-
-    sessionStorage.setItem(
-        "role",
-        currentRole
-    );
-
-    sessionStorage.setItem(
-        "user",
-        currentUser
-    );
-
-    showApp();
-}
-function logout(){
-
-    sessionStorage.clear();
-
-    location.reload();
-}
-
-function showApp(){
-
-    document
-    .getElementById("loginSection")
-    .classList.add("hidden");
-
-    document
-    .getElementById("appSection")
-    .classList.remove("hidden");
-
-    if(currentRole==="requestor"){
-
-    document.getElementById("requestor").value =
-    currentUser;
-
-    document.getElementById("requestor").readOnly = true;
-
-    document.getElementById("status").disabled = true;
-
-    document.getElementById("keterangan").disabled = true;
-
-    document.getElementById("keteranganGroup").style.display = "none";
-
-    document.getElementById("headerKeterangan").style.display = "none";
-
-    document.getElementById("headerLastEdit").style.display = "none";
-
-    document.getElementById("doneCard").style.display = "none";
-}
-
-    loadData();
-}
-
+// --- FUNGSI GOOGLE SHEETS ---
 async function loadData() {
-
     try {
-
-        const response =
-        await fetch(WEBAPP_URL);
-
-        if(!response.ok){
-
-            throw new Error(
-                "Gagal koneksi ke server"
-            );
-        }
-
-        const result =
-        await response.json();
-
-        let data =
-        result.data || [];
-
-        if(currentRole==="requestor"){
-
-            data =
-            data.filter(
-                x =>
-                (x.status || "")
-                .toLowerCase() !== "done"
-            );
-        }
-
-        allData =
-        [...data].reverse();
-
-        renderTable(allData);
-
-        renderDashboard(allData);
-
-    } catch(error){
-
-        console.error(error);
-
-        document.getElementById(
-            "historyTable"
-        ).innerHTML = `
-        <tr>
-            <td colspan="11"
-            class="text-danger text-center">
-            Gagal memuat data
-            </td>
-        </tr>`;
+        const res = await fetch(SCRIPT_URL);
+        const data = await res.json();
+        // Asumsi data.slice(1) adalah data mentah dari Sheets
+        renderTable(data.slice(1)); 
+    } catch (err) {
+        console.error("Gagal memuat data", err);
     }
 }
 
-function renderDashboard(data){
-
-    document
-    .getElementById("openCount")
-    .innerText =
-    data.filter(
-        x=>x.status==="Open"
-    ).length;
-
-    document
-    .getElementById("progressCount")
-    .innerText =
-    data.filter(
-        x=>x.status==="Progress"
-    ).length;
-
-    document
-    .getElementById("doneCount")
-    .innerText =
-    data.filter(
-        x=>x.status==="Done"
-    ).length;
-}
-
-function filterHistory(){
-
-    const keyword =
-    document
-    .getElementById("searchHistory")
-    .value
-    .toLowerCase();
-
-    const filtered =
-    allData.filter(item=>
-
-        JSON.stringify(item)
-        .toLowerCase()
-        .includes(keyword)
-
-    );
-
-    renderTable(filtered);
-}
-function escapeHtml(text){
-
-    if(text == null){
-
-        return "-";
+async function kirimData(action, obj = {}) {
+    try {
+        const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: action, ...obj })
+        });
+        const result = await res.text();
+        alert("Status: " + result);
+        resetForm();
+        loadData();
+    } catch (err) {
+        alert("Terjadi kesalahan koneksi.");
     }
-
-    const div =
-    document.createElement("div");
-
-    div.innerText = text;
-
-    return div.innerHTML;
 }
+
+// --- RENDER & LOGIKA TAMPILAN ---
 function renderTable(data) {
-    const isRequestor = currentRole === "requestor";
+    const role = localStorage.getItem('userRole');
+    const tbody = document.getElementById('historyTable');
+    tbody.innerHTML = '';
+    
+    let stats = { OPEN: 0, PROGRESS: 0, DONE: 0 };
 
-    if (!data.length) {
-        document.getElementById("historyTable").innerHTML = `
+    data.forEach((item, index) => {
+        // item mapping: 0:ID, 1:Tgl, 2:Jam, 3:Req, 4:Area, 5:Desk, 6:Stat, 7:Ket, 8:LastEdit
+        if (stats.hasOwnProperty(item[6])) stats[item[6]]++;
+
+        // Filter tampilan untuk User
+        if (role === 'requestor' && item[6] === 'DONE') return;
+
+        tbody.innerHTML += `
             <tr>
-                <td colspan="${isRequestor ? 9 : 10}" class="text-center p-4">Tidak ada data</td>
+                <td><span class="badge">${item[0]}</span></td>
+                <td>${index + 1}</td>
+                <td>${item[1]}</td>
+                <td>${item[2]}</td>
+                <td>${item[5]}</td>
+                <td>${item[3]}</td>
+                <td>${item[4]}</td>
+                <td><strong>${item[6]}</strong></td>
+                <td>${item[7] || '-'}</td>
+                ${role === 'admin' ? `
+                    <td>
+                        <button class="btn btn-warning btn-sm" onclick="prepareEdit('${item[0]}','${item[1]}','${item[2]}','${item[3]}','${item[4]}','${item[5]}','${item[6]}','${item[7]}')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="hapusData('${item[0]}')">Hapus</button>
+                    </td>` : '<td>Restricted</td>'
+                }
+                <td>${item[8] || '-'}</td>
             </tr>`;
-        return;
-    }
+    });
 
-    document.getElementById("historyTable").innerHTML = data.map((item, index) => {
-        // Tentukan kelas warna soft berdasarkan status
-        let rowClass = "";
-        if (item.status === "Open") rowClass = "bg-soft-danger";
-        else if (item.status === "Progress") rowClass = "bg-soft-warning";
-        else if (item.status === "Done") rowClass = "bg-soft-success";
-
-        return `
-        <tr class="${rowClass}">
-            <td>
-                <span class="badge bg-dark">${item.id}</span>
-            </td>
-
-            <td>${index + 1}</td>
-
-            <td>${item.tanggal || "-"}</td>
-
-            <td>${item.jam || "-"}</td>
-
-            <td>${item.deskripsi || "-"}</td>
-
-            <td>${item.requestor || "-"}</td>
-
-            <td>${item.area || "-"}</td>
-
-            <td>
-			${
-			item.status === "Open"
-			? '<span class="badge bg-danger status-badge">Open</span>'
-			: item.status === "Progress"
-			? '<span class="badge bg-warning text-dark status-badge">Progress</span>'
-			: '<span class="badge bg-success status-badge">Done</span>'
-			}
-			</td>
-
-${!isRequestor ? `<td>${item.keterangan || "-"}</td>` : ""}
-
-<td>
-   ${
-      currentRole==="admin"
-      ?
-      `
-      <button class="btn btn-warning btn-sm"
-      onclick="editData('${item.id}')">
-      Edit
-      </button>
-
-      <button class="btn btn-danger btn-sm"
-      onclick="deleteData('${item.id}')">
-      Hapus
-      </button>
-      `
-      :
-      "-"
-   }
-</td>
-
-${!isRequestor ? `<td>${item.lastEdit || "-"}</td>` : ""}
-        </tr>`;
-    }).join("");
+    // Update Counter
+    document.getElementById('openCount').innerText = stats.OPEN;
+    document.getElementById('progressCount').innerText = stats.PROGRESS;
+    document.getElementById('doneCount').innerText = stats.DONE;
 }
 
-/* =========================
-   SUBMIT DATA (FIXED)
-========================= */
-document
-.getElementById("jobForm")
-.addEventListener(
-"submit",
-async function(e){
-
+// --- FORM HANDLER ---
+document.getElementById('jobForm').onsubmit = function(e) {
     e.preventDefault();
-
     const payload = {
-
-        action:
-        currentId
-        ? "update"
-        : "add",
-
-        id:
-        currentId || "",
-
-        tanggal:
-        document.getElementById(
-        "tanggal"
-        ).value,
-
-        jam:
-        document.getElementById(
-        "jam"
-        ).value
-        + ":" +
-        document.getElementById(
-        "menit"
-        ).value,
-
-        requestor:
-        document.getElementById(
-        "requestor"
-        ).value,
-
-        deskripsi:
-        document.getElementById(
-        "deskripsi"
-        ).value,
-
-        area:
-        document.getElementById(
-        "area"
-        ).value,
-
-        status:
-        document.getElementById(
-        "status"
-        ).value,
-
-        keterangan:
-        document.getElementById(
-        "keterangan"
-        ).value
+        tanggal: document.getElementById('tanggal').value,
+        jam: document.getElementById('jam').value + ':' + document.getElementById('menit').value,
+        requestor: document.getElementById('requestor').value,
+        area: document.getElementById('area').value,
+        deskripsi: document.getElementById('deskripsi').value,
+        status: document.getElementById('status').value,
+        keterangan: document.getElementById('keterangan').value
     };
 
-    try {
-
-        const response =
-        await fetch(
-            WEBAPP_URL,
-            {
-                method:"POST",
-                headers:{
-                    "Content-Type":
-                    "application/json"
-                },
-                body:
-                JSON.stringify(
-                    payload
-                )
-            }
-        );
-
-        const result =
-        await response.json();
-
-        if(result.success){
-
-            alert(
-                currentId
-                ? "Update berhasil"
-                : "Data berhasil disimpan"
-            );
-
-            resetForm();
-
-            loadData();
-
-        }else{
-
-            alert(
-                result.message ||
-                "Gagal menyimpan data"
-            );
-        }
-
-    } catch(err){
-
-        console.error(err);
-
-        alert(
-            "Koneksi ke Apps Script gagal"
-        );
+    if (editId) {
+        kirimData('update', { id: editId, ...payload });
+    } else {
+        kirimData('add', payload);
     }
-});
-/* =========================
-   EDIT DATA
-========================= */
+};
 
-async function editData(id) {
-
-    const response = await fetch(WEBAPP_URL);
-    const result = await response.json();
-
-    const item = (result.data || []).find(x => x.id == id);
-    if (!item) return;
-
-    currentId = id;
-
-    document.getElementById("tanggal").value = item.tanggal;
-
-    const waktu = (item.jam || "00:00").split(":");
-    document.getElementById("jam").value = waktu[0];
-    document.getElementById("menit").value = waktu[1];
-
-    document.getElementById("requestor").value = item.requestor;
-    document.getElementById("deskripsi").value = item.deskripsi;
-    document.getElementById("area").value = item.area;
-    document.getElementById("status").value = item.status;
-    document.getElementById("keterangan").value = item.keterangan || "";
-
-    document.getElementById("submitBtn").classList.add("hidden");
-    document.getElementById("updateBtn").classList.remove("hidden");
+function prepareEdit(id, tgl, jam, req, area, desk, stat, ket) {
+    editId = id;
+    document.getElementById('tanggal').value = tgl;
+    document.getElementById('requestor').value = req;
+    document.getElementById('area').value = area;
+    document.getElementById('deskripsi').value = desk;
+    document.getElementById('status').value = stat;
+    document.getElementById('keterangan').value = ket;
+    
+    document.getElementById('submitBtn').classList.add('hidden');
+    document.getElementById('updateBtn').classList.remove('hidden');
 }
-/* =========================
-   UPDATE DATA
-========================= */
-
-function updateData() {
-    document.getElementById("jobForm").requestSubmit();
-}
-/* =========================
-   DELETE DATA
-========================= */
-
-async function deleteData(id){
-
-    if(
-        !confirm(
-            "Yakin hapus data ini?"
-        )
-    ){
-        return;
-    }
-
-    try{
-
-        const response =
-        await fetch(
-            WEBAPP_URL,
-            {
-                method:"POST",
-                headers:{
-                    "Content-Type":
-                    "application/json"
-                },
-                body:
-                JSON.stringify({
-                    action:"delete",
-                    id:id
-                })
-            }
-        );
-
-        const result =
-        await response.json();
-
-        if(result.success){
-
-            loadData();
-
-        }else{
-
-            alert(
-                result.message
-            );
-        }
-
-    }catch(err){
-
-        console.error(err);
-
-        alert(
-            "Gagal menghapus data"
-        );
-    }
-}async function deleteData(id){
-
-    if(
-        !confirm(
-            "Yakin hapus data ini?"
-        )
-    ){
-        return;
-    }
-
-    try{
-
-        const response =
-        await fetch(
-            WEBAPP_URL,
-            {
-                method:"POST",
-                headers:{
-                    "Content-Type":
-                    "application/json"
-                },
-                body:
-                JSON.stringify({
-                    action:"delete",
-                    id:id
-                })
-            }
-        );
-
-        const result =
-        await response.json();
-
-        if(result.success){
-
-            loadData();
-
-        }else{
-
-            alert(
-                result.message
-            );
-        }
-
-    }catch(err){
-
-        console.error(err);
-
-        alert(
-            "Gagal menghapus data"
-        );
-    }
-}
-/* =========================
-   RESET FORM
-========================= */
 
 function resetForm() {
-    document.getElementById("jobForm").reset();
+    editId = null;
+    document.getElementById('jobForm').reset();
+    document.getElementById('submitBtn').classList.remove('hidden');
+    document.getElementById('updateBtn').classList.add('hidden');
+}
 
-    currentId = null;
-
-    document.getElementById("submitBtn").classList.remove("hidden");
-    document.getElementById("updateBtn").classList.add("hidden");
-
-    setJamSekarang();
-
-    if (currentRole === "requestor") {
-        document.getElementById("requestor").value = currentUser;
+// --- AUTH & UTIL ---
+function handleLogin() {
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+    
+    if (user === "admin" && pass === "190626") {
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('userRole', 'admin');
+        location.reload();
+    } else if (user === "karupn" && pass === "krpn") {
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('userRole', 'requestor');
+        location.reload();
+    } else {
+        alert("Login Gagal!");
     }
 }
 
+function checkAuth() {
+    if (localStorage.getItem('isLoggedIn') === 'true') {
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('appSection').classList.remove('hidden');
+    }
+}
+
+function updateClock() {
+    document.getElementById('clockIndo').innerText = new Date().toLocaleString('id-ID');
+}
+
+function populateTimeSelects() {
+    const jamEl = document.getElementById('jam');
+    const menitEl = document.getElementById('menit');
+    for(let i=0; i<24; i++) jamEl.innerHTML += `<option>${String(i).padStart(2,'0')}</option>`;
+    for(let i=0; i<60; i+=5) menitEl.innerHTML += `<option>${String(i).padStart(2,'0')}</option>`;
+}
 </script>
 
 </body>
