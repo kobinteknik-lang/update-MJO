@@ -527,6 +527,8 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzApIiUbjDyTYkaJh5Em
 
 let editId = null;
 let isSubmitting = false;
+let isLoading = false;
+
 let allData = [];
 let currentPage = 1;
 const pageSize = 10;
@@ -549,10 +551,12 @@ function handleLogin() {
         localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem("userRole", "admin");
         location.reload();
+
     } else if (user === "karupn" && pass === "krpn") {
         localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem("userRole", "requestor");
         location.reload();
+
     } else {
         alert("Login gagal");
     }
@@ -582,9 +586,12 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // =========================
-// LOAD DATA
+// LOAD DATA (FIXED anti double request)
 // =========================
 async function loadData() {
+    if (isLoading) return;
+    isLoading = true;
+
     try {
         const res = await fetch(SCRIPT_URL);
         const result = await res.json();
@@ -592,19 +599,20 @@ async function loadData() {
         if (!result.success) throw new Error(result.message);
 
         allData = result.data.slice(1);
-
         renderTable();
 
     } catch (err) {
         console.error(err);
+
+    } finally {
+        isLoading = false;
     }
 }
 
 // =========================
-// SEND DATA
+// SEND DATA (FIXED safe submit)
 // =========================
 async function kirimData(action, obj = {}) {
-
     if (isSubmitting) return;
     isSubmitting = true;
 
@@ -622,24 +630,25 @@ async function kirimData(action, obj = {}) {
         if (!result.success) throw new Error(result.message);
 
         showToast(result.message, "success");
-
         resetForm();
         loadData();
 
     } catch (err) {
         showToast(err.message, "danger");
-    }
+        resetForm();
 
-    isSubmitting = false;
+    } finally {
+        isSubmitting = false;
+    }
 }
 
 // =========================
-// RENDER TABLE
+// RENDER TABLE (FIXED STATUS + SAFE EDIT)
 // =========================
 function renderTable() {
-
     const role = localStorage.getItem("userRole");
     const tbody = document.getElementById("historyTable");
+
     tbody.innerHTML = "";
 
     const start = (currentPage - 1) * pageSize;
@@ -647,9 +656,14 @@ function renderTable() {
 
     pageData.forEach((item, index) => {
 
-        const status = String(item[6] || "").toUpperCase();
+        const statusRaw = String(item[6] || "").toLowerCase();
 
-        tbody.innerHTML += `
+        let statusClass = "";
+        if (statusRaw === "open") statusClass = "text-danger";
+        else if (statusRaw === "progress") statusClass = "text-warning";
+        else if (statusRaw === "done") statusClass = "text-success";
+
+        const row = `
         <tr>
             <td><span class="ticket-badge">${item[0] || ""}</span></td>
             <td>${start + index + 1}</td>
@@ -658,14 +672,16 @@ function renderTable() {
             <td>${item[5] || ""}</td>
             <td>${item[3] || ""}</td>
             <td>${item[4] || ""}</td>
-            <td><b>${status}</b></td>
+
+            <td><b class="${statusClass}">${statusRaw.toUpperCase()}</b></td>
+
             <td>${item[7] || "-"}</td>
 
             <td>
                 ${role === "admin"
                     ? `
                         <button class="btn btn-warning btn-sm"
-                        onclick="prepareEdit('${item[0]}','${item[1]}','${item[2]}','${item[3]}','${item[4]}','${item[5]}','${item[6]}','${item[7]}')">
+                        onclick='prepareEdit(${JSON.stringify(item)})'>
                         Edit</button>
 
                         <button class="btn btn-danger btn-sm"
@@ -678,28 +694,28 @@ function renderTable() {
 
             <td>${item[8] || "-"}</td>
         </tr>`;
+
+        tbody.innerHTML += row;
     });
 }
 
 // =========================
-// EDIT
+// EDIT (FIXED SAFE VERSION)
 // =========================
-function prepareEdit(id, tgl, jam, req, area, desk, stat, ket) {
+function prepareEdit(item) {
+    editId = item[0];
 
-    editId = id;
+    document.getElementById("tanggal").value = item[1];
 
-    document.getElementById("tanggal").value = tgl;
-
-    const j = (jam || "00:00").split(":");
-
+    const j = (item[2] || "00:00").split(":");
     document.getElementById("jam").value = j[0];
     document.getElementById("menit").value = j[1];
 
-    document.getElementById("requestor").value = req;
-    document.getElementById("area").value = area;
-    document.getElementById("deskripsi").value = desk;
-    document.getElementById("status").value = stat;
-    document.getElementById("keterangan").value = ket;
+    document.getElementById("requestor").value = item[3];
+    document.getElementById("area").value = item[4];
+    document.getElementById("deskripsi").value = item[5];
+    document.getElementById("status").value = item[6];
+    document.getElementById("keterangan").value = item[7] || "";
 
     document.getElementById("submitBtn").classList.add("hidden");
     document.getElementById("updateBtn").classList.remove("hidden");
@@ -723,6 +739,7 @@ function updateData() {
 
     kirimData("update", { id: editId, ...payload });
 }
+
 // =========================
 // DELETE
 // =========================
@@ -730,7 +747,6 @@ function hapusData(id) {
     if (!confirm("Yakin hapus data ini?")) return;
     kirimData("delete", { id });
 }
-
 
 // =========================
 // RESET
@@ -779,15 +795,16 @@ function setTanggalHariIni() {
 }
 
 function populateTimeSelects() {
-
     const jam = document.getElementById("jam");
     const menit = document.getElementById("menit");
 
-    for (let i = 0; i < 24; i++)
+    for (let i = 0; i < 24; i++) {
         jam.innerHTML += `<option>${String(i).padStart(2, "0")}</option>`;
+    }
 
-    for (let i = 0; i < 60; i += 5)
+    for (let i = 0; i < 60; i += 5) {
         menit.innerHTML += `<option>${String(i).padStart(2, "0")}</option>`;
+    }
 }
 </script>
 
