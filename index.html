@@ -586,7 +586,14 @@ document.addEventListener("DOMContentLoaded", () => {
     setInterval(updateClock, 1000);
 
     autoUppercase();
+
+    document.getElementById("submitBtn")
+    .addEventListener("click", () => {
+        console.log("TOMBOL DIKLIK");
+    });
+
 });
+	
 document.getElementById("jobForm").addEventListener("submit", function(e){
 
     e.preventDefault();
@@ -609,10 +616,7 @@ document.getElementById("jobForm").addEventListener("submit", function(e){
     kirimData("add", payload);
 
 });
-	document.getElementById("submitBtn")
-.addEventListener("click", () => {
-    console.log("TOMBOL DIKLIK");
-});
+
 // =========================
 // LOAD DATA (FIXED anti double request)
 // =========================
