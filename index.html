@@ -9,58 +9,72 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-body{
-    background:#f4f6f9;
+body {
+    background: #f4f6f9;
 }
 
-.card{
-    border:none;
-    box-shadow:0 2px 10px rgba(0,0,0,.1);
+.card {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,.1);
 }
 
-.hidden{
-    display:none;
+.hidden {
+    display: none;
 }
 
-.row-open{
-    border-left:5px solid #dc3545;
-    background:#fff5f5;
+/* STATUS ROW */
+.row-open {
+    border-left: 5px solid #dc3545;
+    background: #fff5f5;
 }
 
-.row-progress{
-    border-left:5px solid #ffc107;
-    background:#fffbe6;
+.row-progress {
+    border-left: 5px solid #ffc107;
+    background: #fffbe6;
 }
 
-.row-done{
-    border-left:5px solid #198754;
-    background:#f1fff5;
+.row-done {
+    border-left: 5px solid #198754;
+    background: #f1fff5;
 }
 
-.form-label{
-    font-weight:600;
+/* FORM */
+.form-label {
+    font-weight: 600;
 }
 
-.table th{
-    white-space:nowrap;
+/* TABLE */
+.table th {
+    white-space: nowrap;
 }
 
-.ticket-badge{
-    font-size:12px;
-    background:#212529;
-    color:white;
-    padding:4px 8px;
-    border-radius:6px;
+.ticket-badge {
+    font-size: 12px;
+    background: #212529;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
 }
-.bg-soft-danger { background-color: #fee2e2 !important; }
-    .bg-soft-warning { background-color: #fef9c3 !important; }
-    .bg-soft-success { background-color: #dcfce7 !important; }
-	.bg-soft-success { background-color: #dcfce7 !important; }
-	.status-badge{
-    font-size:14px;
-    padding:8px 14px;
-    border-radius:8px;
-    font-weight:600;
+
+/* SOFT BACKGROUND */
+.bg-soft-danger {
+    background-color: #fee2e2 !important;
+}
+
+.bg-soft-warning {
+    background-color: #fef9c3 !important;
+}
+
+.bg-soft-success {
+    background-color: #dcfce7 !important;
+}
+
+/* STATUS BADGE */
+.status-badge {
+    font-size: 14px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 600;
 }
 </style>
 </head>
@@ -537,15 +551,30 @@ const pageSize = 10;
 // AUTH
 // =========================
 function checkAuth() {
-    if (localStorage.getItem("isLoggedIn") === "true") {
-        document.getElementById("loginSection").classList.add("hidden");
-        document.getElementById("appSection").classList.remove("hidden");
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+
+    const loginSection = document.getElementById("loginSection");
+    const appSection = document.getElementById("appSection");
+
+    if (!loginSection || !appSection) return;
+
+    if (isLoggedIn === "true") {
+        loginSection.classList.add("hidden");
+        appSection.classList.remove("hidden");
+    } else {
+        loginSection.classList.remove("hidden");
+        appSection.classList.add("hidden");
     }
 }
 
 function handleLogin() {
-    const user = document.getElementById("username").value;
-    const pass = document.getElementById("password").value;
+    const userEl = document.getElementById("username");
+    const passEl = document.getElementById("password");
+
+    if (!userEl || !passEl) return;
+
+    const user = userEl.value.trim();
+    const pass = passEl.value.trim();
 
     if (user === "admin" && pass === "190626") {
         localStorage.setItem("isLoggedIn", "true");
@@ -562,14 +591,14 @@ function handleLogin() {
     }
 }
 
-// 🔥 TAMBAHKAN INI
+// expose ke HTML onclick
 window.handleLogin = handleLogin;
 
 function logout() {
-    localStorage.clear();
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("userRole");
     location.reload();
 }
-
 // =========================
 // INIT
 // =========================
@@ -587,36 +616,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
     autoUppercase();
 
-    document.getElementById("submitBtn")
-    .addEventListener("click", () => {
-        console.log("TOMBOL DIKLIK");
-    });
+    // tombol submit (opsional debug)
+    const submitBtn = document.getElementById("submitBtn");
+    if (submitBtn) {
+        submitBtn.addEventListener("click", () => {
+            console.log("TOMBOL DIKLIK");
+        });
+    }
 
+    // FORM SUBMIT (INI YANG UTAMA)
+    const jobForm = document.getElementById("jobForm");
+
+    if (jobForm) {
+        jobForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const jam = document.getElementById("jam")?.value || "00";
+            const menit = document.getElementById("menit")?.value || "00";
+
+            const payload = {
+                tanggal: document.getElementById("tanggal").value,
+                jam: `${jam}:${menit}`,
+                requestor: document.getElementById("requestor").value,
+                area: document.getElementById("area").value,
+                deskripsi: document.getElementById("deskripsi").value,
+                status: document.getElementById("status").value,
+                keterangan: document.getElementById("keterangan").value
+            };
+
+            console.log("KIRIM DATA", payload);
+
+            kirimData("add", payload);
+        });
+    }
 });
-	
-document.getElementById("jobForm").addEventListener("submit", function(e){
-
-    e.preventDefault();
-
-    const payload = {
-        tanggal: document.getElementById("tanggal").value,
-        jam:
-            document.getElementById("jam").value +
-            ":" +
-            document.getElementById("menit").value,
-        requestor: document.getElementById("requestor").value,
-        area: document.getElementById("area").value,
-        deskripsi: document.getElementById("deskripsi").value,
-        status: document.getElementById("status").value,
-        keterangan: document.getElementById("keterangan").value
-    };
-
-    console.log("KIRIM DATA", payload);
-
-    kirimData("add", payload);
-
-});
-
 // =========================
 // LOAD DATA (FIXED anti double request)
 // =========================
@@ -626,19 +659,25 @@ async function loadData() {
 
     try {
         const res = await fetch(SCRIPT_URL);
-    const text = await res.text();
 
-    console.log("RESPONSE:", text);
+        // cek HTTP status dulu
+        if (!res.ok) {
+            throw new Error("HTTP Error: " + res.status);
+        }
 
-    const result = JSON.parse(text);
+        const result = await res.json();
 
-        if (!result.success) throw new Error(result.message);
+        console.log("RESPONSE:", result);
+
+        if (!result.success) {
+            throw new Error(result.message || "Load data gagal");
+        }
 
         allData = result.data.slice(1);
         renderTable();
 
     } catch (err) {
-        console.error(err);
+        console.error("loadData error:", err);
 
     } finally {
         isLoading = false;
@@ -661,23 +700,35 @@ async function kirimData(action, obj = {}) {
             body: JSON.stringify({ action, ...obj })
         });
 
+        if (!res.ok) {
+            throw new Error("HTTP Error: " + res.status);
+        }
+
         const result = await res.json();
 
-        if (!result.success) throw new Error(result.message);
+        console.log("SERVER RESPONSE:", result);
+
+        if (!result.success) {
+            throw new Error(result.message || "Request gagal");
+        }
 
         showToast(result.message, "success");
+
+        // reset hanya kalau sukses
         resetForm();
-        loadData();
+
+        // refresh data
+        await loadData();
 
     } catch (err) {
-        showToast(err.message, "danger");
-        resetForm();
+        console.error("kirimData error:", err);
+
+        showToast(err.message || "Terjadi kesalahan", "danger");
 
     } finally {
         isSubmitting = false;
     }
 }
-
 // =========================
 // RENDER TABLE (FIXED STATUS + SAFE EDIT)
 // =========================
@@ -685,10 +736,10 @@ function renderTable() {
     const role = localStorage.getItem("userRole");
     const tbody = document.getElementById("historyTable");
 
-    tbody.innerHTML = "";
-
     const start = (currentPage - 1) * pageSize;
     const pageData = allData.slice(start, start + pageSize);
+
+    let html = "";
 
     pageData.forEach((item, index) => {
 
@@ -699,17 +750,21 @@ function renderTable() {
         else if (statusRaw === "progress") statusClass = "text-warning";
         else if (statusRaw === "done") statusClass = "text-success";
 
-        const row = `
+        const safeItem = btoa(unescape(encodeURIComponent(JSON.stringify(item))));
+
+        html += `
         <tr>
             <td><span class="ticket-badge">${item[0] || ""}</span></td>
             <td>${start + index + 1}</td>
             <td>${formatTanggal(item[1])}</td>
-			<td>${formatJam(item[2])}</td>
+            <td>${formatJam(item[2])}</td>
             <td>${item[5] || ""}</td>
             <td>${item[3] || ""}</td>
             <td>${item[4] || ""}</td>
 
-            <td><b class="${statusClass}">${statusRaw.toUpperCase()}</b></td>
+            <td><b class="${statusClass}">
+                ${(statusRaw || "-").toUpperCase()}
+            </b></td>
 
             <td>${item[7] || "-"}</td>
 
@@ -717,90 +772,139 @@ function renderTable() {
                 ${role === "admin"
                     ? `
                         <button class="btn btn-warning btn-sm"
-                        onclick='prepareEdit(${JSON.stringify(item)})'>
+                        onclick="prepareEdit('${safeItem}')">
                         Edit</button>
 
                         <button class="btn btn-danger btn-sm"
-                        onclick="hapusData('${item[0]}')">
+                        onclick="hapusData('${item[0] || ""}')">
                         Hapus</button>
                     `
                     : "-"
                 }
             </td>
 
-            <td>${item[8] || "-"}</td>
+            <td>${formatLastEdit(item[8])}</td>
         </tr>`;
-
-        tbody.innerHTML += row;
     });
-}
 
+    tbody.innerHTML = html;
+}
 // =========================
 // EDIT (FIXED SAFE VERSION)
 // =========================
 function prepareEdit(item) {
     editId = item[0];
 
-    document.getElementById("tanggal").value = item[1];
+    const tanggalEl = document.getElementById("tanggal");
+    const jamEl = document.getElementById("jam");
+    const menitEl = document.getElementById("menit");
+    const requestorEl = document.getElementById("requestor");
+    const areaEl = document.getElementById("area");
+    const deskripsiEl = document.getElementById("deskripsi");
+    const statusEl = document.getElementById("status");
+    const keteranganEl = document.getElementById("keterangan");
 
-    const j = (item[2] || "00:00").split(":");
-    document.getElementById("jam").value = j[0];
-    document.getElementById("menit").value = j[1];
+    if (!tanggalEl || !jamEl || !menitEl) return;
 
-    document.getElementById("requestor").value = item[3];
-    document.getElementById("area").value = item[4];
-    document.getElementById("deskripsi").value = item[5];
-    document.getElementById("status").value = item[6];
-    document.getElementById("keterangan").value = item[7] || "";
+    // TANGGAL
+    tanggalEl.value = item[1] || "";
 
-    document.getElementById("submitBtn").classList.add("hidden");
-    document.getElementById("updateBtn").classList.remove("hidden");
+    // JAM (safe split)
+    const time = (item[2] || "00:00").toString().split(":");
+    const jam = (time[0] || "00").padStart(2, "0");
+    const menit = (time[1] || "00").padStart(2, "0");
+
+    jamEl.value = jam;
+    menitEl.value = menit;
+
+    // FIELD TEXT
+    if (requestorEl) requestorEl.value = item[3] || "";
+    if (areaEl) areaEl.value = item[4] || "";
+    if (deskripsiEl) deskripsiEl.value = item[5] || "";
+    if (statusEl) statusEl.value = item[6] || "Open";
+    if (keteranganEl) keteranganEl.value = item[7] || "";
+
+    // toggle button
+    const submitBtn = document.getElementById("submitBtn");
+    const updateBtn = document.getElementById("updateBtn");
+
+    if (submitBtn) submitBtn.classList.add("hidden");
+    if (updateBtn) updateBtn.classList.remove("hidden");
 }
-
-function updateData() {
+	function updateData() {
     if (!editId) {
         alert("Tidak ada data yang dipilih untuk update");
         return;
     }
 
+    const jam = document.getElementById("jam")?.value || "00";
+    const menit = document.getElementById("menit")?.value || "00";
+
     const payload = {
-        tanggal: document.getElementById("tanggal").value,
-        jam: document.getElementById("jam").value + ":" + document.getElementById("menit").value,
-        requestor: document.getElementById("requestor").value,
-        area: document.getElementById("area").value,
-        deskripsi: document.getElementById("deskripsi").value,
-        status: document.getElementById("status").value,
-        keterangan: document.getElementById("keterangan").value
+        tanggal: document.getElementById("tanggal")?.value || "",
+        jam: `${jam}:${menit}`,
+        requestor: document.getElementById("requestor")?.value || "",
+        area: document.getElementById("area")?.value || "",
+        deskripsi: document.getElementById("deskripsi")?.value || "",
+        status: document.getElementById("status")?.value || "Open",
+        keterangan: document.getElementById("keterangan")?.value || ""
     };
+
+    console.log("UPDATE PAYLOAD:", payload);
 
     kirimData("update", { id: editId, ...payload });
 }
-
 // =========================
 // DELETE
 // =========================
-function hapusData(id) {
-    if (!confirm("Yakin hapus data ini?")) return;
-    kirimData("delete", { id });
-}
+let isDeleting = false;
 
+function hapusData(id) {
+    if (!id) {
+        alert("ID tidak valid");
+        return;
+    }
+
+    if (isDeleting) return;
+
+    const confirmDelete = confirm("Yakin hapus data ini?");
+    if (!confirmDelete) return;
+
+    isDeleting = true;
+
+    try {
+        kirimData("delete", { id });
+    } finally {
+        // dikembalikan setelah request selesai (lebih aman di kirimData juga)
+        setTimeout(() => {
+            isDeleting = false;
+        }, 1000);
+    }
+}
 // =========================
 // RESET
 // =========================
 function resetForm() {
     editId = null;
-    document.getElementById("jobForm").reset();
 
-    document.getElementById("submitBtn").classList.remove("hidden");
-    document.getElementById("updateBtn").classList.add("hidden");
+    const form = document.getElementById("jobForm");
+    if (form) form.reset();
+
+    const submitBtn = document.getElementById("submitBtn");
+    const updateBtn = document.getElementById("updateBtn");
+
+    if (submitBtn) submitBtn.classList.remove("hidden");
+    if (updateBtn) updateBtn.classList.add("hidden");
 }
-
 // =========================
 // UTIL
 // =========================
 function autoUppercase() {
     ["requestor", "deskripsi", "keterangan"].forEach(id => {
-        document.getElementById(id).addEventListener("input", function () {
+        const el = document.getElementById(id);
+        if (!el) return;
+
+        el.addEventListener("input", function () {
             this.value = this.value.toUpperCase();
         });
     });
@@ -821,27 +925,40 @@ function showToast(msg, type) {
 }
 
 function updateClock() {
-    document.getElementById("clockIndo").innerText =
-        new Date().toLocaleString("id-ID");
+    const el = document.getElementById("clockIndo");
+    if (!el) return;
+
+    el.innerText = new Date().toLocaleString("id-ID");
 }
 
 function setTanggalHariIni() {
-    document.getElementById("tanggal").value =
-        new Date().toISOString().split("T")[0];
+    const el = document.getElementById("tanggal");
+    if (!el) return;
+
+    el.value = new Date().toISOString().split("T")[0];
 }
 
 function populateTimeSelects() {
     const jam = document.getElementById("jam");
     const menit = document.getElementById("menit");
+    if (!jam || !menit) return;
+
+    jam.innerHTML = "";
+    menit.innerHTML = "";
 
     for (let i = 0; i < 24; i++) {
-        jam.innerHTML += `<option>${String(i).padStart(2, "0")}</option>`;
+        jam.innerHTML += `<option value="${String(i).padStart(2, "0")}">
+            ${String(i).padStart(2, "0")}
+        </option>`;
     }
 
     for (let i = 0; i < 60; i += 5) {
-        menit.innerHTML += `<option>${String(i).padStart(2, "0")}</option>`;
+        menit.innerHTML += `<option value="${String(i).padStart(2, "0")}">
+            ${String(i).padStart(2, "0")}
+        </option>`;
     }
 }
+
 function formatTanggal(val) {
     if (!val) return "";
 
@@ -850,10 +967,10 @@ function formatTanggal(val) {
 
     return d.toLocaleDateString("id-ID");
 }
+
 function formatJam(val) {
     if (!val) return "";
 
-    // kalau format Google Sheets TIME (1899 case)
     const d = new Date(val);
 
     if (!isNaN(d)) {
@@ -864,6 +981,25 @@ function formatJam(val) {
     }
 
     return val;
+}
+
+function setJamSekarang() {
+    const jam = document.getElementById("jam");
+    const menit = document.getElementById("menit");
+    if (!jam || !menit) return;
+
+    const now = new Date();
+
+    jam.value = String(now.getHours()).padStart(2, "0");
+
+    menit.value = String(
+        Math.floor(now.getMinutes() / 5) * 5
+    ).padStart(2, "0");
+}
+	function formatLastEdit(val) {
+    if (!val) return "-";
+    const d = new Date(val);
+    return d.toLocaleString("id-ID");
 }
 </script>
 
