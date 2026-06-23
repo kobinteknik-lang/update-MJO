@@ -964,24 +964,25 @@ function setTanggalHariIni() {
 function populateTimeSelects() {
     const jam = document.getElementById("jam");
     const menit = document.getElementById("menit");
+
     if (!jam || !menit) return;
 
-    jam.innerHTML = "";
-    menit.innerHTML = "";
+    let jamOptions = "";
+    let menitOptions = "";
 
     for (let i = 0; i < 24; i++) {
-        jam.innerHTML += `<option value="${String(i).padStart(2, "0")}">
-            ${String(i).padStart(2, "0")}
-        </option>`;
+        const value = String(i).padStart(2, "0");
+        jamOptions += `<option value="${value}">${value}</option>`;
     }
 
-    for (let i = 0; i < 60; i += 5) {
-        menit.innerHTML += `<option value="${String(i).padStart(2, "0")}">
-            ${String(i).padStart(2, "0")}
-        </option>`;
+    for (let i = 0; i < 60; i++) {
+        const value = String(i).padStart(2, "0");
+        menitOptions += `<option value="${value}">${value}</option>`;
     }
+
+    jam.innerHTML = jamOptions;
+    menit.innerHTML = menitOptions;
 }
-
 function formatTanggal(val) {
     if (!val) return "";
 
@@ -1009,15 +1010,13 @@ function formatJam(val) {
 function setJamSekarang() {
     const jam = document.getElementById("jam");
     const menit = document.getElementById("menit");
+
     if (!jam || !menit) return;
 
     const now = new Date();
 
-    jam.value = String(now.getHours()).padStart(2, "0");
-
-    menit.value = String(
-        Math.floor(now.getMinutes() / 5) * 5
-    ).padStart(2, "0");
+    jam.value = now.getHours().toString().padStart(2, "0");
+    menit.value = now.getMinutes().toString().padStart(2, "0");
 }
 	function formatLastEdit(val) {
     if (!val) return "-";
