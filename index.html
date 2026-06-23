@@ -792,65 +792,45 @@ function renderTable() {
 // =========================
 // EDIT (FIXED SAFE VERSION)
 // =========================
-function prepareEdit(item) {
+function prepareEdit(encoded) {
+    const item = JSON.parse(
+        decodeURIComponent(escape(atob(encoded)))
+    );
+
     editId = item[0];
 
-    const tanggalEl = document.getElementById("tanggal");
-    const jamEl = document.getElementById("jam");
-    const menitEl = document.getElementById("menit");
-    const requestorEl = document.getElementById("requestor");
-    const areaEl = document.getElementById("area");
-    const deskripsiEl = document.getElementById("deskripsi");
-    const statusEl = document.getElementById("status");
-    const keteranganEl = document.getElementById("keterangan");
+    document.getElementById("tanggal").value = item[1];
 
-    if (!tanggalEl || !jamEl || !menitEl) return;
+    const j = (item[2] || "00:00").split(":");
+    document.getElementById("jam").value = j[0];
+    document.getElementById("menit").value = j[1];
 
-    // TANGGAL
-    tanggalEl.value = item[1] || "";
+    document.getElementById("requestor").value = item[3];
+    document.getElementById("area").value = item[4];
+    document.getElementById("deskripsi").value = item[5];
+    document.getElementById("status").value = item[6];
+    document.getElementById("keterangan").value = item[7] || "";
 
-    // JAM (safe split)
-    const time = (item[2] || "00:00").toString().split(":");
-    const jam = (time[0] || "00").padStart(2, "0");
-    const menit = (time[1] || "00").padStart(2, "0");
-
-    jamEl.value = jam;
-    menitEl.value = menit;
-
-    // FIELD TEXT
-    if (requestorEl) requestorEl.value = item[3] || "";
-    if (areaEl) areaEl.value = item[4] || "";
-    if (deskripsiEl) deskripsiEl.value = item[5] || "";
-    if (statusEl) statusEl.value = item[6] || "Open";
-    if (keteranganEl) keteranganEl.value = item[7] || "";
-
-    // toggle button
-    const submitBtn = document.getElementById("submitBtn");
-    const updateBtn = document.getElementById("updateBtn");
-
-    if (submitBtn) submitBtn.classList.add("hidden");
-    if (updateBtn) updateBtn.classList.remove("hidden");
+    document.getElementById("submitBtn").classList.add("hidden");
+    document.getElementById("updateBtn").classList.remove("hidden");
 }
 	function updateData() {
     if (!editId) {
-        alert("Tidak ada data yang dipilih untuk update");
+        alert("ID tidak ditemukan, ulangi klik Edit");
         return;
     }
 
-    const jam = document.getElementById("jam")?.value || "00";
-    const menit = document.getElementById("menit")?.value || "00";
-
     const payload = {
-        tanggal: document.getElementById("tanggal")?.value || "",
-        jam: `${jam}:${menit}`,
-        requestor: document.getElementById("requestor")?.value || "",
-        area: document.getElementById("area")?.value || "",
-        deskripsi: document.getElementById("deskripsi")?.value || "",
-        status: document.getElementById("status")?.value || "Open",
-        keterangan: document.getElementById("keterangan")?.value || ""
+        tanggal: document.getElementById("tanggal").value,
+        jam: document.getElementById("jam").value + ":" + document.getElementById("menit").value,
+        requestor: document.getElementById("requestor").value,
+        area: document.getElementById("area").value,
+        deskripsi: document.getElementById("deskripsi").value,
+        status: document.getElementById("status").value,
+        keterangan: document.getElementById("keterangan").value
     };
 
-    console.log("UPDATE PAYLOAD:", payload);
+    console.log("UPDATE PAYLOAD:", { id: editId, ...payload });
 
     kirimData("update", { id: editId, ...payload });
 }
