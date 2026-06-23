@@ -587,7 +587,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
     autoUppercase();
 });
+document.getElementById("jobForm").addEventListener("submit", function(e){
 
+    e.preventDefault();
+
+    const payload = {
+        tanggal: document.getElementById("tanggal").value,
+        jam:
+            document.getElementById("jam").value +
+            ":" +
+            document.getElementById("menit").value,
+        requestor: document.getElementById("requestor").value,
+        area: document.getElementById("area").value,
+        deskripsi: document.getElementById("deskripsi").value,
+        status: document.getElementById("status").value,
+        keterangan: document.getElementById("keterangan").value
+    };
+
+    console.log("KIRIM DATA", payload);
+
+    kirimData("add", payload);
+
+});
+	document.getElementById("submitBtn")
+.addEventListener("click", () => {
+    console.log("TOMBOL DIKLIK");
+});
 // =========================
 // LOAD DATA (FIXED anti double request)
 // =========================
@@ -597,7 +622,11 @@ async function loadData() {
 
     try {
         const res = await fetch(SCRIPT_URL);
-        const result = await res.json();
+    const text = await res.text();
+
+    console.log("RESPONSE:", text);
+
+    const result = JSON.parse(text);
 
         if (!result.success) throw new Error(result.message);
 
