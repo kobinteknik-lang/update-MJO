@@ -553,630 +553,1718 @@ let currentPage = 1;
 const pageSize = 10;
 
 // =========================
-// AUTH
+// AUTH MODULE
 // =========================
-function checkAuth() {
-    const isLoggedIn = localStorage.getItem("isLoggedIn");
+const Auth = (() => {
+    "use strict";
 
-    const loginSection = document.getElementById("loginSection");
-    const appSection = document.getElementById("appSection");
+    const KEY_LOGIN = "isLoggedIn";
+    const KEY_ROLE = "userRole";
+    const KEY_NAME = "username";
 
-    if (!loginSection || !appSection) return;
+    const elements = {
+        login: null,
+        app: null
+    };
 
-    if (isLoggedIn === "true") {
-        loginSection.classList.add("hidden");
-        appSection.classList.remove("hidden");
+    function init() {
+        elements.login = document.getElementById("loginSection");
+        elements.app = document.getElementById("appSection");
 
-        showLoginInfo(); // 🔥 TAMBAH INI
-    } else {
-        loginSection.classList.remove("hidden");
-        appSection.classList.add("hidden");
+        if (!elements.login || !elements.app) {
+            console.error("Elemen loginSection atau appSection tidak ditemukan.");
+            return;
+        }
+
+        check();
+
+        // Sinkron login/logout antar tab browser
+        window.addEventListener("storage", (e) => {
+            if ([KEY_LOGIN, KEY_ROLE, KEY_NAME].includes(e.key)) {
+                check();
+            }
+        });
     }
-}
 
+    function isLoggedIn() {
+        return localStorage.getItem(KEY_LOGIN) === "true";
+    }
+
+    function login(user) {
+        localStorage.setItem(KEY_LOGIN, "true");
+        localStorage.setItem(KEY_ROLE, user.role);
+        localStorage.setItem(KEY_NAME, user.name);
+
+        check();
+    }
+
+    function logout() {
+        localStorage.removeItem(KEY_LOGIN);
+        localStorage.removeItem(KEY_ROLE);
+        localStorage.removeItem(KEY_NAME);
+
+        check();
+
+        // Bersihkan form login
+        document.getElementById("username")?.value = "";
+        document.getElementById("password")?.value = "";
+        document.getElementById("username")?.focus();
+
+        console.log("Logout berhasil.");
+    }
+
+    function check() {
+        if (!elements.login || !elements.app) return false;
+
+        const logged = isLoggedIn();
+
+        elements.login.classList.toggle("hidden", logged);
+        elements.app.classList.toggle("hidden", !logged);
+
+        if (logged && typeof showLoginInfo === "function") {
+            showLoginInfo();
+        }
+
+        return logged;
+    }
+
+    return {
+        init,
+        login,
+        logout,
+        check,
+        isLoggedIn
+    };
+
+})();
+
+
+// =========================
+// USER DATABASE
+// =========================
+const USERS = {
+    admin: {
+        password: "190626",
+        role: "admin",
+        name: "ADMIN"
+    },
+    karupn: {
+        password: "krpn",
+        role: "requestor",
+        name: "KARUPN"
+    }
+};
+
+
+// =========================
+// LOGIN
+// =========================
 function handleLogin() {
-    const userEl = document.getElementById("username");
-    const passEl = document.getElementById("password");
 
-    const user = userEl.value.trim();
-    const pass = passEl.value.trim();
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
 
-    if (user === "admin" && pass === "190626") {
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userRole", "admin");
-        localStorage.setItem("username", "ADMIN");
+    if (!usernameInput || !passwordInput) return;
 
-        showLoginInfo(); // 🔥 TAMBAH
-        location.reload();
+    const username = usernameInput.value.trim().toLowerCase();
+    const password = passwordInput.value.trim();
 
-    } else if (user === "karupn" && pass === "krpn") {
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userRole", "requestor");
-        localStorage.setItem("username", "KARUPN");
-
-        showLoginInfo(); // 🔥 TAMBAH
-        location.reload();
-
-    } else {
-        alert("Login gagal");
+    if (!username || !password) {
+        alert("Username dan Password harus diisi.");
+        usernameInput.focus();
+        return;
     }
+
+    const account = USERS[username];
+
+    if (!account || account.password !== password) {
+        alert("Username atau Password salah.");
+
+        passwordInput.value = "";
+        passwordInput.focus();
+        return;
+    }
+
+    Auth.login(account);
+
+    console.log("Login berhasil:", account.name);
 }
-function logout() {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("userRole");
-    location.reload();
-}
+
+
 // =========================
-// INIT
+// LOGOUT
+// =========================
+function logout() {
+    Auth.logout();
+}
+
+
+// =========================
+// INIT APPLICATION
 // =========================
 document.addEventListener("DOMContentLoaded", () => {
+
+    // =====================
+    // AUTH INIT
+    // =====================
+    Auth.init();
+
+
+    // =====================
+    // LOGIN HANDLER
+    // =====================
+    document.getElementById("password")?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            handleLogin();
+        }
+    });
+
+    document.getElementById("btnLogin")
+        ?.addEventListener("click", handleLogin);
+
+
+    // =====================
+    // LOGOUT HANDLER
+    // =====================
+    document.getElementById("btnLogout")
+        ?.addEventListener("click", logout);
+
+
+    // =====================
+    // FORM INITIALIZATION
+    // =====================
     populateTimeSelects();
     setTanggalHariIni();
-    checkAuth();
-	  applyRoleUI();
-	   applyFormRoleUI();
-
-    if (localStorage.getItem("isLoggedIn") === "true") {
-        loadData();
-		showLoginInfo();
-    }
-
-    setInterval(loadData, 15000);
-    setInterval(updateClock, 1000);
 
     autoUppercase();
 
-    // tombol submit (opsional debug)
-    const submitBtn = document.getElementById("submitBtn");
-    if (submitBtn) {
-        submitBtn.addEventListener("click", () => {
-            console.log("TOMBOL DIKLIK");
-        });
+
+    // =====================
+    // ROLE UI
+    // =====================
+    applyRoleUI();
+    applyFormRoleUI();
+
+
+    // =====================
+    // LOAD DATA USER LOGIN
+    // =====================
+    if (Auth.isLoggedIn()) {
+        loadData();
+        showLoginInfo();
     }
 
-    // FORM SUBMIT (INI YANG UTAMA)
+
+    // =====================
+    // REALTIME UPDATE
+    // =====================
+    setInterval(() => {
+        if (Auth.isLoggedIn()) {
+            loadData();
+        }
+    }, 15000);
+
+
+    setInterval(updateClock, 1000);
+
+
+
+    // =====================
+    // DEBUG BUTTON
+    // =====================
+    const submitBtn = document.getElementById("submitBtn");
+
+    submitBtn?.addEventListener("click", () => {
+        console.log("TOMBOL SUBMIT DIKLIK");
+    });
+
+
+
+    // =====================
+    // FORM SUBMIT
+    // =====================
     const jobForm = document.getElementById("jobForm");
 
-    if (jobForm) {
-        jobForm.addEventListener("submit", function (e) {
-            e.preventDefault();
 
-            const jam = document.getElementById("jam")?.value || "00";
-            const menit = document.getElementById("menit")?.value || "00";
+    jobForm?.addEventListener("submit", (e) => {
 
-            const role = localStorage.getItem("userRole");
+        e.preventDefault();
 
-const payload = {
-    tanggal: document.getElementById("tanggal").value,
-    jam: `${jam}:${menit}`,
-    requestor: document.getElementById("requestor").value,
-    area: document.getElementById("area").value,
-    deskripsi: document.getElementById("deskripsi").value,
 
-    // 🔒 LOCK STATUS UNTUK REQUESTOR
-    status: role === "requestor"
-        ? "Open"
-        : document.getElementById("status").value,
+        const jam = document.getElementById("jam")?.value || "00";
+        const menit = document.getElementById("menit")?.value || "00";
 
-    keterangan: document.getElementById("keterangan").value
-};
 
-            console.log("KIRIM DATA", payload);
+        const role = localStorage.getItem("userRole");
 
-            kirimData("add", payload);
-        });
-    }
+
+        const payload = {
+
+            tanggal:
+                document.getElementById("tanggal")?.value || "",
+
+
+            jam:
+                `${jam}:${menit}`,
+
+
+            requestor:
+                document.getElementById("requestor")?.value || "",
+
+
+            area:
+                document.getElementById("area")?.value || "",
+
+
+            deskripsi:
+                document.getElementById("deskripsi")?.value || "",
+
+
+            // 🔒 REQUESTOR TIDAK BOLEH UBAH STATUS
+            status:
+                role === "requestor"
+                    ? "Open"
+                    : document.getElementById("status")?.value || "Open",
+
+
+            keterangan:
+                document.getElementById("keterangan")?.value || ""
+        };
+
+
+        console.log("DATA DIKIRIM:", payload);
+
+
+        kirimData("add", payload);
+
+    });
+
 });
 // =========================
-// LOAD DATA (FIXED anti double request)
+// LOAD DATA
 // =========================
-async function loadData() {
-    if (isLoading) return;
+
+let isLoading = false;
+let loadController = null;
+
+async function loadData(forceRefresh = false) {
+
+    // Cegah request bertumpuk
+    if (isLoading && !forceRefresh) return;
+
+
+    // Batalkan request sebelumnya jika ada refresh paksa
+    if (loadController) {
+        loadController.abort();
+    }
+
+
+    loadController = new AbortController();
+
+
     isLoading = true;
 
+
     try {
-        const res = await fetch(SCRIPT_URL);
+
+        const res = await fetch(SCRIPT_URL, {
+            signal: loadController.signal,
+            cache: "no-store"
+        });
+
 
         if (!res.ok) {
-            throw new Error("HTTP Error: " + res.status);
+            throw new Error(`HTTP Error: ${res.status}`);
         }
+
 
         const result = await res.json();
 
+
         console.log("RESPONSE:", result);
+
 
         if (!result.success) {
             throw new Error(result.message || "Load data gagal");
         }
 
-        // data utama
-       allData = result.data.slice(1).sort((a, b) => {
-    return (b[1] + " " + b[2]).localeCompare(a[1] + " " + a[2]);
-});
 
-        // 🔥 reset filter setiap reload
+        // =====================
+        // PROSES DATA
+        // =====================
+
+        const rawData = Array.isArray(result.data)
+            ? result.data
+            : [];
+
+
+        allData = rawData
+            .slice(1)
+            .filter(row => row.length > 0)
+            .sort((a, b) => {
+
+                const dateA = `${a[1] || ""} ${a[2] || ""}`;
+                const dateB = `${b[1] || ""} ${b[2] || ""}`;
+
+                return dateB.localeCompare(dateA);
+
+            });
+
+
+
+        // =====================
+        // RESET VIEW
+        // =====================
+
         window.filteredData = null;
-
-        // 🔥 reset pagination
         currentPage = 1;
 
+
         renderTable();
-		updateDashboard();
+        updateDashboard();
+
+
 
     } catch (err) {
-        console.error("loadData error:", err);
+
+        // Abaikan error ketika request dibatalkan
+        if (err.name !== "AbortError") {
+            console.error("loadData error:", err);
+
+            // Optional
+            showNotification?.(
+                "Gagal mengambil data"
+            );
+        }
+
 
     } finally {
+
         isLoading = false;
+        loadController = null;
+
     }
 }
 
 // =========================
-// SEND DATA (FIXED safe submit)
+// SEND DATA
 // =========================
+
+let isSubmitting = false;
+let submitController = null;
+
+
 async function kirimData(action, obj = {}) {
-    if (isSubmitting) return;
+
+    // Cegah double submit
+    if (isSubmitting) {
+        console.warn("Submit sedang berjalan...");
+        return;
+    }
+
+
     isSubmitting = true;
 
+
+    // Disable tombol submit
+    const submitBtn = document.getElementById("submitBtn");
+
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = "Mengirim...";
+    }
+
+
+    submitController = new AbortController();
+
+
     try {
+
+        const payload = {
+            action,
+            ...obj
+        };
+
+
+        console.log("SEND DATA:", payload);
+
+
         const res = await fetch(SCRIPT_URL, {
             method: "POST",
+
             headers: {
                 "Content-Type": "text/plain;charset=utf-8"
             },
-            body: JSON.stringify({ action, ...obj })
+
+            body: JSON.stringify(payload),
+
+            signal: submitController.signal
         });
 
+
+
         if (!res.ok) {
-            throw new Error("HTTP Error: " + res.status);
+            throw new Error(
+                `HTTP Error: ${res.status}`
+            );
         }
+
+
 
         const result = await res.json();
 
-        console.log("SERVER RESPONSE:", result);
+
+        console.log(
+            "SERVER RESPONSE:",
+            result
+        );
+
+
 
         if (!result.success) {
-            throw new Error(result.message || "Request gagal");
+            throw new Error(
+                result.message || "Request gagal"
+            );
         }
 
-        showToast(result.message, "success");
 
-        // reset hanya kalau sukses
+
+        // =====================
+        // SUCCESS
+        // =====================
+
+        showToast(
+            result.message || "Data berhasil disimpan",
+            "success"
+        );
+
+
+        // Reset form hanya jika berhasil
         resetForm();
 
-        // refresh data
-        await loadData();
+
+        // Refresh data terbaru
+        await loadData(true);
+
+
 
     } catch (err) {
-        console.error("kirimData error:", err);
 
-        showToast(err.message || "Terjadi kesalahan", "danger");
+
+        if (err.name === "AbortError") {
+
+            console.warn(
+                "Request dibatalkan"
+            );
+
+            return;
+        }
+
+
+        console.error(
+            "kirimData error:",
+            err
+        );
+
+
+        showToast(
+            err.message || "Terjadi kesalahan",
+            "danger"
+        );
+
+
 
     } finally {
+
+
         isSubmitting = false;
+
+
+        submitController = null;
+
+
+        // Aktifkan tombol kembali
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = "Simpan";
+        }
+
     }
 }
+
 // =========================
-// RENDER TABLE (FIXED STATUS + SAFE EDIT)
+// RENDER TABLE FILTERED
 // =========================
+
 function renderTableFiltered() {
+
     const role = localStorage.getItem("userRole");
     const tbody = document.getElementById("historyTable");
 
-    const dataSource = window.filteredData || allData;
+    if (!tbody) return;
+
+
+    const dataSource = Array.isArray(window.filteredData)
+        ? window.filteredData
+        : allData;
+
+
+    if (!dataSource || dataSource.length === 0) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="12" class="text-center">
+                    Data tidak tersedia
+                </td>
+            </tr>
+        `;
+
+        renderPaginationInfo();
+        return;
+    }
+
+
 
     const start = (currentPage - 1) * pageSize;
-    const pageData = dataSource.slice(start, start + pageSize);
+
+    const pageData = dataSource.slice(
+        start,
+        start + pageSize
+    );
+
+
 
     let html = "";
 
+
+
     pageData.forEach((item, index) => {
 
-        const statusRaw = String(item[6] || "").toLowerCase();
 
-        let statusClass = "";
-        if (statusRaw === "open") statusClass = "text-danger";
-        else if (statusRaw === "progress") statusClass = "text-warning";
-        else if (statusRaw === "done") statusClass = "text-success";
+        const statusRaw =
+            String(item[6] || "")
+            .toLowerCase()
+            .trim();
 
-        const safeItem = btoa(
-            unescape(encodeURIComponent(JSON.stringify(item)))
+
+
+        const statusClass = {
+
+            open: "text-danger",
+
+            progress: "text-warning",
+
+            done: "text-success"
+
+        }[statusRaw] || "";
+
+
+
+        /*
+            Encode data untuk edit
+            menggunakan UTF-8 base64
+        */
+
+        const safeItem = encodeURIComponent(
+            btoa(
+                unescape(
+                    encodeURIComponent(
+                        JSON.stringify(item)
+                    )
+                )
+            )
         );
+
+
 
         let keteranganCol = "";
         let aksiCol = "";
         let lastEditCol = "";
 
-        // 🔒 hanya admin / non-requestor
+
+
+        // =====================
+        // ADMIN VIEW
+        // =====================
         if (role !== "requestor") {
-            keteranganCol = `<td>${item[7] || "-"}</td>`;
 
-            aksiCol = `
+
+            keteranganCol = `
                 <td>
-                    <button class="btn btn-warning btn-sm"
-                        onclick="prepareEdit('${safeItem}')">
-                        Edit
-                    </button>
-
-                    <button class="btn btn-danger btn-sm"
-                        onclick="hapusData('${item[0] || ""}')">
-                        Hapus
-                    </button>
+                    ${escapeHTML(item[7] || "-")}
                 </td>
             `;
 
-            lastEditCol = `<td>${formatLastEdit(item[8])}</td>`;
+
+
+            aksiCol = `
+                <td>
+
+                    <button 
+                        class="btn btn-warning btn-sm"
+                        onclick="prepareEdit(decodeURIComponent('${safeItem}'))">
+                        Edit
+                    </button>
+
+
+                    <button 
+                        class="btn btn-danger btn-sm"
+                        onclick="hapusData('${escapeHTML(item[0] || "")}')">
+                        Hapus
+                    </button>
+
+                </td>
+            `;
+
+
+
+            lastEditCol = `
+                <td>
+                    ${formatLastEdit(item[8])}
+                </td>
+            `;
+
         }
 
-        html += `
-        <tr>
-            <td><span class="ticket-badge">${item[0] || ""}</span></td>
-            <td>${start + index + 1}</td>
-            <td>${formatTanggal(item[1])}</td>
-            <td>${formatJam(item[2])}</td>
-            <td>${item[5] || ""}</td>
-            <td>${item[3] || ""}</td>
-            <td>${item[4] || ""}</td>
 
-            <td><b class="${statusClass}">
-                ${(statusRaw || "-").toUpperCase()}
-            </b></td>
+
+        html += `
+
+        <tr>
+
+            <td>
+                <span class="ticket-badge">
+                    ${escapeHTML(item[0] || "")}
+                </span>
+            </td>
+
+
+            <td>
+                ${start + index + 1}
+            </td>
+
+
+            <td>
+                ${formatTanggal(item[1])}
+            </td>
+
+
+            <td>
+                ${formatJam(item[2])}
+            </td>
+
+
+            <td>
+                ${escapeHTML(item[5] || "")}
+            </td>
+
+
+            <td>
+                ${escapeHTML(item[3] || "")}
+            </td>
+
+
+            <td>
+                ${escapeHTML(item[4] || "")}
+            </td>
+
+
+            <td>
+                <b class="${statusClass}">
+                    ${(statusRaw || "-").toUpperCase()}
+                </b>
+            </td>
+
 
             ${keteranganCol}
+
             ${aksiCol}
+
             ${lastEditCol}
-        </tr>`;
+
+
+        </tr>
+
+        `;
+
     });
+
+
 
     tbody.innerHTML = html;
 
+
     renderPaginationInfo();
+
+}
+	function escapeHTML(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
 }
 // =========================
 // EDIT (FIXED SAFE VERSION)
 // =========================
+// =========================
+// PREPARE EDIT
+// =========================
+
 function prepareEdit(encoded) {
-    const item = JSON.parse(
-        decodeURIComponent(escape(atob(encoded)))
-    );
 
-    editId = item[0];
+    try {
 
-    document.getElementById("tanggal").value = item[1];
+        const item = JSON.parse(
+            decodeURIComponent(
+                atob(encoded)
+            )
+        );
 
-    const j = (item[2] || "00:00").split(":");
-    document.getElementById("jam").value = j[0];
-    document.getElementById("menit").value = j[1];
 
-    document.getElementById("requestor").value = item[3];
-    document.getElementById("area").value = item[4];
-    document.getElementById("deskripsi").value = item[5];
-    document.getElementById("status").value = item[6];
-    document.getElementById("keterangan").value = item[7] || "";
+        if (!item || !item[0]) {
+            throw new Error("Data edit tidak valid");
+        }
 
-    document.getElementById("submitBtn").classList.add("hidden");
-    document.getElementById("updateBtn").classList.remove("hidden");
+
+        editId = item[0];
+
+
+        setValue("tanggal", item[1] || "");
+
+
+        const time = (item[2] || "00:00").split(":");
+
+        setValue("jam", time[0] || "00");
+        setValue("menit", time[1] || "00");
+
+
+        setValue("requestor", item[3] || "");
+        setValue("area", item[4] || "");
+        setValue("deskripsi", item[5] || "");
+        setValue("status", item[6] || "Open");
+        setValue("keterangan", item[7] || "");
+
+
+
+        // Toggle tombol
+        document.getElementById("submitBtn")
+            ?.classList.add("hidden");
+
+
+        document.getElementById("updateBtn")
+            ?.classList.remove("hidden");
+
+
+
+        // Scroll ke form
+        document.getElementById("jobForm")
+            ?.scrollIntoView({
+                behavior: "smooth"
+            });
+
+
+
+    } catch (err) {
+
+        console.error(
+            "prepareEdit error:",
+            err
+        );
+
+        alert(
+            "Data edit tidak dapat dibuka"
+        );
+
+    }
+
 }
-	function updateData() {
+
+
+
+// =========================
+// UPDATE DATA
+// =========================
+
+function updateData() {
+
+
     if (!editId) {
-        alert("ID tidak ditemukan, ulangi klik Edit");
+
+        alert(
+            "ID tidak ditemukan, silakan pilih Edit ulang."
+        );
+
         return;
     }
 
+
+
+    const role =
+        localStorage.getItem("userRole");
+
+
+
     const payload = {
-        tanggal: document.getElementById("tanggal").value,
-        jam: document.getElementById("jam").value + ":" + document.getElementById("menit").value,
-        requestor: document.getElementById("requestor").value,
-        area: document.getElementById("area").value,
-        deskripsi: document.getElementById("deskripsi").value,
-        status: document.getElementById("status").value,
-        keterangan: document.getElementById("keterangan").value
+
+        tanggal:
+            getValue("tanggal"),
+
+
+        jam:
+            `${getValue("jam")}:${getValue("menit")}`,
+
+
+        requestor:
+            getValue("requestor"),
+
+
+        area:
+            getValue("area"),
+
+
+        deskripsi:
+            getValue("deskripsi"),
+
+
+        // 🔒 Requestor tidak boleh mengubah status
+        status:
+            role === "requestor"
+                ? "Open"
+                : getValue("status"),
+
+
+        keterangan:
+            getValue("keterangan")
+
     };
 
-    console.log("UPDATE PAYLOAD:", { id: editId, ...payload });
 
-    kirimData("update", { id: editId, ...payload });
+
+    console.log(
+        "UPDATE PAYLOAD:",
+        {
+            id: editId,
+            ...payload
+        }
+    );
+
+
+
+    kirimData(
+        "update",
+        {
+            id: editId,
+            ...payload
+        }
+    );
+
+
+    resetEditMode();
+
+}
+
+
+
+// =========================
+// HELPER FORM
+// =========================
+
+function setValue(id, value) {
+
+    const el = document.getElementById(id);
+
+    if (el) {
+        el.value = value;
+    }
+
+}
+
+
+function getValue(id) {
+
+    return document.getElementById(id)?.value || "";
+
+}
+
+
+
+// =========================
+// RESET MODE EDIT
+// =========================
+
+function resetEditMode() {
+
+    editId = null;
+
+
+    document.getElementById("submitBtn")
+        ?.classList.remove("hidden");
+
+
+    document.getElementById("updateBtn")
+        ?.classList.add("hidden");
+
 }
 // =========================
 // DELETE
 // =========================
+
 let isDeleting = false;
 
-function hapusData(id) {
+
+async function hapusData(id) {
+
     if (!id) {
         alert("ID tidak valid");
         return;
     }
 
-    if (isDeleting) return;
 
-    const confirmDelete = confirm("Yakin hapus data ini?");
-    if (!confirmDelete) return;
+    if (isDeleting) {
+        return;
+    }
+
+
+    const confirmDelete = confirm(
+        "Yakin ingin menghapus data ini?"
+    );
+
+
+    if (!confirmDelete) {
+        return;
+    }
+
+
 
     isDeleting = true;
 
+
+
     try {
-        kirimData("delete", { id });
+
+        await kirimData(
+            "delete",
+            {
+                id
+            }
+        );
+
+
+    } catch (err) {
+
+        console.error(
+            "hapusData error:",
+            err
+        );
+
+
     } finally {
-        // dikembalikan setelah request selesai (lebih aman di kirimData juga)
-        setTimeout(() => {
-            isDeleting = false;
-        }, 1000);
+
+        isDeleting = false;
+
     }
+
 }
+
+
+
 // =========================
-// RESET
+// RESET FORM
 // =========================
+
 function resetForm() {
+
+
     editId = null;
 
-    const form = document.getElementById("jobForm");
-    if (form) form.reset();
 
-    const submitBtn = document.getElementById("submitBtn");
-    const updateBtn = document.getElementById("updateBtn");
 
-    if (submitBtn) submitBtn.classList.remove("hidden");
-    if (updateBtn) updateBtn.classList.add("hidden");
+    const form =
+        document.getElementById("jobForm");
+
+
+    if (form) {
+        form.reset();
+    }
+
+
+
+    // Tombol mode
+    document.getElementById("submitBtn")
+        ?.classList.remove("hidden");
+
+
+    document.getElementById("updateBtn")
+        ?.classList.add("hidden");
+
+
+
+    // Default value
+    setDefaultFormValue();
+
+
+
 }
+
+
+
 // =========================
-// UTIL
+// DEFAULT FORM VALUE
+// =========================
+
+function setDefaultFormValue() {
+
+
+    const tanggal =
+        document.getElementById("tanggal");
+
+
+    const status =
+        document.getElementById("status");
+
+
+    if (tanggal) {
+
+        const today =
+            new Date()
+            .toISOString()
+            .split("T")[0];
+
+
+        tanggal.value = today;
+
+    }
+
+
+
+    if (status) {
+
+        status.value = "Open";
+
+    }
+
+
+
+    document.getElementById("keterangan")
+        ?.value = "";
+
+}
+
+
+	
+// =========================
+// UTIL FUNCTIONS
+// =========================
+
+
+// =========================
+// AUTO UPPERCASE
 // =========================
 function autoUppercase() {
-    ["requestor", "deskripsi", "keterangan"].forEach(id => {
+
+    [
+        "requestor",
+        "deskripsi",
+        "keterangan"
+    ].forEach(id => {
+
         const el = document.getElementById(id);
+
         if (!el) return;
 
+
         el.addEventListener("input", function () {
-            this.value = this.value.toUpperCase();
+
+            this.value =
+                this.value.toUpperCase();
+
         });
+
     });
+
 }
 
-function showToast(msg, type) {
-    const toast = document.createElement("div");
-    toast.className = `alert alert-${type}`;
-    toast.style.position = "fixed";
-    toast.style.top = "10px";
-    toast.style.right = "10px";
-    toast.style.zIndex = 9999;
+
+
+// =========================
+// TOAST
+// =========================
+function showToast(msg, type = "info") {
+
+    const oldToast =
+        document.querySelector(".app-toast");
+
+
+    if (oldToast) {
+        oldToast.remove();
+    }
+
+
+
+    const toast =
+        document.createElement("div");
+
+
+    toast.className =
+        `alert alert-${type} app-toast`;
+
+
+    Object.assign(toast.style, {
+
+        position: "fixed",
+        top: "15px",
+        right: "15px",
+        zIndex: "9999",
+        minWidth: "250px"
+
+    });
+
+
+
     toast.innerText = msg;
+
 
     document.body.appendChild(toast);
 
-    setTimeout(() => toast.remove(), 2500);
+
+
+    setTimeout(() => {
+
+        toast.remove();
+
+    }, 3000);
+
 }
 
+
+
+// =========================
+// CLOCK
+// =========================
 function updateClock() {
-    const el = document.getElementById("clockIndo");
+
+    const el =
+        document.getElementById("clockIndo");
+
+
     if (!el) return;
 
-    el.innerText = new Date().toLocaleString("id-ID");
+
+    el.textContent =
+        new Date().toLocaleString(
+            "id-ID"
+        );
+
 }
 
+
+
+// =========================
+// DEFAULT DATE
+// =========================
 function setTanggalHariIni() {
-    const el = document.getElementById("tanggal");
+
+    const el =
+        document.getElementById("tanggal");
+
+
     if (!el) return;
 
-    el.value = new Date().toISOString().split("T")[0];
+
+    el.value =
+        new Date()
+        .toISOString()
+        .split("T")[0];
+
 }
 
+
+
+// =========================
+// TIME SELECT
+// =========================
 function populateTimeSelects() {
-    const jam = document.getElementById("jam");
-    const menit = document.getElementById("menit");
+
+
+    const jam =
+        document.getElementById("jam");
+
+
+    const menit =
+        document.getElementById("menit");
+
+
 
     if (!jam || !menit) return;
 
-    let jamOptions = "";
-    let menitOptions = "";
 
-    for (let i = 0; i < 24; i++) {
-        const value = String(i).padStart(2, "0");
-        jamOptions += `<option value="${value}">${value}</option>`;
-    }
 
-    for (let i = 0; i < 60; i++) {
-        const value = String(i).padStart(2, "0");
-        menitOptions += `<option value="${value}">${value}</option>`;
-    }
+    jam.innerHTML =
+        Array.from(
+            { length: 24 },
+            (_, i) => {
 
-    jam.innerHTML = jamOptions;
-    menit.innerHTML = menitOptions;
+                const v =
+                    String(i)
+                    .padStart(2, "0");
+
+
+                return `
+                <option value="${v}">
+                    ${v}
+                </option>`;
+
+            }
+        ).join("");
+
+
+
+    menit.innerHTML =
+        Array.from(
+            { length: 60 },
+            (_, i) => {
+
+                const v =
+                    String(i)
+                    .padStart(2, "0");
+
+
+                return `
+                <option value="${v}">
+                    ${v}
+                </option>`;
+
+            }
+        ).join("");
+
 }
+
+
+
+// =========================
+// FORMAT DATE
+// =========================
 function formatTanggal(val) {
-    if (!val) return "";
 
-    const d = new Date(val);
-    if (isNaN(d)) return val;
+    if (!val) return "-";
 
-    return d.toLocaleDateString("id-ID");
+
+    const d =
+        new Date(val);
+
+
+    if (isNaN(d)) {
+        return val;
+    }
+
+
+    return d.toLocaleDateString(
+        "id-ID"
+    );
+
 }
 
+
+
+// =========================
+// FORMAT TIME
+// =========================
 function formatJam(val) {
-    if (!val) return "";
 
-    const d = new Date(val);
+    if (!val) return "-";
 
-    if (!isNaN(d)) {
-        return d.toLocaleTimeString("id-ID", {
+
+    if (
+        /^\d{2}:\d{2}$/.test(val)
+    ) {
+        return val;
+    }
+
+
+
+    const d =
+        new Date(val);
+
+
+    if (isNaN(d)) {
+        return val;
+    }
+
+
+
+    return d.toLocaleTimeString(
+        "id-ID",
+        {
             hour: "2-digit",
             minute: "2-digit"
-        });
-    }
+        }
+    );
 
-    return val;
 }
 
+
+
+// =========================
+// CURRENT TIME
+// =========================
 function setJamSekarang() {
-    const jam = document.getElementById("jam");
-    const menit = document.getElementById("menit");
+
+
+    const now =
+        new Date();
+
+
+    const jam =
+        document.getElementById("jam");
+
+
+    const menit =
+        document.getElementById("menit");
+
 
     if (!jam || !menit) return;
 
-    const now = new Date();
 
-    jam.value = now.getHours().toString().padStart(2, "0");
-    menit.value = now.getMinutes().toString().padStart(2, "0");
+    jam.value =
+        String(now.getHours())
+        .padStart(2, "0");
+
+
+    menit.value =
+        String(now.getMinutes())
+        .padStart(2, "0");
+
 }
-	function formatLastEdit(dateString) {
+
+
+
+// =========================
+// LAST EDIT
+// =========================
+function formatLastEdit(dateString) {
+
     if (!dateString) return "-";
 
-    const date = new Date(dateString);
 
-    return date.toLocaleString("id-ID", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
-    });
+    const date =
+        new Date(dateString);
+
+
+    if (isNaN(date)) {
+        return "-";
+    }
+
+
+    return date.toLocaleString(
+        "id-ID",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
+
 }
+
+
+
+// =========================
+// DASHBOARD
+// =========================
 function updateDashboard() {
-    const data = allData || [];
 
-    let open = 0;
-    let progress = 0;
-    let done = 0;
 
-    data.forEach(item => {
-        const status = String(item[6] || "").toLowerCase();
+    const counter = {
 
-        if (status === "open") open++;
-        else if (status === "progress") progress++;
-        else if (status === "done") done++;
+        open: 0,
+        progress: 0,
+        done: 0
+
+    };
+
+
+
+    (allData || [])
+    .forEach(item => {
+
+
+        const status =
+            String(item[6] || "")
+            .toLowerCase();
+
+
+
+        if (counter[status] !== undefined) {
+            counter[status]++;
+        }
+
+
     });
 
-    const openEl = document.getElementById("openCount");
-    const progressEl = document.getElementById("progressCount");
-    const doneEl = document.getElementById("doneCount");
 
-    if (openEl) openEl.innerText = open;
-    if (progressEl) progressEl.innerText = progress;
-    if (doneEl) doneEl.innerText = done;
+
+    document.getElementById("openCount")
+        ?.textContent = counter.open;
+
+
+    document.getElementById("progressCount")
+        ?.textContent = counter.progress;
+
+
+    document.getElementById("doneCount")
+        ?.textContent = counter.done;
+
 }
+
+
+
+// =========================
+// ROLE FORM UI
+// =========================
 function applyFormRoleUI() {
-    const role = localStorage.getItem("userRole");
 
-    const keteranganGroup = document.getElementById("keteranganGroup");
-    const statusSelect = document.getElementById("status");
 
-    if (role === "requestor") {
+    const role =
+        localStorage.getItem("userRole");
 
-        // HIDE KETERANGAN
-        if (keteranganGroup) {
-            keteranganGroup.style.display = "none";
-        }
 
-        // LOCK STATUS jadi OPEN
-        if (statusSelect) {
-            statusSelect.value = "Open";
-            statusSelect.disabled = true;
-        }
 
-    } else {
-
-        // admin normal
-        if (keteranganGroup) {
-            keteranganGroup.style.display = "block";
-        }
-
-        if (statusSelect) {
-            statusSelect.disabled = false;
-        }
-    }
-}
-function applyRoleUI() {
-    const role = localStorage.getItem("userRole");
-
-    const headerKeterangan = document.getElementById("headerKeterangan");
-    const headerLastEdit = document.getElementById("headerLastEdit");
-    const doneCard = document.getElementById("doneCard");
-
-    if (role === "requestor") {
-
-        // HEADER
-        if (headerKeterangan) headerKeterangan.style.display = "none";
-        if (headerLastEdit) headerLastEdit.style.display = "none";
-
-        // DASHBOARD CARD (opsional)
-        if (doneCard) doneCard.style.display = "none";
-
-        // OPTIONAL: sembunyikan kolom ACTION header kalau nanti kamu tambah id
-        // document.getElementById("headerAksi").style.display = "none";
-    }
-}
-function renderPaginationInfo() {
-    const totalPages = Math.ceil(allData.length / pageSize);
-
-    document.getElementById("paginationInfo").innerText =
-        `Page ${currentPage} / ${totalPages}`;
-
-    document.getElementById("prevBtn").disabled = currentPage === 1;
-    document.getElementById("nextBtn").disabled = currentPage === totalPages;
-}
-
-function nextPage() {
-    const totalPages = Math.ceil(allData.length / pageSize);
-
-    if (currentPage < totalPages) {
-        currentPage++;
-        renderTable();
-    }
-}
-
-function prevPage() {
-    if (currentPage > 1) {
-        currentPage--;
-        renderTable();
-    }
-}
-window.filterHistory = function () {
-    const input = document.getElementById("searchHistory");
-    if (!input) return;
-
-    const keyword = input.value.toLowerCase();
-
-    const filtered = allData.filter(item => {
-        return (
-            String(item[0]).toLowerCase().includes(keyword) ||
-            String(item[3]).toLowerCase().includes(keyword) ||
-            String(item[4]).toLowerCase().includes(keyword) ||
-            String(item[5]).toLowerCase().includes(keyword)
+    const group =
+        document.getElementById(
+            "keteranganGroup"
         );
-    });
+
+
+    const status =
+        document.getElementById(
+            "status"
+        );
+
+
+
+    const requestor =
+        role === "requestor";
+
+
+
+    if (group) {
+        group.style.display =
+            requestor
+            ? "none"
+            : "block";
+    }
+
+
+
+    if (status) {
+
+        status.disabled =
+            requestor;
+
+
+        if (requestor) {
+            status.value = "Open";
+        }
+
+    }
+
+}
+
+
+
+// =========================
+// ROLE TABLE UI
+// =========================
+function applyRoleUI() {
+
+
+    const role =
+        localStorage.getItem("userRole");
+
+
+    const hide =
+        role === "requestor";
+
+
+
+    document.getElementById(
+        "headerKeterangan"
+    )?.style.display =
+        hide ? "none" : "";
+
+
+
+    document.getElementById(
+        "headerLastEdit"
+    )?.style.display =
+        hide ? "none" : "";
+
+
+
+    document.getElementById(
+        "doneCard"
+    )?.style.display =
+        hide ? "none" : "";
+
+}
+
+
+
+// =========================
+// PAGINATION
+// =========================
+function renderPaginationInfo() {
+
+
+    const totalPages =
+        Math.max(
+            1,
+            Math.ceil(
+                allData.length / pageSize
+            )
+        );
+
+
+    const info =
+        document.getElementById(
+            "paginationInfo"
+        );
+
+
+    if (info) {
+        info.textContent =
+            `Page ${currentPage} / ${totalPages}`;
+    }
+
+
+
+    document.getElementById("prevBtn")
+        ?.toggleAttribute(
+            "disabled",
+            currentPage === 1
+        );
+
+
+    document.getElementById("nextBtn")
+        ?.toggleAttribute(
+            "disabled",
+            currentPage === totalPages
+        );
+
+}
+
+
+
+// =========================
+// SEARCH
+// =========================
+window.filterHistory = function () {
+
+
+    const keyword =
+        document.getElementById(
+            "searchHistory"
+        )?.value
+        .toLowerCase()
+        .trim();
+
+
+
+    window.filteredData =
+        !keyword
+        ? null
+        : allData.filter(item => {
+
+
+            return [
+                item[0],
+                item[3],
+                item[4],
+                item[5]
+            ]
+            .some(v =>
+                String(v || "")
+                .toLowerCase()
+                .includes(keyword)
+            );
+
+
+        });
+
+
 
     currentPage = 1;
-    window.filteredData = filtered;
+
     renderTableFiltered();
+
 };
 
+
+
+// =========================
+// TABLE
+// =========================
 function renderTable() {
     renderTableFiltered();
 }
-function showLoginInfo() {
-    const role = localStorage.getItem("userRole");
-    const isLogin = localStorage.getItem("isLoggedIn");
-    const username = localStorage.getItem("username"); // 🔥 TAMBAH
 
-    const info = document.getElementById("loginInfo");
+
+
+// =========================
+// LOGIN INFO
+// =========================
+function showLoginInfo() {
+
+
+    const info =
+        document.getElementById(
+            "loginInfo"
+        );
+
 
     if (!info) return;
 
-    if (isLogin === "true") {
 
-        info.innerText = `LOGIN: ${username || role}`;
 
-        if (role === "admin") {
-            info.className = "badge bg-primary";
-        } else if (role === "requestor") {
-            info.className = "badge bg-success";
-        } else {
-            info.className = "badge bg-secondary";
-        }
+    const role =
+        localStorage.getItem("userRole");
 
-    } else {
-        info.innerText = "";
+
+    const username =
+        localStorage.getItem("username");
+
+
+
+    if (!Auth.isLoggedIn()) {
+
+        info.textContent = "";
+
+        return;
+
     }
+
+
+
+    info.textContent =
+        `LOGIN: ${username || role}`;
+
+
+
+    info.className =
+        role === "admin"
+        ? "badge bg-primary"
+        :
+        role === "requestor"
+        ? "badge bg-success"
+        :
+        "badge bg-secondary";
+
 }
 </script>
 
