@@ -87,17 +87,25 @@ body {
      class="card p-4 mb-4 mx-auto"
      style="max-width:400px">
 
-    <h4 class="text-center mb-3">Login System</h4>
+    <h4 class="text-center mb-3">
+        Login System
+    </h4>
 
-    <input id="username" class="form-control mb-2" placeholder="Username">
-    <input id="password" type="password" class="form-control mb-3" placeholder="Password">
+    <input id="username"
+           class="form-control mb-2"
+           placeholder="Username">
 
-    <button class="btn btn-primary w-100" onclick="handleLogin()">
+    <input id="password"
+           type="password"
+           class="form-control mb-3"
+           placeholder="Password">
+
+    <button id="btnLogin"
+            class="btn btn-primary w-100">
         Login
     </button>
 
 </div>
-
 
 <!-- ================= APP (INI YANG FIX) ================= -->
 <div id="appSection" class="hidden">
@@ -699,147 +707,32 @@ function logout() {
 }
 
 
-// =========================
-// INIT APPLICATION
-// =========================
-document.addEventListener("DOMContentLoaded", () => {
+function login(user) {
 
-    // =====================
-    // AUTH INIT
-    // =====================
-    Auth.init();
+    localStorage.setItem(KEY_LOGIN, "true");
+    localStorage.setItem(KEY_ROLE, user.role);
+    localStorage.setItem(KEY_NAME, user.name);
 
 
-    // =====================
-    // LOGIN HANDLER
-    // =====================
-    document.getElementById("password")?.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-            handleLogin();
-        }
-    });
-
-    document.getElementById("btnLogin")
-        ?.addEventListener("click", handleLogin);
+    check();
 
 
-    // =====================
-    // LOGOUT HANDLER
-    // =====================
-    document.getElementById("btnLogout")
-        ?.addEventListener("click", logout);
-
-
-    // =====================
-    // FORM INITIALIZATION
-    // =====================
-    populateTimeSelects();
-    setTanggalHariIni();
-
-    autoUppercase();
-
-
-    // =====================
-    // ROLE UI
-    // =====================
-    applyRoleUI();
-    applyFormRoleUI();
-
-
-    // =====================
-    // LOAD DATA USER LOGIN
-    // =====================
-    if (Auth.isLoggedIn()) {
-        loadData();
-        showLoginInfo();
+    // Update tampilan role setelah login
+    if (typeof applyRoleUI === "function") {
+        applyRoleUI();
     }
 
 
-    // =====================
-    // REALTIME UPDATE
-    // =====================
-    setInterval(() => {
-        if (Auth.isLoggedIn()) {
-            loadData();
-        }
-    }, 15000);
+    if (typeof applyFormRoleUI === "function") {
+        applyFormRoleUI();
+    }
 
 
-    setInterval(updateClock, 1000);
+    if (typeof showLoginInfo === "function") {
+        showLoginInfo();
+    }
 
-
-
-    // =====================
-    // DEBUG BUTTON
-    // =====================
-    const submitBtn = document.getElementById("submitBtn");
-
-    submitBtn?.addEventListener("click", () => {
-        console.log("TOMBOL SUBMIT DIKLIK");
-    });
-
-
-
-    // =====================
-    // FORM SUBMIT
-    // =====================
-    const jobForm = document.getElementById("jobForm");
-
-
-    jobForm?.addEventListener("submit", (e) => {
-
-        e.preventDefault();
-
-
-        const jam = document.getElementById("jam")?.value || "00";
-        const menit = document.getElementById("menit")?.value || "00";
-
-
-        const role = localStorage.getItem("userRole");
-
-
-        const payload = {
-
-            tanggal:
-                document.getElementById("tanggal")?.value || "",
-
-
-            jam:
-                `${jam}:${menit}`,
-
-
-            requestor:
-                document.getElementById("requestor")?.value || "",
-
-
-            area:
-                document.getElementById("area")?.value || "",
-
-
-            deskripsi:
-                document.getElementById("deskripsi")?.value || "",
-
-
-            // 🔒 REQUESTOR TIDAK BOLEH UBAH STATUS
-            status:
-                role === "requestor"
-                    ? "Open"
-                    : document.getElementById("status")?.value || "Open",
-
-
-            keterangan:
-                document.getElementById("keterangan")?.value || ""
-        };
-
-
-        console.log("DATA DIKIRIM:", payload);
-
-
-        kirimData("add", payload);
-
-    });
-
-});
+}
 // =========================
 // LOAD DATA
 // =========================
