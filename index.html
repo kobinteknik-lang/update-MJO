@@ -166,7 +166,7 @@ body {
 
         <div class="card-body">
 
-            <form id="jobForm">
+            <form id="jobForm" onsubmit="submitForm(event)">
 
                 <div class="row">
 
@@ -559,109 +559,229 @@ let isLoading = false;
 let allData = [];
 let currentPage = 1;
 const pageSize = 10;
-
 // =========================
-// AUTH MODULE
+// AUTH MODULE (FINAL FIX)
 // =========================
 const Auth = (() => {
     "use strict";
 
     const KEY_LOGIN = "isLoggedIn";
-    const KEY_ROLE = "userRole";
-    const KEY_NAME = "username";
+    const KEY_ROLE  = "userRole";
+    const KEY_NAME  = "username";
 
-    const elements = {
-        login: null,
-        app: null
-    };
+    let loginSection = null;
+    let appSection = null;
+
 
     function init() {
-        elements.login = document.getElementById("loginSection");
-        elements.app = document.getElementById("appSection");
 
-        if (!elements.login || !elements.app) {
-            console.error("Elemen loginSection atau appSection tidak ditemukan.");
+        loginSection = document.getElementById("loginSection");
+        appSection   = document.getElementById("appSection");
+
+        if (!loginSection || !appSection) {
+            console.error("loginSection atau appSection tidak ditemukan.");
             return;
         }
 
         check();
 
-        // Sinkron login/logout antar tab browser
+
         window.addEventListener("storage", (e) => {
+
             if ([KEY_LOGIN, KEY_ROLE, KEY_NAME].includes(e.key)) {
                 check();
             }
+
         });
+
     }
+
+
 
     function isLoggedIn() {
+
         return localStorage.getItem(KEY_LOGIN) === "true";
+
     }
 
+
+
     function login(user) {
+
+
+        if (!user || !user.role || !user.name) {
+
+            console.error("Data user tidak valid.");
+            return false;
+
+        }
+
+
         localStorage.setItem(KEY_LOGIN, "true");
         localStorage.setItem(KEY_ROLE, user.role);
         localStorage.setItem(KEY_NAME, user.name);
 
+
         check();
+
+
+        return true;
+
     }
+
+
+
 
     function logout() {
-        localStorage.removeItem(KEY_LOGIN);
-        localStorage.removeItem(KEY_ROLE);
-        localStorage.removeItem(KEY_NAME);
+
+
+        [
+            KEY_LOGIN,
+            KEY_ROLE,
+            KEY_NAME
+
+        ].forEach(key => {
+
+            localStorage.removeItem(key);
+
+        });
+
+
 
         check();
 
-        // Bersihkan form login
-        document.getElementById("username")?.value = "";
-        document.getElementById("password")?.value = "";
-        document.getElementById("username")?.focus();
+
+
+        const username =
+            document.getElementById("username");
+
+
+        const password =
+            document.getElementById("password");
+
+
+
+        if(username){
+
+            username.value = "";
+            username.focus();
+
+        }
+
+
+        if(password){
+
+            password.value = "";
+
+        }
+
+
 
         console.log("Logout berhasil.");
+
     }
 
+
+
+
+
     function check() {
-        if (!elements.login || !elements.app) return false;
+
+
+        if(!loginSection || !appSection){
+
+            return false;
+
+        }
+
+
 
         const logged = isLoggedIn();
 
-        elements.login.classList.toggle("hidden", logged);
-        elements.app.classList.toggle("hidden", !logged);
 
-        if (logged && typeof showLoginInfo === "function") {
-            showLoginInfo();
+
+        loginSection.classList.toggle(
+            "hidden",
+            logged
+        );
+
+
+        appSection.classList.toggle(
+            "hidden",
+            !logged
+        );
+
+
+
+        if(logged){
+
+
+            if(typeof showLoginInfo === "function"){
+                showLoginInfo();
+            }
+
+
+            if(typeof applyRoleUI === "function"){
+                applyRoleUI();
+            }
+
+
+            if(typeof applyFormRoleUI === "function"){
+                applyFormRoleUI();
+            }
+
+
         }
 
+
+
         return logged;
+
     }
 
+
+
     return {
+
         init,
         login,
         logout,
         check,
         isLoggedIn
+
     };
 
+
 })();
+
+
 
 
 // =========================
 // USER DATABASE
 // =========================
-const USERS = {
-    admin: {
+const USERS = Object.freeze({
+
+    admin: Object.freeze({
+
         password: "190626",
         role: "admin",
         name: "ADMIN"
-    },
-    karupn: {
+
+    }),
+
+
+    karupn: Object.freeze({
+
         password: "krpn",
         role: "requestor",
         name: "KARUPN"
-    }
-};
+
+    })
+
+});
+
+
 
 
 // =========================
@@ -669,174 +789,357 @@ const USERS = {
 // =========================
 function handleLogin() {
 
-    const usernameInput = document.getElementById("username");
-    const passwordInput = document.getElementById("password");
 
-    if (!usernameInput || !passwordInput) return;
+    const usernameInput =
+        document.getElementById("username");
 
-    const username = usernameInput.value.trim().toLowerCase();
-    const password = passwordInput.value.trim();
 
-    if (!username || !password) {
-        alert("Username dan Password harus diisi.");
-        usernameInput.focus();
+    const passwordInput =
+        document.getElementById("password");
+
+
+
+    if(!usernameInput || !passwordInput){
+
+        console.error(
+            "Input login tidak ditemukan."
+        );
+
         return;
+
     }
 
-    const account = USERS[username];
 
-    if (!account || account.password !== password) {
-        alert("Username atau Password salah.");
+
+    const username =
+        usernameInput.value
+        .trim()
+        .toLowerCase();
+
+
+
+    const password =
+        passwordInput.value.trim();
+
+
+
+
+    if(!username || !password){
+
+        alert(
+            "Username dan Password harus diisi."
+        );
+
+        usernameInput.focus();
+
+        return;
+
+    }
+
+
+
+
+    const account =
+        USERS[username];
+
+
+
+    if(!account){
+
+        alert(
+            "Username tidak ditemukan."
+        );
+
+        usernameInput.focus();
+
+        return;
+
+    }
+
+
+
+
+    if(account.password !== password){
+
+
+        alert(
+            "Password salah."
+        );
+
 
         passwordInput.value = "";
         passwordInput.focus();
+
+
         return;
+
     }
 
+
+
+
+    // SIMPAN LOGIN
     Auth.login(account);
 
-    console.log("Login berhasil:", account.name);
+
+
+    // UPDATE UI
+    applyRoleUI?.();
+    applyFormRoleUI?.();
+    showLoginInfo?.();
+
+
+
+    // LOAD DATA
+    loadData?.(true);
+
+
+
+    // RESET INPUT LOGIN
+    usernameInput.value = "";
+    passwordInput.value = "";
+
+
+
+    showToast?.(
+        `Selamat datang ${account.name}`,
+        "success"
+    );
+
+
+    console.log(
+        "Login berhasil:",
+        account.name
+    );
+
 }
+
+
 
 
 // =========================
 // LOGOUT
 // =========================
-function logout() {
+function logout(){
+
     Auth.logout();
-}
-
-
-function login(user) {
-
-    localStorage.setItem(KEY_LOGIN, "true");
-    localStorage.setItem(KEY_ROLE, user.role);
-    localStorage.setItem(KEY_NAME, user.name);
-
-
-    check();
-
-
-    // Update tampilan role setelah login
-    if (typeof applyRoleUI === "function") {
-        applyRoleUI();
-    }
-
-
-    if (typeof applyFormRoleUI === "function") {
-        applyFormRoleUI();
-    }
-
-
-    if (typeof showLoginInfo === "function") {
-        showLoginInfo();
-    }
 
 }
+
+
 // =========================
-// LOAD DATA
+// LOAD DATA (FIXED)
 // =========================
 
 let isLoading = false;
 let loadController = null;
 
+
 async function loadData(forceRefresh = false) {
 
-    // Cegah request bertumpuk
-    if (isLoading && !forceRefresh) return;
 
-
-    // Batalkan request sebelumnya jika ada refresh paksa
-    if (loadController) {
-        loadController.abort();
+    // Pastikan user sudah login
+    if (typeof Auth !== "undefined" && !Auth.isLoggedIn()) {
+        console.warn("User belum login.");
+        return;
     }
 
 
+
+    // Cegah request ganda
+    if (isLoading && !forceRefresh) {
+        console.warn("Load masih berjalan...");
+        return;
+    }
+
+
+
+    // Batalkan request sebelumnya
+    if (loadController) {
+
+        try {
+            loadController.abort();
+        } catch(e){}
+
+    }
+
+
+
     loadController = new AbortController();
+
+    const signal = loadController.signal;
 
 
     isLoading = true;
 
 
+
     try {
 
-        const res = await fetch(SCRIPT_URL, {
-            signal: loadController.signal,
-            cache: "no-store"
-        });
+
+        const res = await fetch(
+            SCRIPT_URL,
+            {
+                method: "GET",
+                cache: "no-store",
+                signal
+            }
+        );
 
 
-        if (!res.ok) {
-            throw new Error(`HTTP Error: ${res.status}`);
+
+        if(!res.ok){
+
+            throw new Error(
+                `HTTP Error ${res.status}`
+            );
+
         }
+
+
 
 
         const result = await res.json();
 
 
-        console.log("RESPONSE:", result);
+
+        console.log(
+            "LOAD RESPONSE:",
+            result
+        );
 
 
-        if (!result.success) {
-            throw new Error(result.message || "Load data gagal");
+
+
+        if(!result || result.success !== true){
+
+            throw new Error(
+                result?.message ||
+                "Data gagal dimuat"
+            );
+
         }
 
 
-        // =====================
-        // PROSES DATA
-        // =====================
 
-        const rawData = Array.isArray(result.data)
+
+        const rawData =
+            Array.isArray(result.data)
             ? result.data
             : [];
 
 
-        allData = rawData
+
+
+        // Hapus header Google Sheet
+        allData =
+            rawData
             .slice(1)
-            .filter(row => row.length > 0)
-            .sort((a, b) => {
+            .filter(row =>
+                Array.isArray(row) &&
+                row.length > 0 &&
+                row[0]
+            )
+            .sort((a,b)=>{
 
-                const dateA = `${a[1] || ""} ${a[2] || ""}`;
-                const dateB = `${b[1] || ""} ${b[2] || ""}`;
 
-                return dateB.localeCompare(dateA);
+                const dateA =
+                    new Date(
+                        `${a[1] || ""} ${a[2] || ""}`
+                    );
+
+
+                const dateB =
+                    new Date(
+                        `${b[1] || ""} ${b[2] || ""}`
+                    );
+
+
+
+                return (
+                    (isNaN(dateB) ? 0 : dateB)
+                    -
+                    (isNaN(dateA) ? 0 : dateA)
+                );
+
 
             });
 
 
 
-        // =====================
-        // RESET VIEW
-        // =====================
+
+
+        // Reset filter dan halaman
 
         window.filteredData = null;
+
         currentPage = 1;
 
 
+
         renderTable();
+
         updateDashboard();
 
 
 
-    } catch (err) {
+        console.log(
+            `Berhasil memuat ${allData.length} data`
+        );
 
-        // Abaikan error ketika request dibatalkan
-        if (err.name !== "AbortError") {
-            console.error("loadData error:", err);
 
-            // Optional
-            showNotification?.(
-                "Gagal mengambil data"
+
+    }
+    catch(err){
+
+
+
+        if(err.name === "AbortError"){
+
+            console.log(
+                "Request dibatalkan"
             );
+
+            return;
+
         }
 
 
-    } finally {
 
-        isLoading = false;
-        loadController = null;
+        console.error(
+            "loadData error:",
+            err
+        );
+
+
+
+        if(typeof showToast === "function"){
+
+            showToast(
+                "Gagal mengambil data",
+                "danger"
+            );
+
+        }
+
 
     }
+    finally{
+
+
+        // Pastikan hanya reset controller aktif
+
+        if(loadController?.signal === signal){
+
+            loadController = null;
+            isLoading = false;
+
+        }
+
+
+    }
+
+
 }
 
 // =========================
@@ -919,7 +1222,19 @@ async function kirimData(action, obj = {}) {
                 result.message || "Request gagal"
             );
         }
+function submitForm(e){
+    e.preventDefault();
 
+    kirimData("add",{
+        tanggal:getValue("tanggal"),
+        jam:`${getValue("jam")}:${getValue("menit")}`,
+        requestor:getValue("requestor"),
+        area:getValue("area"),
+        deskripsi:getValue("deskripsi"),
+        status:getValue("status"),
+        keterangan:getValue("keterangan")
+    });
+}
 
 
         // =====================
@@ -2159,6 +2474,29 @@ function showLoginInfo() {
         "badge bg-secondary";
 
 }
+document.addEventListener("DOMContentLoaded",()=>{
+
+    Auth.init();
+
+
+    document.getElementById("btnLogin")
+    ?.addEventListener(
+        "click",
+        handleLogin
+    );
+
+
+    document.getElementById("password")
+    ?.addEventListener(
+        "keydown",
+        e=>{
+            if(e.key==="Enter"){
+                handleLogin();
+            }
+        }
+    );
+
+});
 </script>
 
 </body>
