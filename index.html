@@ -296,11 +296,31 @@ button:hover {
 
 
         <input
-            type="password"
-            id="password"
-            class="form-control"
-            placeholder="Password"
-            autocomplete="current-password">
+            <form id="loginForm">
+
+<input 
+id="username"
+class="form-control mb-2"
+placeholder="Username">
+
+
+<input
+id="password"
+type="password"
+class="form-control mb-3"
+placeholder="Password">
+
+
+<button
+type="submit"
+id="btnLogin"
+class="btn btn-primary w-100">
+
+Login
+
+</button>
+
+</form>
 
     </div>
 
@@ -3386,17 +3406,16 @@ function renderPagination(){
 
 
 
+const info =
+document.getElementById("paginationInfo");
 
-    document
 
-    .getElementById(
-        "paginationInfo"
-    )
+if(info){
 
-    ?.textContent =
-
+    info.textContent =
     `Page ${AppState.currentPage} / ${totalPage}`;
 
+}
 
 
 
@@ -3544,35 +3563,26 @@ function updateDashboard(){
 
 
 
-    document
+   const openCount =
+document.getElementById("openCount");
 
-    .getElementById("openCount")
+const progressCount =
+document.getElementById("progressCount");
 
-    ?.textContent =
-    counter.open;
-
-
-
-
-
-    document
-
-    .getElementById("progressCount")
-
-    ?.textContent =
-    counter.progress;
+const doneCount =
+document.getElementById("doneCount");
 
 
+if(openCount)
+    openCount.textContent = counter.open;
 
 
+if(progressCount)
+    progressCount.textContent = counter.progress;
 
-    document
 
-    .getElementById("doneCount")
-
-    ?.textContent =
-    counter.done;
-
+if(doneCount)
+    doneCount.textContent = counter.done;
 
 
 
@@ -4893,49 +4903,43 @@ function applyRoleUI(){
 
 
 
-    document
+    const headerKet =
+document.getElementById("headerKeterangan");
 
-    .getElementById(
-        "headerKeterangan"
-    )
 
-    ?.style
+if(headerKet){
 
-    .display =
+    headerKet.style.display =
     admin ? "" : "none";
 
+}
 
 
 
 
 
 
-    document
 
-    .getElementById(
-        "headerLastEdit"
-    )
+  const headerLastEdit =
+document.getElementById("headerLastEdit");
 
-    ?.style
 
-    .display =
+if(headerLastEdit){
+
+    headerLastEdit.style.display =
     admin ? "" : "none";
 
+}
 
 
 
+const doneCard =
+document.getElementById("doneCard");
 
 
+if(doneCard){
 
-    document
-
-    .getElementById(
-        "doneCard"
-    )
-
-    ?.style
-
-    .display =
+    doneCard.style.display =
     admin ? "" : "none";
 
 
