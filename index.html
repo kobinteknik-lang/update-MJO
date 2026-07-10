@@ -143,7 +143,7 @@
                     type="text" 
                     id="username" 
                     class="form-control" 
-                    placeholder="Masukkan Username" 
+                    placeholder="Username" 
                     autocomplete="username" 
                     required>
             </div>
@@ -154,7 +154,7 @@
                     type="password" 
                     id="password" 
                     class="form-control" 
-                    placeholder="Masukkan Password" 
+                    placeholder="Password" 
                     autocomplete="current-password" 
                     required>
             </div>
@@ -165,14 +165,14 @@
         </form>
     </div>
 
-<div id="appSection" class="hidden">
+
+    <div id="appSection" class="hidden">
 
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
             <div>
                 <h4 class="mb-0">Work Request Dashboard</h4>
                 <small class="text-muted">Work Request Management System</small>
             </div>
-
             <div class="d-flex align-items-center gap-2">
                 <span id="loginInfo" class="badge bg-success"></span>
                 <button id="btnLogout" class="btn btn-outline-danger btn-sm">Logout</button>
@@ -193,12 +193,12 @@
 
             <div class="col-md-4">
                 <div class="card p-3 bg-warning text-dark">
-                    <div>IN PROGRESS</div>
+                    <div>PROGRESS</div>
                     <h4 id="progressCount" class="mb-0">0</h4>
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-4" id="doneCard">
                 <div class="card p-3 bg-success text-white">
                     <div>DONE</div>
                     <h4 id="doneCount" class="mb-0">0</h4>
@@ -206,268 +206,126 @@
             </div>
         </div>
 
-<div class="col-md-4">
-            <div class="card p-3 bg-warning text-dark">
-                <div>PROGRESS</div>
-                <h4 id="progressCount" class="mb-0">0</h4>
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                FORM INPUT WORK REQUEST
             </div>
-        </div>
+            <div class="card-body">
+                <form id="jobForm">
+                    <div class="row g-3">
+                        
+                        <div class="col-md-6">
+                            <label for="tanggal" class="form-label">Tanggal <span class="text-danger">*</span></label>
+                            <input type="date" id="tanggal" class="form-control" required>
+                        </div>
 
-        <div class="col-md-4" id="doneCard">
-            <div class="card p-3 bg-success text-white">
-                <div>DONE</div>
-                <h4 id="doneCount" class="mb-0">0</h4>
-            </div>
-        </div>
-    </div>
+                        <div class="col-md-6">
+                            <label for="jam" class="form-label">Waktu <span class="text-danger">*</span></label>
+                            <div class="d-flex gap-2">
+                                <select id="jam" class="form-select" required></select>
+                                <select id="menit" class="form-select" required></select>
+                                <button type="button" id="btnNow" class="btn btn-info text-nowrap text-white">Sekarang</button>
+                            </div>
+                        </div>
 
-    <div class="card mb-4">
-        <div class="card-header bg-success text-white">
-            FORM INPUT WORK REQUEST
-        </div>
+                        <div class="col-md-6">
+                            <label for="requestor" class="form-label">Requestor <span class="text-danger">*</span></label>
+                            <input type="text" id="requestor" class="form-control" placeholder="Nama Requestor" required>
+                        </div>
 
-        <div class="card-body">
-            <form id="jobForm">
-                <div class="row g-3">
-                    
-                    <div class="col-md-6">
-                        <label for="tanggal" class="form-label">
-                            Tanggal <span class="text-danger">*</span>
-                        </label>
-                        <input type="date" id="tanggal" class="form-control" required>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="jam" class="form-label">
-                            Waktu <span class="text-danger">*</span>
-                        </label>
-                        <div class="d-flex gap-2">
-                            <select id="jam" class="form-select" required>
+                        <div class="col-md-6">
+                            <label for="area" class="form-label">Area Kerja <span class="text-danger">*</span></label>
+                            <select id="area" class="form-select" required>
+                                <option value="">-- Pilih Area --</option>
+                                <option value="LINE 1A">LINE 1A</option>
+                                <option value="LINE 1B">LINE 1B</option>
+                                <option value="LINE 1C">LINE 1C</option>
+                                <option value="LINE 2A">LINE 2A</option>
+                                <option value="LINE 2B">LINE 2B</option>
+                                <option value="LINE 2C">LINE 2C</option>
+                                <option value="WORKSHOP">WORKSHOP</option>
+                                <option value="UTILITY">UTILITY</option>
+                                <option value="PRODUKSI">PRODUKSI</option>
+                                <option value="OFFICE">OFFICE</option>
                                 </select>
-                            <select id="menit" class="form-select" required>
-                                </select>
-                            <button type="button" id="btnNow" class="btn btn-info text-nowrap text-white">
-                                Sekarang
-                            </button>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="deskripsi" class="form-label">Deskripsi Pekerjaan <span class="text-danger">*</span></label>
+                            <textarea id="deskripsi" class="form-control" rows="4" placeholder="Masukkan deskripsi pekerjaan" required></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="status" class="form-label">Status</label>
+                            <select id="status" class="form-select">
+                                <option value="Open">Open</option>
+                                <option value="Progress">Progress</option>
+                                <option value="Done">Done</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6" id="keteranganGroup">
+                            <label for="keterangan" class="form-label">Keterangan</label>
+                            <input type="text" id="keterangan" class="form-control" placeholder="Tambahkan keterangan">
                         </div>
                     </div>
 
-<div class="col-md-6">
-                        <label for="requestor" class="form-label">
-                            Requestor <span class="text-danger">*</span>
-                        </label>
-                        <input 
-                            type="text" 
-                            id="requestor" 
-                            class="form-control" 
-                            placeholder="Nama Requestor" 
-                            required>
+                    <div class="mt-4 d-flex gap-2 flex-wrap">
+                        <button type="submit" id="submitBtn" class="btn btn-success">Simpan Data</button>
+                        <button type="button" id="updateBtn" class="btn btn-warning hidden">Update Data</button>
+                        <button type="button" id="resetBtn" class="btn btn-secondary">Reset</button>
                     </div>
-
-                    <div class="col-md-6">
-                        <label for="area" class="form-label">
-                            Area Kerja <span class="text-danger">*</span>
-                        </label>
-                        <select id="area" class="form-select" required>
-                            <option value="">-- Pilih Area --</option>
-                            <option value="LINE 1A">LINE 1A</option>
-                            <option value="LINE 1B">LINE 1B</option>
-                            <option value="LINE 1C">LINE 1C</option>
-                            <option value="LINE 2A">LINE 2A</option>
-                            <option value="LINE 2B">LINE 2B</option>
-                            <option value="LINE 2C">LINE 2C</option>
-                            
-                            <option value="PRESS01 PN1">PRESS01 PN1</option>
-                            <option value="PRESS02 PN1">PRESS02 PN1</option>
-                            <option value="PRESS03 PN1">PRESS03 PN1</option>
-                            <option value="PRESS05 PN1">PRESS05 PN1</option>
-                            <option value="PRESS10 PN1C">PRESS10 PN1C</option>
-                            <option value="PRESS12 PN1C">PRESS12 PN1C</option>
-                            <option value="PRESS11">PRESS11</option>
-                            <option value="PRESS01 PN2B">PRESS01 PN2B</option>
-                            <option value="PRESS02 PN2A">PRESS02 PN2A</option>
-                            <option value="PRESS03 PN2C">PRESS03 PN2C</option>
-                            <option value="PRESS02 PN2B">PRESS02 PN2B</option>
-                            
-                            <option value="SQUARING 1C">SQUARING 1C</option>
-                            <option value="POLISHING 1C">POLISHING 1C</option>
-                            
-                            <option value="PACKING 1A">PACKING 1A</option>
-                            <option value="PACKING 1B">PACKING 1B</option>
-                            <option value="PACKING 1C">PACKING 1C</option>
-                            <option value="PACKING 2A">PACKING 2A</option>
-                            <option value="PACKING 2B">PACKING 2B</option>
-                            <option value="PACKING 2C">PACKING 2C</option>
-                            
-                            <option value="KILN 1A">KILN 1A</option>
-                            <option value="KILN 1B">KILN 1B</option>
-                            <option value="KILN 1C">KILN 1C</option>
-                            <option value="KILN 2A">KILN 2A</option>
-                            <option value="KILN 2B">KILN 2B</option>
-                            <option value="KILN 2C">KILN 2C</option>
-                            
-                            <option value="HD 1A">HD 1A</option>
-                            <option value="HD 1B">HD 1B</option>
-                            <option value="HD 1C">HD 1C</option>
-                            <option value="HD 2A">HD 2A</option>
-                            <option value="HD 2B">HD 2B</option>
-                            <option value="HD 2C">HD 2C</option>
-                            
-                            <option value="DRYER 1A">DRYER 1A</option>
-                            <option value="DRYER 1B">DRYER 1B</option>
-                            <option value="DRYER 1C">DRYER 1C</option>
-                            <option value="DRYER 2A">DRYER 2A</option>
-                            <option value="DRYER 2B">DRYER 2B</option>
-                            <option value="DRYER 2C">DRYER 2C</option>
-                            
-                            <option value="PRINT ROTOCOLOR PN1">PRINT ROTOCOLOR PN1</option>
-                            <option value="PRINT ROTOCOLOR PN2">PRINT ROTOCOLOR PN2</option>
-                            <option value="BMSD">BMSD</option>
-                            <option value="ATM 10000A">ATM 10000A</option>
-                            <option value="ATM 10000B">ATM 10000B</option>
-                            <option value="ATM 7000">ATM 7000</option>
-                            
-                            <option value="GLAZE MOLEN PN1">GLAZE MOLEN PN1</option>
-                            <option value="GLAZE MOLEN PN2">GLAZE MOLEN PN2</option>
-                            
-                            <option value="DP 1A">DP 1A</option>
-                            <option value="DP 1B">DP 1B</option>
-                            <option value="DP 1C">DP 1C</option>
-                            <option value="DP 2A">DP 2A</option>
-                            <option value="DP 2B">DP 2B</option>
-                            <option value="DP 2C">DP 2C</option>
-                            
-                            <option value="TANGKI WATERGLAZE">TANGKI WATERGLAZE</option>
-                            
-                            <option value="GLAZING LINE 1A">GLAZING LINE 1A</option>
-                            <option value="GLAZING LINE 1B">GLAZING LINE 1B</option>
-                            <option value="GLAZING LINE 1C">GLAZING LINE 1C</option>
-                            <option value="GLAZING LINE 2A">GLAZING LINE 2A</option>
-                            <option value="GLAZING LINE 2B">GLAZING LINE 2B</option>
-                            <option value="GLAZING LINE 2C">GLAZING LINE 2C</option>
-                            
-                            <option value="GENSET PN1">GENSET PN1</option>
-                            <option value="GENSET PN2">GENSET PN2</option>
-                            
-                            <option value="KOMPRESSOR PN1">KOMPRESSOR PN1</option>
-                            <option value="KOMPRESSOR PN2">KOMPRESSOR PN2</option>
-                            
-                            <option value="WORKSHOP">WORKSHOP</option>
-                            <option value="UTILITY">UTILITY</option>
-                            <option value="PRODUKSI">PRODUKSI</option>
-                            <option value="WHFG">WHFG</option>
-                            <option value="WHRM">WHRM</option>
-                            <option value="WHSP">WHSP</option>
-                            <option value="GA">GA</option>
-                            <option value="RND">RND</option>
-                            <option value="PROYEK">PROYEK</option>
-                            <option value="OFFICE">OFFICE</option>
-                            <option value="ENGINEERING">ENGINEERING</option>
-                        </select>
-                    </div>
-<div class="col-12">
-                        <label for="deskripsi" class="form-label">
-                            Deskripsi Pekerjaan <span class="text-danger">*</span>
-                        </label>
-                        <textarea 
-                            id="deskripsi" 
-                            class="form-control" 
-                            rows="4" 
-                            placeholder="Masukkan deskripsi pekerjaan" 
-                            required></textarea>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="status" class="form-label">Status</label>
-                        <select id="status" class="form-select">
-                            <option value="Open">Open</option>
-                            <option value="Progress">Progress</option>
-                            <option value="Done">Done</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-6" id="keteranganGroup">
-                        <label for="keterangan" class="form-label">Keterangan</label>
-                        <input 
-                            type="text" 
-                            id="keterangan" 
-                            class="form-control" 
-                            placeholder="Tambahkan keterangan">
-                    </div>
-                </div>
-
-                <div class="mt-4 d-flex gap-2 flex-wrap">
-                    <button type="submit" id="submitBtn" class="btn btn-success">
-                        Simpan Data
-                    </button>
-                    <button type="button" id="updateBtn" class="btn btn-warning hidden">
-                        Update Data
-                    </button>
-                    <button type="button" id="resetBtn" class="btn btn-secondary">
-                        Reset
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-<div class="card mb-4">
-        <div class="card-header bg-dark text-white">
-            HISTORY DATA
-        </div>
-
-        <div class="card-body">
-            <div class="alert alert-light border">
-                <strong>Keterangan Status :</strong>
-                <br>
-                <span class="text-danger">🔴 Open</span> = Permintaan baru masuk
-                <br>
-                <span class="text-warning">🟡 Progress</span> = Sedang dikerjakan
-                <br>
-                <span class="text-success">🟢 Done</span> = Pekerjaan selesai
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-md-4">
-                    <input 
-                        type="text" 
-                        id="searchHistory" 
-                        class="form-control" 
-                        placeholder="Cari data...">
-                </div>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover align-middle">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID Tiket</th>
-                            <th>No</th>
-                            <th>Tanggal</th>
-                            <th>Jam</th>
-                            <th>Deskripsi</th>
-                            <th>Requestor</th>
-                            <th>Area</th>
-                            <th>Status</th>
-                            <th id="headerKeterangan">Keterangan</th>
-                            <th>Aksi</th>
-                            <th id="headerLastEdit">Last Edit</th>
-                        </tr>
-                    </thead>
-                    <tbody id="historyTable">
-                        <tr>
-                            <td colspan="11" class="text-center">Memuat data...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <button id="prevBtn" class="btn btn-secondary btn-sm">⬅ Prev</button>
-                <div id="paginationInfo" class="fw-semibold"></div>
-                <button id="nextBtn" class="btn btn-secondary btn-sm">Next ➡</button>
+                </form>
             </div>
         </div>
-    </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">HISTORY DATA</div>
+            <div class="card-body">
+                <div class="alert alert-light border">
+                    <strong>Keterangan Status :</strong><br>
+                    <span class="text-danger">🔴 Open</span> = Permintaan baru masuk<br>
+                    <span class="text-warning">🟡 Progress</span> = Sedang dikerjakan<br>
+                    <span class="text-success">🟢 Done</span> = Pekerjaan selesai
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <input type="text" id="searchHistory" class="form-control" placeholder="Cari data...">
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID Tiket</th>
+                                <th>No</th>
+                                <th>Tanggal</th>
+                                <th>Jam</th>
+                                <th>Deskripsi</th>
+                                <th>Requestor</th>
+                                <th>Area</th>
+                                <th>Status</th>
+                                <th id="headerKeterangan">Keterangan</th>
+                                <th>Aksi</th>
+                                <th id="headerLastEdit">Last Edit</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTable">
+                            <tr>
+                                <td colspan="11" class="text-center">Memuat data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <button id="prevBtn" class="btn btn-secondary btn-sm">⬅ Prev</button>
+                    <div id="paginationInfo" class="fw-semibold"></div>
+                    <button id="nextBtn" class="btn btn-secondary btn-sm">Next ➡</button>
+                </div>
+            </div>
+        </div>
+
+    </div> </div>
 
     </div> </div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
