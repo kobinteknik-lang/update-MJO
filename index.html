@@ -1,1184 +1,5312 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Work Request System</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap -->
+<link 
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet">
+
 
 <style>
-body {
-    background: #f4f6f9;
+
+/* =========================
+   GLOBAL
+========================= */
+
+:root {
+
+    --bg-main:#f4f6f9;
+
+    --danger-soft:#fff5f5;
+
+    --warning-soft:#fffbe6;
+
+    --success-soft:#f1fff5;
+
+    --shadow:
+        0 2px 10px rgba(0,0,0,.1);
+
 }
+
+
+body {
+
+    background:var(--bg-main);
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+}
+
+
+
+/* =========================
+   CARD
+========================= */
 
 .card {
-    border: none;
-    box-shadow: 0 2px 10px rgba(0,0,0,.1);
+
+    border:none;
+
+    box-shadow:var(--shadow);
+
 }
+
+
+
+/* =========================
+   UTIL
+========================= */
 
 .hidden {
-    display: none;
+
+    display:none !important;
+
 }
 
-/* STATUS ROW */
+
+
+/* =========================
+   STATUS ROW
+========================= */
+
 .row-open {
-    border-left: 5px solid #dc3545;
-    background: #fff5f5;
+
+    border-left:
+        5px solid #dc3545;
+
+    background:
+        var(--danger-soft);
+
 }
+
 
 .row-progress {
-    border-left: 5px solid #ffc107;
-    background: #fffbe6;
+
+    border-left:
+        5px solid #ffc107;
+
+    background:
+        var(--warning-soft);
+
 }
+
 
 .row-done {
-    border-left: 5px solid #198754;
-    background: #f1fff5;
+
+    border-left:
+        5px solid #198754;
+
+    background:
+        var(--success-soft);
+
 }
 
-/* FORM */
+
+
+/* =========================
+   FORM
+========================= */
+
 .form-label {
-    font-weight: 600;
+
+    font-weight:600;
+
 }
 
-/* TABLE */
+
+
+/* =========================
+   TABLE
+========================= */
+
 .table th {
-    white-space: nowrap;
+
+    white-space:nowrap;
+
 }
+
 
 .ticket-badge {
-    font-size: 12px;
-    background: #212529;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 6px;
+
+    font-size:12px;
+
+    background:#212529;
+
+    color:white;
+
+    padding:
+        4px 8px;
+
+    border-radius:6px;
+
 }
 
-/* SOFT BACKGROUND */
+
+
+/* =========================
+   SOFT COLOR
+========================= */
+
 .bg-soft-danger {
-    background-color: #fee2e2 !important;
+
+    background:#fee2e2 !important;
+
 }
+
 
 .bg-soft-warning {
-    background-color: #fef9c3 !important;
+
+    background:#fef9c3 !important;
+
 }
+
 
 .bg-soft-success {
-    background-color: #dcfce7 !important;
+
+    background:#dcfce7 !important;
+
 }
 
-/* STATUS BADGE */
+
+
+/* =========================
+   STATUS BADGE
+========================= */
+
 .status-badge {
-    font-size: 14px;
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-weight: 600;
+
+    font-size:14px;
+
+    padding:
+        8px 14px;
+
+    border-radius:8px;
+
+    font-weight:600;
+
 }
+
+
+
+/* =========================
+   BUTTON
+========================= */
+
+button {
+
+    transition:.2s;
+
+}
+
+
+button:hover {
+
+    transform:translateY(-1px);
+
+}
+
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:768px){
+
+    .table {
+
+        font-size:13px;
+
+    }
+
+
+    .container {
+
+        padding:
+            10px;
+
+    }
+
+}
+
+
 </style>
+
 </head>
+
+
+
 <body>
 
+
+<div class="container mt-4">
 <div class="container mt-4">
 
-<!-- ================= LOGIN ================= -->
-<div id="loginSection"
-     class="card p-4 mb-4 mx-auto"
-     style="max-width:400px">
 
-    <h4 class="text-center mb-3">Login System</h4>
+<!-- =========================
+     LOGIN SECTION
+========================= -->
 
-    <input id="username" class="form-control mb-2" placeholder="Username">
-    <input id="password" type="password" class="form-control mb-3" placeholder="Password">
+<div 
+    id="loginSection"
+    class="card p-4 mb-4 mx-auto"
+    style="max-width:400px">
 
-    <button class="btn btn-primary w-100" onclick="handleLogin()">
+
+    <h4 class="text-center mb-3">
+        Login System
+    </h4>
+
+
+
+    <div class="mb-2">
+
+        <label class="form-label">
+            Username
+        </label>
+
+
+        <input
+            type="text"
+            id="username"
+            class="form-control"
+            placeholder="Username"
+            autocomplete="username">
+
+    </div>
+
+
+
+
+    <div class="mb-3">
+
+        <label class="form-label">
+            Password
+        </label>
+
+
+        <input
+            type="password"
+            id="password"
+            class="form-control"
+            placeholder="Password"
+            autocomplete="current-password">
+
+    </div>
+
+
+
+
+    <button
+        id="btnLogin"
+        class="btn btn-primary w-100">
+
         Login
+
     </button>
 
+
 </div>
 
 
-<!-- ================= APP (INI YANG FIX) ================= -->
-<div id="appSection" class="hidden">
 
-    <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
 
-    <h4 class="mb-0">Work Request Dashboard</h4>
 
-    <div class="d-flex align-items-center gap-2">
+<!-- =========================
+     APPLICATION SECTION
+========================= -->
 
-        <span id="loginInfo" class="badge bg-success"></span>
+<div 
+    id="appSection"
+    class="hidden">
 
-        <button class="btn btn-outline-danger btn-sm" onclick="logout()">
+
+
+
+
+<!-- =========================
+     HEADER
+========================= -->
+
+
+<div 
+    class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+
+
+    <div>
+
+        <h4 class="mb-0">
+            Work Request Dashboard
+        </h4>
+
+
+        <small class="text-muted">
+            Work Request Management System
+        </small>
+
+    </div>
+
+
+
+
+
+    <div 
+        class="d-flex align-items-center gap-2">
+
+
+        <span
+            id="loginInfo"
+            class="badge bg-success">
+        </span>
+
+
+
+        <button
+            id="btnLogout"
+            class="btn btn-outline-danger btn-sm">
+
             Logout
+
         </button>
 
+
     </div>
+
 
 </div>
 
-    <div class="text-center mb-3">
-        <h6 id="clockIndo"></h6>
-    </div>
 
 
-    <!-- DASHBOARD -->
-    <div class="row mb-4 text-center">
 
-        <div class="col">
-            <div class="card p-2 bg-danger text-white">
+
+<!-- =========================
+     CLOCK
+========================= -->
+
+
+<div class="text-center mb-3">
+
+
+    <h6 
+        id="clockIndo"
+        class="text-secondary">
+
+    </h6>
+
+
+</div>
+
+
+
+
+
+<!-- =========================
+     DASHBOARD CARD
+========================= -->
+
+
+<div 
+    class="row mb-4 text-center g-3">
+
+
+
+    <!-- OPEN -->
+
+    <div class="col-md-4">
+
+
+        <div 
+            class="card p-3 bg-danger text-white">
+
+
+            <div>
                 OPEN
-                <h4 id="openCount">0</h4>
             </div>
+
+
+            <h4 
+                id="openCount"
+                class="mb-0">
+
+                0
+
+            </h4>
+
+
         </div>
 
-        <div class="col">
-            <div class="card p-2 bg-warning">
+
+    </div>
+
+
+
+
+
+    <!-- PROGRESS -->
+
+    <div class="col-md-4">
+
+
+        <div 
+            class="card p-3 bg-warning">
+
+
+            <div>
                 PROGRESS
-                <h4 id="progressCount">0</h4>
             </div>
+
+
+            <h4 
+                id="progressCount"
+                class="mb-0">
+
+                0
+
+            </h4>
+
+
         </div>
 
-        <div class="col" id="doneCard">
-            <div class="card p-2 bg-success text-white">
+
+    </div>
+
+
+
+
+
+    <!-- DONE -->
+
+    <div 
+        class="col-md-4"
+        id="doneCard">
+
+
+        <div 
+            class="card p-3 bg-success text-white">
+
+
+            <div>
                 DONE
-                <h4 id="doneCount">0</h4>
-            </div>
-        </div>
-
-    </div>
-	    <!-- FORM WORK REQUEST -->
-    <div class="card mb-4">
-
-        <div class="card-header bg-success text-white">
-            FORM INPUT WORK REQUEST
-        </div>
-
-        <div class="card-body">
-
-            <form id="jobForm">
-
-                <div class="row">
-
-                    <!-- TANGGAL -->
-                    <div class="col-md-6 mb-3">
-
-                        <label class="form-label">
-                            Tanggal
-                            <span class="text-danger">*</span>
-                        </label>
-
-                        <input
-                            type="date"
-                            id="tanggal"
-                            class="form-control"
-                            required>
-
-                    </div>
-
-                    <!-- WAKTU -->
-                    <div class="col-md-6 mb-3">
-
-                        <label class="form-label">
-                            Waktu
-                            <span class="text-danger">*</span>
-                        </label>
-
-                        <div class="d-flex gap-2">
-
-                            <select
-                                id="jam"
-                                class="form-select">
-                            </select>
-
-                            <select
-                                id="menit"
-                                class="form-select">
-                            </select>
-
-                            <button
-                                type="button"
-                                class="btn btn-info"
-                                onclick="setJamSekarang()">
-                                Sekarang
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                    <!-- REQUESTOR -->
-                    <div class="col-md-6 mb-3">
-
-                        <label class="form-label">
-                            Requestor
-                            <span class="text-danger">*</span>
-                        </label>
-
-                        <input
-                            type="text"
-                            id="requestor"
-                            class="form-control"
-                            placeholder="Nama Requestor"
-                            required>
-
-                    </div>
-
-                    <!-- AREA -->
-                    <div class="col-md-6 mb-3">
-
-                        <label class="form-label">
-                            Area Kerja
-                            <span class="text-danger">*</span>
-                        </label>
-
-                        <select
-                            id="area"
-                            class="form-select"
-                            required>
-
-                            <option value="">
-                                -- Pilih Area --
-                            </option>
-							<option value="LINE 1A">LINE 1A</option>
-							<option value="LINE 1B">LINE 1B</option>
-							<option value="LINE 1C">LINE 1C</option>
-							<option value="LINE 2A">LINE 2A</option>
-							<option value="LINE 2B">LINE 2B</option>
-							<option value="LINE 2C">LINE 2C</option>
-                            <option value="PRESS01 PN1">PRESS01 PN1</option>
-                            <option value="PRESS02 PN1">PRESS02 PN1</option>
-                            <option value="PRESS03 PN1">PRESS03 PN1</option>
-                            <option value="PRESS05 PN1">PRESS05 PN1</option>
-                            <option value="PRESS10 PN1C">PRESS10 PN1C</option>
-                            <option value="PRESS12 PN1C">PRESS12 PN1C</option>
-							<option value="PRESS11">PRESS11</option>
-							<option value="PRESS01 PN2B">PRESS01 PN2B</option>
-                            <option value="PRESS02 PN2A">PRESS02 PN2A</option>
-                            <option value="PRESS03 PN2C">PRESS03 PN2C</option>
-							<option value="PRESS02 PN2B">PRESS02 PN2B</option>
-							<option value=" SQUARING 1C">SQUARING 1C</option>
-							<option value=" POLESHING 1C">POLESHING 1C</option>
-							<option value=" PACKING 1A">PACKING 1A</option>
-							<option value=" PACKING 1B">PACKING 1B</option>
-							<option value=" PACKING 1C">PACKING 1C</option>
-							<option value=" PACKING 2A">PACKING 2A</option>
-							<option value=" PACKING 2B">PACKING 2B</option>
-							<option value=" PACKING 2C">PACKING 2C</option>
-							<option value=" KILN 1A">KILN 1A</option>
-							<option value=" KILN 1B">KILN 1B</option>
-							<option value=" KILN 1C">KILN 1C</option>
-							<option value=" KILN 2A">KILN 2A</option>
-							<option value=" KILN 2B">KILN 2B</option>
-							<option value=" KILN 2C">KILN 2C</option>
-							<option value=" HD 1A">HD 1A</option>
-							<option value=" HD 1B">HD 1B</option>
-							<option value=" HD 1C">HD 1C</option>
-							<option value=" HD 2A">HD 2A</option>
-							<option value=" HD 2B">HD 2B</option>
-							<option value=" HD 2C">HD 2C</option>
-							<option value=" DRYER 1A">DRYER 1A</option>
-							<option value=" DRYER 1B">DRYER 1B</option>
-							<option value=" DRYER 1C">DRYER 1C</option>
-							<option value=" DRYER 2A">DRYER 2A</option>
-							<option value=" DRYER 2B">DRYER 2B</option>
-							<option value=" DRYER 2C">DRYER 2C</option>
-							<option value=" PRINT ROTOCOLOR PN1">PRINT ROTOCOLOR PN1</option>
-							<option value=" PRINT ROTOCOLOR PN2">PRINT ROTOCOLOR PN2</option>
-							<option value=" BMSD">BMSD</option>
-							<option value=" ATM 10000A">ATM 10000A</option>
-							<option value=" ATM 10000B">ATM 10000B</option>
-							<option value=" ATM 7000">ATM 7000</option>
-							<option value=" GLAZE MOLEN PN1">GLAZE MOLEN PN1</option>
-							<option value=" GALZE MOLEN PN2">GLAZE MOLEN PN2</option>
-							<option value=" DP 1A">DP 1A</option>
-							<option value=" DP 1B">DP 1B</option>
-							<option value=" DP 1C">DP 1C</option>
-							<option value=" DP 2A">DP 2A</option>
-							<option value=" DP 2B">DP 2B</option>
-							<option value=" DP 2C">DP 2C</option>
-							<option value=" TANGKI WATERGLAZE">TANGKI WATERGLAZE</option>
-							<option value=" GLAZING LINE 1A">GLAZING LINE 1A</option>
-							<option value=" GLAZING LINE 1B">GLAZING LINE 1B</option>
-							<option value=" GLAZING LINE 1C">GLAZING LINE 1C</option>
-							<option value=" GLAZING LINE 2A">GLAZING LINE 2A</option>
-							<option value=" GLAZING LINE 2B">GLAZING LINE 2B</option>
-							<option value=" GLAZING LINE 2C">GLAZING LINE 2C</option>
-							<option value=" GENSET PN1">GENSET PN1</option>
-							<option value=" GENSET PN2">GENSET PN2</option>
-							<option value=" KOMPRESSOR PN1">KOMPRESSOR PN1</option>
-							<option value=" KOMPRESSOR PN2">KOMPRESSOR PN2</option>
-							<option value="WORKSHOP">WORKSHOP</option>
-							<option value="UTILITY">UTILITY</option>
-							<option value="PRODUKSI">PRODUKSI</option>
-							<option value="WHFG">WHFG</option>
-							<option value="WHRM">WHRM</option>
-							<option value="WHSP">WHSP</option>
-							<option value="GA">GA</option>
-							<option value="RND">RND</option>
-							<option value="PROYEK">PROYEK</option>
-                            <option value="OFFICE">OFFICE</option>
-							<option value="ENGINEERING">ENGINEERING</option>
-
-                        </select>
-
-                    </div>
-
-                    <!-- DESKRIPSI -->
-                    <div class="col-12 mb-3">
-
-                        <label class="form-label">
-                            Deskripsi Pekerjaan
-                            <span class="text-danger">*</span>
-                        </label>
-
-                        <textarea
-                            id="deskripsi"
-                            rows="4"
-                            class="form-control"
-                            placeholder="Masukkan deskripsi pekerjaan"
-                            required></textarea>
-
-                    </div>
-
-                    <!-- STATUS -->
-                    <div class="col-md-6 mb-3">
-
-                        <label class="form-label">
-                            Status
-                        </label>
-
-                        <select
-                            id="status"
-                            class="form-select">
-
-                            <option value="Open">
-                                Open
-                            </option>
-
-                            <option value="Progress">
-                                Progress
-                            </option>
-
-                            <option value="Done">
-                                Done
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                    <!-- KETERANGAN -->
-                    <div
-                        class="col-md-6 mb-3"
-                        id="keteranganGroup">
-
-                        <label class="form-label">
-                            Keterangan
-                        </label>
-
-                        <input
-                            type="text"
-                            id="keterangan"
-                            class="form-control"
-                            placeholder="Tambahkan keterangan">
-
-                    </div>
-
-                </div>
-
-                <div class="mt-2">
-
-                    <button
-                        type="submit"
-                        id="submitBtn"
-                        class="btn btn-success">
-                        Simpan Data
-                    </button>
-
-                    <button
-                        type="button"
-                        id="updateBtn"
-                        class="btn btn-warning hidden"
-                        onclick="updateData()">
-                        Update Data
-                    </button>
-
-                    <button
-                        type="button"
-                        class="btn btn-secondary"
-                        onclick="resetForm()">
-                        Reset
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-    <!-- HISTORY DATA -->
-    <div class="card">
-
-        <div class="card-header bg-dark text-white">
-            HISTORY DATA
-        </div>
-
-        <div class="card-body">
-
-            <div class="alert alert-light border">
-
-                <strong>Keterangan Status :</strong>
-                <br>
-
-                🔴 Open = Permintaan baru masuk
-                <br>
-
-                🟡 Progress = Sedang dikerjakan
-                <br>
-
-                🟢 Done = Pekerjaan selesai
-
             </div>
 
-            <!-- SEARCH -->
 
-            <div class="row mb-3">
+            <h4 
+                id="doneCount"
+                class="mb-0">
 
-                <div class="col-md-4">
+                0
 
-                    <input
-                        type="text"
-                        id="searchHistory"
-                        class="form-control"
-                        placeholder="Cari data..."
-                        onkeyup="filterHistory()">
+            </h4>
 
-                </div>
 
-            </div>
+        </div>
 
-            <!-- TABLE -->
-
-            <div class="table-responsive">
-
-                <table
-                    class="table table-bordered table-hover align-middle">
-
-                    <thead class="table-dark">
-
-                        <tr>
-
-                            <th>ID Tiket</th>
-
-                            <th>No</th>
-
-                            <th>Tanggal</th>
-
-                            <th>Jam</th>
-
-                            <th>Deskripsi</th>
-
-                            <th>Requestor</th>
-
-                            <th>Area</th>
-
-                            <th>Status</th>
-
-                            <th id="headerKeterangan">
-                                Keterangan
-                            </th>
-							
-                            <th>Aksi</th>
-							
-							<th id="headerLastEdit">Last Edit</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="historyTable">
-
-                        <tr>
-
-                            <td colspan="10"
-                                class="text-center">
-
-                                Memuat data...
-
-                            </td>
-
-                        </tr>
-
-                    </tbody>
-
-                </table>
-				  <div class="d-flex justify-content-between align-items-center mt-3">
-
-        <button id="prevBtn" class="btn btn-secondary btn-sm" onclick="prevPage()">
-            ⬅ Prev
-        </button>
-
-        <div id="paginationInfo" class="fw-semibold"></div>
-
-        <button id="nextBtn" class="btn btn-secondary btn-sm" onclick="nextPage()">
-            Next ➡
-        </button>
 
     </div>
 
-            </div>
 
-        </div>
-
-    </div>
 
 </div>
-<!-- END APP -->
+<!-- =========================
+     FORM WORK REQUEST
+========================= -->
+
+<div class="card mb-4">
+
+
+<div class="card-header bg-success text-white">
+
+    FORM INPUT WORK REQUEST
+
+</div>
+
+
+
+<div class="card-body">
+
+
+<form id="jobForm">
+
+
+
+<div class="row g-3">
+
+
+
+
+
+<!-- =========================
+     TANGGAL
+========================= -->
+
+<div class="col-md-6">
+
+
+<label 
+    class="form-label">
+
+    Tanggal
+    <span class="text-danger">*</span>
+
+</label>
+
+
+
+<input
+
+    type="date"
+
+    id="tanggal"
+
+    class="form-control"
+
+    required>
+
+
+</div>
+
+
+
+
+
+<!-- =========================
+     WAKTU
+========================= -->
+
+<div class="col-md-6">
+
+
+<label class="form-label">
+
+    Waktu
+    <span class="text-danger">*</span>
+
+</label>
+
+
+
+
+<div class="d-flex gap-2">
+
+
+<select
+
+    id="jam"
+
+    class="form-select"
+
+    required>
+
+</select>
+
+
+
+
+
+<select
+
+    id="menit"
+
+    class="form-select"
+
+    required>
+
+</select>
+
+
+
+
+
+<button
+
+    type="button"
+
+    id="btnNow"
+
+    class="btn btn-info text-nowrap">
+
+
+    Sekarang
+
+
+</button>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<!-- =========================
+     REQUESTOR
+========================= -->
+
+
+<div class="col-md-6">
+
+
+<label class="form-label">
+
+    Requestor
+
+    <span class="text-danger">*</span>
+
+</label>
+
+
+
+
+<input
+
+    type="text"
+
+    id="requestor"
+
+    class="form-control"
+
+    placeholder="Nama Requestor"
+
+    required>
+
+
+</div>
+
+
+
+
+
+
+
+<!-- =========================
+     AREA KERJA
+========================= -->
+
+
+<div class="col-md-6">
+
+
+<label class="form-label">
+
+
+    Area Kerja
+
+    <span class="text-danger">*</span>
+
+
+</label>
+
+
+
+
+<select
+
+    id="area"
+
+    class="form-select"
+
+    required>
+
+
+
+<option value="">
+
+    -- Pilih Area --
+
+</option>
+
+
+
+<option value="LINE 1A">
+LINE 1A
+</option>
+
+
+<option value="LINE 1B">
+LINE 1B
+</option>
+
+
+<option value="LINE 1C">
+LINE 1C
+</option>
+
+
+<option value="LINE 2A">
+LINE 2A
+</option>
+
+
+<option value="LINE 2B">
+LINE 2B
+</option>
+
+
+<option value="LINE 2C">
+LINE 2C
+</option>
+
+
+
+
+<option value="PRESS01 PN1">
+PRESS01 PN1
+</option>
+
+
+<option value="PRESS02 PN1">
+PRESS02 PN1
+</option>
+
+
+<option value="PRESS03 PN1">
+PRESS03 PN1
+</option>
+
+
+<option value="PRESS05 PN1">
+PRESS05 PN1
+</option>
+
+
+
+<option value="PRESS10 PN1C">
+PRESS10 PN1C
+</option>
+
+
+<option value="PRESS12 PN1C">
+PRESS12 PN1C
+</option>
+
+
+
+<option value="PRESS11">
+PRESS11
+</option>
+
+
+
+
+<option value="PRESS01 PN2B">
+PRESS01 PN2B
+</option>
+
+
+<option value="PRESS02 PN2A">
+PRESS02 PN2A
+</option>
+
+
+<option value="PRESS03 PN2C">
+PRESS03 PN2C
+</option>
+
+
+<option value="PRESS02 PN2B">
+PRESS02 PN2B
+</option>
+
+
+
+
+<option value="SQUARING 1C">
+SQUARING 1C
+</option>
+
+
+<option value="POLISHING 1C">
+POLISHING 1C
+</option>
+
+
+
+
+<option value="PACKING 1A">
+PACKING 1A
+</option>
+
+
+<option value="PACKING 1B">
+PACKING 1B
+</option>
+
+
+<option value="PACKING 1C">
+PACKING 1C
+</option>
+
+
+<option value="PACKING 2A">
+PACKING 2A
+</option>
+
+
+<option value="PACKING 2B">
+PACKING 2B
+</option>
+
+
+<option value="PACKING 2C">
+PACKING 2C
+</option>
+
+
+
+
+
+<option value="KILN 1A">
+KILN 1A
+</option>
+
+
+<option value="KILN 1B">
+KILN 1B
+</option>
+
+
+<option value="KILN 1C">
+KILN 1C
+</option>
+
+
+<option value="KILN 2A">
+KILN 2A
+</option>
+
+
+<option value="KILN 2B">
+KILN 2B
+</option>
+
+
+<option value="KILN 2C">
+KILN 2C
+</option>
+
+
+
+
+
+<option value="HD 1A">
+HD 1A
+</option>
+
+
+<option value="HD 1B">
+HD 1B
+</option>
+
+
+<option value="HD 1C">
+HD 1C
+</option>
+
+
+<option value="HD 2A">
+HD 2A
+</option>
+
+
+<option value="HD 2B">
+HD 2B
+</option>
+
+
+<option value="HD 2C">
+HD 2C
+</option>
+
+
+
+
+
+<option value="DRYER 1A">
+DRYER 1A
+</option>
+
+
+<option value="DRYER 1B">
+DRYER 1B
+</option>
+
+
+<option value="DRYER 1C">
+DRYER 1C
+</option>
+
+
+<option value="DRYER 2A">
+DRYER 2A
+</option>
+
+
+<option value="DRYER 2B">
+DRYER 2B
+</option>
+
+
+<option value="DRYER 2C">
+DRYER 2C
+</option>
+
+
+
+
+
+<option value="PRINT ROTOCOLOR PN1">
+PRINT ROTOCOLOR PN1
+</option>
+
+
+<option value="PRINT ROTOCOLOR PN2">
+PRINT ROTOCOLOR PN2
+</option>
+
+
+<option value="BMSD">
+BMSD
+</option>
+
+
+<option value="ATM 10000A">
+ATM 10000A
+</option>
+
+
+<option value="ATM 10000B">
+ATM 10000B
+</option>
+
+
+<option value="ATM 7000">
+ATM 7000
+</option>
+
+
+
+<option value="GLAZE MOLEN PN1">
+GLAZE MOLEN PN1
+</option>
+
+
+<option value="GLAZE MOLEN PN2">
+GLAZE MOLEN PN2
+</option>
+
+<option value="DP 1A">
+DP 1A
+</option>
+
+
+<option value="DP 1B">
+DP 1B
+</option>
+
+
+<option value="DP 1C">
+DP 1C
+</option>
+
+
+<option value="DP 2A">
+DP 2A
+</option>
+
+
+<option value="DP 2B">
+DP 2B
+</option>
+
+
+<option value="DP 2C">
+DP 2C
+</option>
+
+
+
+
+<option value="TANGKI WATERGLAZE">
+TANGKI WATERGLAZE
+</option>
+
+
+
+
+<option value="GLAZING LINE 1A">
+GLAZING LINE 1A
+</option>
+
+
+<option value="GLAZING LINE 1B">
+GLAZING LINE 1B
+</option>
+
+
+<option value="GLAZING LINE 1C">
+GLAZING LINE 1C
+</option>
+
+
+<option value="GLAZING LINE 2A">
+GLAZING LINE 2A
+</option>
+
+
+<option value="GLAZING LINE 2B">
+GLAZING LINE 2B
+</option>
+
+
+<option value="GLAZING LINE 2C">
+GLAZING LINE 2C
+</option>
+
+
+
+
+<option value="GENSET PN1">
+GENSET PN1
+</option>
+
+
+<option value="GENSET PN2">
+GENSET PN2
+</option>
+
+
+
+
+<option value="KOMPRESSOR PN1">
+KOMPRESSOR PN1
+</option>
+
+
+<option value="KOMPRESSOR PN2">
+KOMPRESSOR PN2
+</option>
+
+
+
+
+<option value="WORKSHOP">
+WORKSHOP
+</option>
+
+
+<option value="UTILITY">
+UTILITY
+</option>
+
+
+<option value="PRODUKSI">
+PRODUKSI
+</option>
+
+
+<option value="WHFG">
+WHFG
+</option>
+
+
+<option value="WHRM">
+WHRM
+</option>
+
+
+<option value="WHSP">
+WHSP
+</option>
+
+
+<option value="GA">
+GA
+</option>
+
+
+<option value="RND">
+RND
+</option>
+
+
+<option value="PROYEK">
+PROYEK
+</option>
+
+
+<option value="OFFICE">
+OFFICE
+</option>
+
+
+<option value="ENGINEERING">
+ENGINEERING
+</option>
+
+
+</select>
+
+
+</div>
+
+
+
+
+
+<!-- =========================
+     DESKRIPSI PEKERJAAN
+========================= -->
+
+
+<div class="col-12">
+
+
+<label class="form-label">
+
+
+    Deskripsi Pekerjaan
+
+    <span class="text-danger">*</span>
+
+
+</label>
+
+
+
+
+<textarea
+
+    id="deskripsi"
+
+    class="form-control"
+
+    rows="4"
+
+    placeholder="Masukkan deskripsi pekerjaan"
+
+    required></textarea>
+
+
+</div>
+
+
+
+
+
+
+<!-- =========================
+     STATUS
+========================= -->
+
+
+<div class="col-md-6">
+
+
+<label class="form-label">
+
+    Status
+
+</label>
+
+
+
+<select
+
+    id="status"
+
+    class="form-select">
+
+
+<option value="Open">
+
+    Open
+
+</option>
+
+
+<option value="Progress">
+
+    Progress
+
+</option>
+
+
+<option value="Done">
+
+    Done
+
+</option>
+
+
+</select>
+
+
+</div>
+
+
+
+
+
+
+
+<!-- =========================
+     KETERANGAN
+========================= -->
+
+
+<div
+
+    class="col-md-6"
+
+    id="keteranganGroup">
+
+
+<label class="form-label">
+
+    Keterangan
+
+</label>
+
+
+
+<input
+
+    type="text"
+
+    id="keterangan"
+
+    class="form-control"
+
+    placeholder="Tambahkan keterangan">
+
+
+</div>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+<!-- =========================
+     BUTTON
+========================= -->
+
+
+<div class="mt-4 d-flex gap-2 flex-wrap">
+
+
+<button
+
+    type="submit"
+
+    id="submitBtn"
+
+    class="btn btn-success">
+
+    Simpan Data
+
+</button>
+
+
+
+
+<button
+
+    type="button"
+
+    id="updateBtn"
+
+    class="btn btn-warning hidden">
+
+    Update Data
+
+</button>
+
+
+
+
+<button
+
+    type="button"
+
+    id="resetBtn"
+
+    class="btn btn-secondary">
+
+    Reset
+
+</button>
+
+
+</div>
+
+
+
+</form>
+
+
+
+</div>
+
+
+</div>
+<!-- =========================
+     HISTORY DATA
+========================= -->
+
+<div class="card mb-4">
+
+
+<div class="card-header bg-dark text-white">
+
+    HISTORY DATA
+
+</div>
+
+
+
+
+<div class="card-body">
+
+
+
+
+
+<!-- STATUS INFO -->
+
+<div class="alert alert-light border">
+
+
+<strong>
+    Keterangan Status :
+</strong>
+
+
+<br>
+
+
+<span class="text-danger">
+    🔴 Open
+</span>
+=
+Permintaan baru masuk
+
+
+<br>
+
+
+<span class="text-warning">
+    🟡 Progress
+</span>
+=
+Sedang dikerjakan
+
+
+<br>
+
+
+<span class="text-success">
+    🟢 Done
+</span>
+=
+Pekerjaan selesai
+
+
+</div>
+
+
+
+
+
+
+
+<!-- SEARCH -->
+
+<div class="row mb-3">
+
+
+<div class="col-md-4">
+
+
+<input
+
+    type="text"
+
+    id="searchHistory"
+
+    class="form-control"
+
+    placeholder="Cari data...">
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- TABLE -->
+
+<div class="table-responsive">
+
+
+
+<table
+
+    class="table table-bordered table-hover align-middle">
+
+
+
+<thead class="table-dark">
+
+
+<tr>
+
+
+<th>
+    ID Tiket
+</th>
+
+
+<th>
+    No
+</th>
+
+
+<th>
+    Tanggal
+</th>
+
+
+<th>
+    Jam
+</th>
+
+
+<th>
+    Deskripsi
+</th>
+
+
+<th>
+    Requestor
+</th>
+
+
+<th>
+    Area
+</th>
+
+
+<th>
+    Status
+</th>
+
+
+<th id="headerKeterangan">
+
+    Keterangan
+
+</th>
+
+
+
+<th>
+
+    Aksi
+
+</th>
+
+
+
+<th id="headerLastEdit">
+
+    Last Edit
+
+</th>
+
+
+
+</tr>
+
+
+</thead>
+
+
+
+
+
+<tbody id="historyTable">
+
+
+<tr>
+
+
+<td 
+    colspan="11"
+    class="text-center">
+
+
+    Memuat data...
+
+
+</td>
+
+
+</tr>
+
+
+
+</tbody>
+
+
+
+</table>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- PAGINATION -->
+
+<div
+
+class="d-flex justify-content-between align-items-center mt-3">
+
+
+<button
+
+    id="prevBtn"
+
+    class="btn btn-secondary btn-sm">
+
+
+    ⬅ Prev
+
+
+</button>
+
+
+
+
+
+<div
+
+    id="paginationInfo"
+
+    class="fw-semibold">
+
+
+</div>
+
+
+
+
+
+<button
+
+    id="nextBtn"
+
+    class="btn btn-secondary btn-sm">
+
+
+    Next ➡
+
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+</div>
+<!-- END APP SECTION -->
+
+
 
 </div>
 <!-- END CONTAINER -->
+
+
+
+
+
+<!-- Bootstrap JS -->
+
+<script
+
+src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+
+</script>
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzApIiUbjDyTYkaJh5EmotOgyY7OwoxMzA_7HlQ9cf_L6GyZ7A1I_fMDszyKebfSolvAQ/exec";
 
-let editId = null;
-let isSubmitting = false;
-let isLoading = false;
+/* =====================================================
+   CONFIGURATION
+===================================================== */
 
-let allData = [];
-let currentPage = 1;
-const pageSize = 10;
 
-// =========================
-// AUTH
-// =========================
-function checkAuth() {
-    const isLoggedIn = localStorage.getItem("isLoggedIn");
+const SCRIPT_URL = 
+"https://script.google.com/macros/s/AKfycbzApIiUbjDyTYkaJh5EmotOgyY7OwoxMzA_7HlQ9cf_L6GyZ7A1I_fMDszyKebfSolvAQ/exec";
 
-    const loginSection = document.getElementById("loginSection");
-    const appSection = document.getElementById("appSection");
 
-    if (!loginSection || !appSection) return;
 
-    if (isLoggedIn === "true") {
-        loginSection.classList.add("hidden");
-        appSection.classList.remove("hidden");
 
-        showLoginInfo(); // 🔥 TAMBAH INI
-    } else {
-        loginSection.classList.remove("hidden");
-        appSection.classList.add("hidden");
-    }
-}
 
-function handleLogin() {
-    const userEl = document.getElementById("username");
-    const passEl = document.getElementById("password");
+/* =====================================================
+   APPLICATION STATE
+===================================================== */
 
-    const user = userEl.value.trim();
-    const pass = passEl.value.trim();
 
-    if (user === "admin" && pass === "190626") {
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userRole", "admin");
-        localStorage.setItem("username", "ADMIN");
+const AppState = {
 
-        showLoginInfo(); // 🔥 TAMBAH
-        location.reload();
 
-    } else if (user === "karupn" && pass === "krpn") {
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userRole", "requestor");
-        localStorage.setItem("username", "KARUPN");
+    editId:null,
 
-        showLoginInfo(); // 🔥 TAMBAH
-        location.reload();
 
-    } else {
-        alert("Login gagal");
-    }
-}
-function logout() {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("userRole");
-    location.reload();
-}
-// =========================
-// INIT
-// =========================
-document.addEventListener("DOMContentLoaded", () => {
-    populateTimeSelects();
-    setTanggalHariIni();
-    checkAuth();
-	  applyRoleUI();
-	   applyFormRoleUI();
+    isSubmitting:false,
 
-    if (localStorage.getItem("isLoggedIn") === "true") {
-        loadData();
-		showLoginInfo();
-    }
 
-    setInterval(loadData, 15000);
-    setInterval(updateClock, 1000);
+    isLoading:false,
 
-    autoUppercase();
 
-    // tombol submit (opsional debug)
-    const submitBtn = document.getElementById("submitBtn");
-    if (submitBtn) {
-        submitBtn.addEventListener("click", () => {
-            console.log("TOMBOL DIKLIK");
-        });
-    }
+    isDeleting:false,
 
-    // FORM SUBMIT (INI YANG UTAMA)
-    const jobForm = document.getElementById("jobForm");
 
-    if (jobForm) {
-        jobForm.addEventListener("submit", function (e) {
-            e.preventDefault();
+    allData:[],
 
-            const jam = document.getElementById("jam")?.value || "00";
-            const menit = document.getElementById("menit")?.value || "00";
 
-            const role = localStorage.getItem("userRole");
+    filteredData:null,
 
-const payload = {
-    tanggal: document.getElementById("tanggal").value,
-    jam: `${jam}:${menit}`,
-    requestor: document.getElementById("requestor").value,
-    area: document.getElementById("area").value,
-    deskripsi: document.getElementById("deskripsi").value,
 
-    // 🔒 LOCK STATUS UNTUK REQUESTOR
-    status: role === "requestor"
-        ? "Open"
-        : document.getElementById("status").value,
+    currentPage:1,
 
-    keterangan: document.getElementById("keterangan").value
+
+    pageSize:10,
+
+
+    loadController:null,
+
+
+    submitController:null
+
+
 };
 
-            console.log("KIRIM DATA", payload);
 
-            kirimData("add", payload);
-        });
+
+
+
+
+
+
+
+/* =====================================================
+   USER DATABASE
+
+   NOTE:
+   Untuk produksi sebaiknya dipindahkan
+   ke backend / Apps Script.
+===================================================== */
+
+
+const USERS = {
+
+
+    admin:{
+
+        password:"190626",
+
+        role:"admin",
+
+        name:"ADMIN"
+
+    },
+
+
+
+    karupn:{
+
+        password:"krpn",
+
+        role:"requestor",
+
+        name:"KARUPN"
+
     }
-});
-// =========================
-// LOAD DATA (FIXED anti double request)
-// =========================
-async function loadData() {
-    if (isLoading) return;
-    isLoading = true;
 
-    try {
-        const res = await fetch(SCRIPT_URL);
 
-        if (!res.ok) {
-            throw new Error("HTTP Error: " + res.status);
-        }
+};
 
-        const result = await res.json();
 
-        console.log("RESPONSE:", result);
 
-        if (!result.success) {
-            throw new Error(result.message || "Load data gagal");
-        }
 
-        // data utama
-       allData = result.data.slice(1).sort((a, b) => {
-    return (b[1] + " " + b[2]).localeCompare(a[1] + " " + a[2]);
-});
 
-        // 🔥 reset filter setiap reload
-        window.filteredData = null;
 
-        // 🔥 reset pagination
-        currentPage = 1;
 
-        renderTable();
-		updateDashboard();
 
-    } catch (err) {
-        console.error("loadData error:", err);
 
-    } finally {
-        isLoading = false;
-    }
-}
+/* =====================================================
+   AUTH MODULE
+===================================================== */
 
-// =========================
-// SEND DATA (FIXED safe submit)
-// =========================
-async function kirimData(action, obj = {}) {
-    if (isSubmitting) return;
-    isSubmitting = true;
 
-    try {
-        const res = await fetch(SCRIPT_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "text/plain;charset=utf-8"
-            },
-            body: JSON.stringify({ action, ...obj })
-        });
+const Auth = (()=>{
 
-        if (!res.ok) {
-            throw new Error("HTTP Error: " + res.status);
-        }
 
-        const result = await res.json();
+    const KEY_LOGIN =
+        "isLoggedIn";
 
-        console.log("SERVER RESPONSE:", result);
 
-        if (!result.success) {
-            throw new Error(result.message || "Request gagal");
-        }
+    const KEY_ROLE =
+        "userRole";
 
-        showToast(result.message, "success");
 
-        // reset hanya kalau sukses
-        resetForm();
+    const KEY_NAME =
+        "username";
 
-        // refresh data
-        await loadData();
 
-    } catch (err) {
-        console.error("kirimData error:", err);
 
-        showToast(err.message || "Terjadi kesalahan", "danger");
 
-    } finally {
-        isSubmitting = false;
-    }
-}
-// =========================
-// RENDER TABLE (FIXED STATUS + SAFE EDIT)
-// =========================
-function renderTableFiltered() {
-    const role = localStorage.getItem("userRole");
-    const tbody = document.getElementById("historyTable");
+    function login(user){
 
-    const dataSource = window.filteredData || allData;
 
-    const start = (currentPage - 1) * pageSize;
-    const pageData = dataSource.slice(start, start + pageSize);
-
-    let html = "";
-
-    pageData.forEach((item, index) => {
-
-        const statusRaw = String(item[6] || "").toLowerCase();
-
-        let statusClass = "";
-        if (statusRaw === "open") statusClass = "text-danger";
-        else if (statusRaw === "progress") statusClass = "text-warning";
-        else if (statusRaw === "done") statusClass = "text-success";
-
-        const safeItem = btoa(
-            unescape(encodeURIComponent(JSON.stringify(item)))
+        localStorage.setItem(
+            KEY_LOGIN,
+            "true"
         );
 
-        let keteranganCol = "";
-        let aksiCol = "";
-        let lastEditCol = "";
 
-        // 🔒 hanya admin / non-requestor
-        if (role !== "requestor") {
-            keteranganCol = `<td>${item[7] || "-"}</td>`;
+        localStorage.setItem(
+            KEY_ROLE,
+            user.role
+        );
 
-            aksiCol = `
-                <td>
-                    <button class="btn btn-warning btn-sm"
-                        onclick="prepareEdit('${safeItem}')">
-                        Edit
-                    </button>
 
-                    <button class="btn btn-danger btn-sm"
-                        onclick="hapusData('${item[0] || ""}')">
-                        Hapus
-                    </button>
-                </td>
-            `;
+        localStorage.setItem(
+            KEY_NAME,
+            user.name
+        );
 
-            lastEditCol = `<td>${formatLastEdit(item[8])}</td>`;
-        }
 
-        html += `
-        <tr>
-            <td><span class="ticket-badge">${item[0] || ""}</span></td>
-            <td>${start + index + 1}</td>
-            <td>${formatTanggal(item[1])}</td>
-            <td>${formatJam(item[2])}</td>
-            <td>${item[5] || ""}</td>
-            <td>${item[3] || ""}</td>
-            <td>${item[4] || ""}</td>
+        updateAuthUI();
 
-            <td><b class="${statusClass}">
-                ${(statusRaw || "-").toUpperCase()}
-            </b></td>
 
-            ${keteranganCol}
-            ${aksiCol}
-            ${lastEditCol}
-        </tr>`;
-    });
-
-    tbody.innerHTML = html;
-
-    renderPaginationInfo();
-}
-// =========================
-// EDIT (FIXED SAFE VERSION)
-// =========================
-function prepareEdit(encoded) {
-    const item = JSON.parse(
-        decodeURIComponent(escape(atob(encoded)))
-    );
-
-    editId = item[0];
-
-    document.getElementById("tanggal").value = item[1];
-
-    const j = (item[2] || "00:00").split(":");
-    document.getElementById("jam").value = j[0];
-    document.getElementById("menit").value = j[1];
-
-    document.getElementById("requestor").value = item[3];
-    document.getElementById("area").value = item[4];
-    document.getElementById("deskripsi").value = item[5];
-    document.getElementById("status").value = item[6];
-    document.getElementById("keterangan").value = item[7] || "";
-
-    document.getElementById("submitBtn").classList.add("hidden");
-    document.getElementById("updateBtn").classList.remove("hidden");
-}
-	function updateData() {
-    if (!editId) {
-        alert("ID tidak ditemukan, ulangi klik Edit");
-        return;
     }
 
-    const payload = {
-        tanggal: document.getElementById("tanggal").value,
-        jam: document.getElementById("jam").value + ":" + document.getElementById("menit").value,
-        requestor: document.getElementById("requestor").value,
-        area: document.getElementById("area").value,
-        deskripsi: document.getElementById("deskripsi").value,
-        status: document.getElementById("status").value,
-        keterangan: document.getElementById("keterangan").value
+
+
+
+
+    function logout(){
+
+
+        localStorage.removeItem(KEY_LOGIN);
+
+
+        localStorage.removeItem(KEY_ROLE);
+
+
+        localStorage.removeItem(KEY_NAME);
+
+
+
+        AppState.allData=[];
+
+
+        AppState.filteredData=null;
+
+
+
+        updateAuthUI();
+
+
+
+        document
+        .getElementById("username")
+        ?.focus();
+
+
+
+    }
+
+
+
+
+
+
+    function isLoggedIn(){
+
+
+        return (
+
+            localStorage.getItem(KEY_LOGIN)
+            ===
+            "true"
+
+        );
+
+
+    }
+
+
+
+
+
+
+    function getRole(){
+
+
+        return (
+
+            localStorage.getItem(KEY_ROLE)
+            ||
+            ""
+
+        );
+
+
+    }
+
+
+
+
+
+
+
+    function getName(){
+
+
+        return (
+
+            localStorage.getItem(KEY_NAME)
+            ||
+            ""
+
+        );
+
+
+    }
+
+
+
+
+
+
+    return {
+
+
+        login,
+
+
+        logout,
+
+
+        isLoggedIn,
+
+
+        getRole,
+
+
+        getName
+
+
     };
 
-    console.log("UPDATE PAYLOAD:", { id: editId, ...payload });
 
-    kirimData("update", { id: editId, ...payload });
+
+})();
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   AUTH UI
+===================================================== */
+
+
+function updateAuthUI(){
+
+
+
+    const logged =
+        Auth.isLoggedIn();
+
+
+
+
+    document
+
+    .getElementById("loginSection")
+
+    ?.classList
+
+    .toggle(
+        "hidden",
+        logged
+    );
+
+
+
+
+
+    document
+
+    .getElementById("appSection")
+
+    ?.classList
+
+    .toggle(
+        "hidden",
+        !logged
+    );
+
+
+
+
+
+    if(logged){
+
+
+        showLoginInfo();
+
+
+        applyRoleUI();
+
+
+        applyFormRoleUI();
+
+
+    }
+
+
+
 }
-// =========================
-// DELETE
-// =========================
-let isDeleting = false;
 
-function hapusData(id) {
-    if (!id) {
-        alert("ID tidak valid");
+
+
+
+
+
+
+
+
+/* =====================================================
+   LOGIN PROCESS
+===================================================== */
+
+
+function handleLogin(){
+
+
+
+    const username =
+        document
+
+        .getElementById("username")
+
+        ?.value
+
+        .trim()
+
+        .toLowerCase();
+
+
+
+
+
+    const password =
+        document
+
+        .getElementById("password")
+
+        ?.value
+
+        .trim();
+
+
+
+
+
+
+    if(!username || !password){
+
+
+        showToast(
+            "Username dan password wajib diisi",
+            "warning"
+        );
+
+
         return;
+
     }
 
-    if (isDeleting) return;
 
-    const confirmDelete = confirm("Yakin hapus data ini?");
-    if (!confirmDelete) return;
 
-    isDeleting = true;
 
-    try {
-        kirimData("delete", { id });
-    } finally {
-        // dikembalikan setelah request selesai (lebih aman di kirimData juga)
-        setTimeout(() => {
-            isDeleting = false;
-        }, 1000);
+
+
+
+    const user =
+        USERS[username];
+
+
+
+
+
+
+    if(
+        !user ||
+        user.password !== password
+    ){
+
+
+        showToast(
+            "Username atau password salah",
+            "danger"
+        );
+
+
+
+        document
+        .getElementById("password")
+        .value="";
+
+
+
+        return;
+
+
     }
+
+
+
+
+
+
+
+    Auth.login(user);
+
+
+
+    loadData(true);
+
+
+
 }
-// =========================
-// RESET
-// =========================
-function resetForm() {
-    editId = null;
 
-    const form = document.getElementById("jobForm");
-    if (form) form.reset();
 
-    const submitBtn = document.getElementById("submitBtn");
-    const updateBtn = document.getElementById("updateBtn");
 
-    if (submitBtn) submitBtn.classList.remove("hidden");
-    if (updateBtn) updateBtn.classList.add("hidden");
+
+
+
+
+
+
+/* =====================================================
+   LOGOUT BUTTON
+===================================================== */
+
+
+function logout(){
+
+
+    Auth.logout();
+
+
 }
-// =========================
-// UTIL
-// =========================
-function autoUppercase() {
-    ["requestor", "deskripsi", "keterangan"].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
 
-        el.addEventListener("input", function () {
-            this.value = this.value.toUpperCase();
-        });
+
+
+/* =====================================================
+   LOAD DATA FROM GOOGLE APPS SCRIPT
+===================================================== */
+
+
+async function loadData(forceRefresh=false){
+
+
+
+    if(
+        AppState.isLoading &&
+        !forceRefresh
+    ){
+
+        return;
+
+    }
+
+
+
+
+
+    if(AppState.loadController){
+
+        AppState.loadController.abort();
+
+    }
+
+
+
+
+
+
+    AppState.loadController =
+        new AbortController();
+
+
+
+
+
+    AppState.isLoading=true;
+
+
+
+
+
+    try{
+
+
+
+        const response =
+            await fetch(
+                SCRIPT_URL,
+                {
+
+                    method:"GET",
+
+                    cache:"no-store",
+
+                    signal:
+                    AppState.loadController.signal
+
+                }
+
+            );
+
+
+
+
+
+
+
+        if(!response.ok){
+
+
+            throw new Error(
+                "HTTP Error "
+                +
+                response.status
+            );
+
+
+        }
+
+
+
+
+
+
+
+        const result =
+            await response.json();
+
+
+
+
+
+
+
+        if(!result.success){
+
+
+            throw new Error(
+
+                result.message
+                ||
+                "Gagal mengambil data"
+
+            );
+
+
+        }
+
+
+
+
+
+
+
+        const rawData =
+            Array.isArray(result.data)
+
+            ?
+
+            result.data
+
+            :
+
+            [];
+
+
+
+
+
+
+
+
+        /*
+            Cek apakah baris pertama
+            adalah header Google Sheet
+        */
+
+
+        let dataStart=0;
+
+
+
+        if(
+            rawData.length &&
+            String(rawData[0][0])
+            .toLowerCase()
+            .includes("id")
+        ){
+
+            dataStart=1;
+
+        }
+
+
+
+
+
+
+
+
+        AppState.allData =
+
+            rawData
+
+            .slice(dataStart)
+
+            .filter(
+                row =>
+                Array.isArray(row)
+                &&
+                row.length
+            )
+
+            .sort(
+                (a,b)=>{
+
+
+                    const dateA =
+                    `${a[1] || ""} ${a[2] || ""}`;
+
+
+                    const dateB =
+                    `${b[1] || ""} ${b[2] || ""}`;
+
+
+
+                    return dateB.localeCompare(dateA);
+
+
+                }
+
+            );
+
+
+
+
+
+
+
+        AppState.filteredData=null;
+
+
+        AppState.currentPage=1;
+
+
+
+
+
+
+        renderTable();
+
+
+        updateDashboard();
+
+
+
+
+    }
+
+
+    catch(error){
+
+
+
+        if(
+            error.name === "AbortError"
+        ){
+
+            return;
+
+        }
+
+
+
+
+
+
+        console.error(
+            "LOAD ERROR:",
+            error
+        );
+
+
+
+
+
+        showToast(
+            "Gagal mengambil data",
+            "danger"
+        );
+
+
+
+    }
+
+
+
+
+
+    finally{
+
+
+
+        AppState.isLoading=false;
+
+
+        AppState.loadController=null;
+
+
+
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   SEND DATA TO GOOGLE APPS SCRIPT
+===================================================== */
+
+
+async function kirimData(
+    action,
+    data={}
+){
+
+
+
+
+
+    if(AppState.isSubmitting){
+
+
+        showToast(
+            "Request masih diproses",
+            "warning"
+        );
+
+
+        return false;
+
+
+    }
+
+
+
+
+
+
+
+    AppState.isSubmitting=true;
+
+
+
+
+
+
+    const btn =
+        document.getElementById(
+            "submitBtn"
+        );
+
+
+
+
+    if(btn){
+
+
+        btn.disabled=true;
+
+
+        btn.innerHTML=
+            "Mengirim...";
+
+
+    }
+
+
+
+
+
+
+
+
+
+    AppState.submitController =
+        new AbortController();
+
+
+
+
+
+
+    try{
+
+
+
+
+
+        const payload={
+
+            action,
+
+            ...data
+
+        };
+
+
+
+
+
+
+
+
+        const response =
+            await fetch(
+                SCRIPT_URL,
+                {
+
+
+                    method:"POST",
+
+
+                    headers:{
+
+
+                        "Content-Type":
+                        "text/plain;charset=utf-8"
+
+
+                    },
+
+
+                    body:
+                    JSON.stringify(payload),
+
+
+
+                    signal:
+                    AppState.submitController.signal
+
+
+                }
+
+            );
+
+
+
+
+
+
+
+
+        if(!response.ok){
+
+
+            throw new Error(
+                "HTTP Error "
+                +
+                response.status
+            );
+
+
+        }
+
+
+
+
+
+
+
+
+        const result =
+            await response.json();
+
+
+
+
+
+
+
+
+        if(!result.success){
+
+
+            throw new Error(
+
+                result.message
+                ||
+                "Request gagal"
+
+            );
+
+
+        }
+
+
+
+
+
+
+
+
+
+        showToast(
+
+            result.message
+            ||
+            "Data berhasil diproses",
+
+            "success"
+
+        );
+
+
+
+
+
+
+
+        resetForm();
+
+
+
+
+
+        await loadData(true);
+
+
+
+
+
+
+        return true;
+
+
+
+
+
+
+
+    }
+
+
+    catch(error){
+
+
+
+
+
+        if(
+            error.name === "AbortError"
+        ){
+
+            return false;
+
+        }
+
+
+
+
+
+
+
+        console.error(
+            "SEND ERROR:",
+            error
+        );
+
+
+
+
+
+
+        showToast(
+
+            error.message
+            ||
+            "Terjadi kesalahan",
+
+            "danger"
+
+        );
+
+
+
+
+
+        return false;
+
+
+
+
+
+    }
+
+
+
+
+
+
+
+    finally{
+
+
+
+        AppState.isSubmitting=false;
+
+
+
+        AppState.submitController=null;
+
+
+
+
+
+
+        if(btn){
+
+
+            btn.disabled=false;
+
+
+            btn.innerHTML=
+            "Simpan Data";
+
+
+        }
+
+
+
+
+    }
+
+
+
+}
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+
+function escapeHTML(value){
+
+
+    return String(value ?? "")
+
+    .replaceAll("&","&amp;")
+
+    .replaceAll("<","&lt;")
+
+    .replaceAll(">","&gt;")
+
+    .replaceAll('"',"&quot;")
+
+    .replaceAll("'","&#039;");
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   RENDER TABLE
+===================================================== */
+
+
+function renderTable(){
+
+
+    const tbody =
+        document.getElementById(
+            "historyTable"
+        );
+
+
+
+    if(!tbody)return;
+
+
+
+
+
+    const role =
+        Auth.getRole();
+
+
+
+
+
+    const data =
+
+        Array.isArray(
+            AppState.filteredData
+        )
+
+        ?
+
+        AppState.filteredData
+
+        :
+
+        AppState.allData;
+
+
+
+
+
+
+
+
+    if(!data.length){
+
+
+        tbody.innerHTML=`
+
+        <tr>
+
+            <td colspan="11"
+                class="text-center">
+
+                Data tidak tersedia
+
+            </td>
+
+        </tr>
+
+        `;
+
+
+        renderPagination();
+
+        return;
+
+
+    }
+
+
+
+
+
+
+
+
+    const start =
+
+        (
+            AppState.currentPage - 1
+
+        )
+
+        *
+
+        AppState.pageSize;
+
+
+
+
+
+
+
+
+    const pageData =
+
+        data.slice(
+
+            start,
+
+            start + AppState.pageSize
+
+        );
+
+
+
+
+
+
+
+
+    let html="";
+
+
+
+
+
+
+
+    pageData.forEach(
+
+        (item,index)=>{
+
+
+
+
+
+
+
+            const status =
+
+                String(item[6] || "")
+
+                .trim()
+
+                .toLowerCase();
+
+
+
+
+
+
+            const statusClass = {
+
+
+                open:
+                "text-danger",
+
+
+                progress:
+                "text-warning",
+
+
+                done:
+                "text-success"
+
+
+
+            }[status] || "";
+
+
+
+
+
+
+
+            let actionColumn="";
+
+            let ketColumn="";
+
+            let editColumn="";
+
+
+
+
+
+
+
+
+            if(role !== "requestor"){
+
+
+
+
+
+                ketColumn=`
+
+                <td>
+
+                ${escapeHTML(
+                    item[7] || "-"
+                )}
+
+                </td>
+
+                `;
+
+
+
+
+
+
+
+
+                const encoded =
+
+                encodeURIComponent(
+
+                    btoa(
+
+                        encodeURIComponent(
+
+                            JSON.stringify(item)
+
+                        )
+
+                    )
+
+                );
+
+
+
+
+
+
+
+
+                actionColumn=`
+
+                <td>
+
+
+                <button
+
+                class="btn btn-warning btn-sm btn-edit"
+
+                data-item="${encoded}">
+
+
+                Edit
+
+                </button>
+
+
+
+                <button
+
+                class="btn btn-danger btn-sm btn-delete"
+
+                data-id="${escapeHTML(item[0])}">
+
+
+                Hapus
+
+                </button>
+
+
+
+                </td>
+
+                `;
+
+
+
+
+
+
+
+
+
+                editColumn=`
+
+                <td>
+
+                ${formatLastEdit(item[8])}
+
+                </td>
+
+                `;
+
+
+
+            }
+
+
+
+
+
+
+
+
+
+            html += `
+
+            <tr>
+
+
+            <td>
+
+                <span class="ticket-badge">
+
+                ${escapeHTML(item[0])}
+
+                </span>
+
+
+            </td>
+
+
+
+
+            <td>
+
+            ${start + index + 1}
+
+            </td>
+
+
+
+
+            <td>
+
+            ${formatTanggal(item[1])}
+
+            </td>
+
+
+
+
+            <td>
+
+            ${formatJam(item[2])}
+
+            </td>
+
+
+
+
+            <td>
+
+            ${escapeHTML(item[5])}
+
+            </td>
+
+
+
+
+            <td>
+
+            ${escapeHTML(item[3])}
+
+            </td>
+
+
+
+
+            <td>
+
+            ${escapeHTML(item[4])}
+
+            </td>
+
+
+
+
+            <td>
+
+            <b class="${statusClass}">
+
+            ${status.toUpperCase()}
+
+            </b>
+
+            </td>
+
+
+
+
+            ${ketColumn}
+
+            ${actionColumn}
+
+            ${editColumn}
+
+
+
+            </tr>
+
+            `;
+
+
+
+
+        }
+
+
+    );
+
+
+
+
+
+
+
+    tbody.innerHTML=html;
+
+
+
+
+
+
+    renderPagination();
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   SEARCH
+===================================================== */
+
+
+function filterHistory(){
+
+
+
+    const keyword =
+
+        document
+
+        .getElementById(
+            "searchHistory"
+        )
+
+        ?.value
+
+        .toLowerCase()
+
+        .trim();
+
+
+
+
+
+
+
+    if(!keyword){
+
+
+        AppState.filteredData=null;
+
+
+
+    }
+
+    else{
+
+
+        AppState.filteredData =
+
+        AppState.allData.filter(
+
+            row=>
+
+
+            row.some(
+
+                value =>
+
+                String(value ?? "")
+
+                .toLowerCase()
+
+                .includes(keyword)
+
+            )
+
+
+        );
+
+
+
+    }
+
+
+
+
+
+
+
+    AppState.currentPage=1;
+
+
+    renderTable();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   PAGINATION
+===================================================== */
+
+
+function renderPagination(){
+
+
+
+    const data =
+
+    Array.isArray(
+        AppState.filteredData
+    )
+
+    ?
+
+    AppState.filteredData
+
+    :
+
+    AppState.allData;
+
+
+
+
+
+
+    const totalPage =
+
+        Math.max(
+
+            1,
+
+            Math.ceil(
+
+                data.length /
+                AppState.pageSize
+
+            )
+
+        );
+
+
+
+
+
+
+
+    document
+
+    .getElementById(
+        "paginationInfo"
+    )
+
+    ?.textContent =
+
+    `Page ${AppState.currentPage} / ${totalPage}`;
+
+
+
+
+
+
+
+    const prev =
+
+    document.getElementById(
+        "prevBtn"
+    );
+
+
+
+    const next =
+
+    document.getElementById(
+        "nextBtn"
+    );
+
+
+
+
+
+
+    if(prev)
+
+        prev.disabled =
+        AppState.currentPage<=1;
+
+
+
+
+
+    if(next)
+
+        next.disabled =
+        AppState.currentPage>=totalPage;
+
+
+
+}
+
+
+
+
+
+
+
+function nextPage(){
+
+
+    AppState.currentPage++;
+
+
+    renderTable();
+
+
+}
+
+
+
+
+
+function prevPage(){
+
+
+    if(AppState.currentPage>1){
+
+        AppState.currentPage--;
+
+    }
+
+
+    renderTable();
+
+
+}
+
+
+
+
+
+
+
+
+/* =====================================================
+   DASHBOARD
+===================================================== */
+
+
+function updateDashboard(){
+
+
+
+    const counter={
+
+
+        open:0,
+
+
+        progress:0,
+
+
+        done:0
+
+
+    };
+
+
+
+
+
+
+    AppState.allData.forEach(row=>{
+
+
+        const status =
+
+        String(row[6] || "")
+
+        .trim()
+
+        .toLowerCase();
+
+
+
+
+
+        if(counter[status] !== undefined){
+
+
+            counter[status]++;
+
+
+        }
+
+
+
     });
+
+
+
+
+
+
+
+    document
+
+    .getElementById("openCount")
+
+    ?.textContent =
+    counter.open;
+
+
+
+
+
+    document
+
+    .getElementById("progressCount")
+
+    ?.textContent =
+    counter.progress;
+
+
+
+
+
+    document
+
+    .getElementById("doneCount")
+
+    ?.textContent =
+    counter.done;
+
+
+
+
 }
 
-function showToast(msg, type) {
-    const toast = document.createElement("div");
-    toast.className = `alert alert-${type}`;
-    toast.style.position = "fixed";
-    toast.style.top = "10px";
-    toast.style.right = "10px";
-    toast.style.zIndex = 9999;
-    toast.innerText = msg;
+
+
+/* =====================================================
+   FORM SUBMIT - TAMBAH DATA
+===================================================== */
+
+
+async function submitForm(e){
+
+
+    e.preventDefault();
+
+
+
+
+    const payload = {
+
+
+        tanggal:
+        getValue("tanggal"),
+
+
+
+        jam:
+        `${getValue("jam")}:${getValue("menit")}`,
+
+
+
+        requestor:
+        getValue("requestor"),
+
+
+
+        area:
+        getValue("area"),
+
+
+
+        deskripsi:
+        getValue("deskripsi"),
+
+
+
+        status:
+        getValue("status"),
+
+
+
+        keterangan:
+        getValue("keterangan")
+
+
+
+    };
+
+
+
+
+
+
+    if(
+        !payload.tanggal ||
+        !payload.requestor ||
+        !payload.area ||
+        !payload.deskripsi
+    ){
+
+
+        showToast(
+
+            "Data wajib belum lengkap",
+
+            "warning"
+
+        );
+
+
+        return;
+
+    }
+
+
+
+
+
+
+
+    await kirimData(
+        "insert",
+        payload
+    );
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   PREPARE EDIT
+===================================================== */
+
+
+function prepareEdit(encoded){
+
+
+
+    try{
+
+
+
+        const item =
+
+        JSON.parse(
+
+            decodeURIComponent(
+
+                atob(encoded)
+
+            )
+
+        );
+
+
+
+
+
+
+        if(
+            !item ||
+            !item[0]
+        ){
+
+            throw new Error(
+                "Data tidak valid"
+            );
+
+        }
+
+
+
+
+
+
+
+        AppState.editId =
+            item[0];
+
+
+
+
+
+
+
+        setValue(
+            "tanggal",
+            item[1] || ""
+        );
+
+
+
+
+
+
+        const time =
+
+        String(item[2] || "00:00")
+
+        .split(":");
+
+
+
+
+
+        setValue(
+            "jam",
+            time[0] || "00"
+        );
+
+
+
+        setValue(
+            "menit",
+            time[1] || "00"
+        );
+
+
+
+
+
+
+
+        setValue(
+            "requestor",
+            item[3] || ""
+        );
+
+
+
+        setValue(
+            "area",
+            item[4] || ""
+        );
+
+
+
+        setValue(
+            "deskripsi",
+            item[5] || ""
+        );
+
+
+
+        setValue(
+            "status",
+            item[6] || "Open"
+        );
+
+
+
+        setValue(
+            "keterangan",
+            item[7] || ""
+        );
+
+
+
+
+
+
+
+        document
+
+        .getElementById(
+            "submitBtn"
+        )
+
+        ?.classList
+
+        .add("hidden");
+
+
+
+
+
+
+        document
+
+        .getElementById(
+            "updateBtn"
+        )
+
+        ?.classList
+
+        .remove("hidden");
+
+
+
+
+
+
+
+        document
+
+        .getElementById(
+            "jobForm"
+        )
+
+        ?.scrollIntoView({
+
+            behavior:"smooth"
+
+        });
+
+
+
+
+
+
+    }
+
+    catch(err){
+
+
+
+        console.error(
+            "EDIT ERROR",
+            err
+        );
+
+
+
+        showToast(
+            "Data edit gagal dibuka",
+            "danger"
+        );
+
+
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   UPDATE DATA
+===================================================== */
+
+
+async function updateData(){
+
+
+
+    if(!AppState.editId){
+
+
+
+        showToast(
+            "ID data tidak ditemukan",
+            "warning"
+        );
+
+
+        return;
+
+
+    }
+
+
+
+
+
+
+
+    const role =
+        Auth.getRole();
+
+
+
+
+
+
+
+    const payload={
+
+
+
+        id:
+        AppState.editId,
+
+
+
+        tanggal:
+        getValue("tanggal"),
+
+
+
+        jam:
+        `${getValue("jam")}:${getValue("menit")}`,
+
+
+
+        requestor:
+        getValue("requestor"),
+
+
+
+        area:
+        getValue("area"),
+
+
+
+        deskripsi:
+        getValue("deskripsi"),
+
+
+
+
+        status:
+
+        role === "requestor"
+
+        ?
+
+        "Open"
+
+        :
+
+        getValue("status"),
+
+
+
+
+        keterangan:
+        getValue("keterangan")
+
+
+
+    };
+
+
+
+
+
+
+
+
+    const success =
+
+    await kirimData(
+        "update",
+        payload
+    );
+
+
+
+
+
+
+
+    if(success){
+
+
+        resetEditMode();
+
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   DELETE DATA
+===================================================== */
+
+
+async function hapusData(id){
+
+
+
+    if(!id)return;
+
+
+
+
+
+    if(AppState.isDeleting)return;
+
+
+
+
+
+    if(
+        !confirm(
+            "Yakin ingin menghapus data ini?"
+        )
+    ){
+
+        return;
+
+    }
+
+
+
+
+
+
+
+    AppState.isDeleting=true;
+
+
+
+
+
+
+    try{
+
+
+
+        await kirimData(
+
+            "delete",
+
+            {
+
+                id
+
+            }
+
+        );
+
+
+
+    }
+
+    finally{
+
+
+        AppState.isDeleting=false;
+
+
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   RESET FORM
+===================================================== */
+
+
+function resetForm(){
+
+
+
+    AppState.editId=null;
+
+
+
+
+
+
+    document
+
+    .getElementById(
+        "jobForm"
+    )
+
+    ?.reset();
+
+
+
+
+
+
+    resetEditMode();
+
+
+
+
+
+
+    setDefaultFormValue();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function resetEditMode(){
+
+
+
+    AppState.editId=null;
+
+
+
+
+
+
+    document
+
+    .getElementById(
+        "submitBtn"
+    )
+
+    ?.classList
+
+    .remove("hidden");
+
+
+
+
+
+
+    document
+
+    .getElementById(
+        "updateBtn"
+    )
+
+    ?.classList
+
+    .add("hidden");
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   FORM HELPER
+===================================================== */
+
+
+function setValue(id,value){
+
+
+    const el =
+    document.getElementById(id);
+
+
+
+    if(el)
+
+        el.value=value;
+
+
+
+}
+
+
+
+
+
+
+
+function getValue(id){
+
+
+    return (
+
+        document
+
+        .getElementById(id)
+
+        ?.value
+
+        ||
+
+        ""
+
+    );
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   DEFAULT VALUE
+===================================================== */
+
+
+function setDefaultFormValue(){
+
+
+
+    const now =
+    new Date();
+
+
+
+
+
+
+    setValue(
+
+        "tanggal",
+
+        now
+
+        .toISOString()
+
+        .split("T")[0]
+
+    );
+
+
+
+
+
+
+    setValue(
+        "status",
+        "Open"
+    );
+
+
+
+
+
+    setJamSekarang();
+
+
+
+}
+
+
+
+/* =====================================================
+   TOAST NOTIFICATION
+===================================================== */
+
+
+function showToast(
+    message,
+    type="info"
+){
+
+
+    document
+
+    .querySelector(".app-toast")
+
+    ?.remove();
+
+
+
+
+
+    const toast =
+    document.createElement("div");
+
+
+
+
+
+    toast.className =
+    `alert alert-${type} app-toast`;
+
+
+
+
+
+    Object.assign(
+
+        toast.style,
+
+        {
+
+            position:"fixed",
+
+            top:"20px",
+
+            right:"20px",
+
+            zIndex:"9999",
+
+            minWidth:"250px",
+
+            boxShadow:
+            "0 3px 10px rgba(0,0,0,.2)"
+
+        }
+
+    );
+
+
+
+
+
+
+
+    toast.textContent =
+    message;
+
+
+
+
 
     document.body.appendChild(toast);
 
-    setTimeout(() => toast.remove(), 2500);
+
+
+
+
+
+    setTimeout(()=>{
+
+
+        toast.remove();
+
+
+    },3000);
+
+
+
 }
 
-function updateClock() {
-    const el = document.getElementById("clockIndo");
-    if (!el) return;
 
-    el.innerText = new Date().toLocaleString("id-ID");
-}
 
-function setTanggalHariIni() {
-    const el = document.getElementById("tanggal");
-    if (!el) return;
 
-    el.value = new Date().toISOString().split("T")[0];
-}
 
-function populateTimeSelects() {
-    const jam = document.getElementById("jam");
-    const menit = document.getElementById("menit");
 
-    if (!jam || !menit) return;
 
-    let jamOptions = "";
-    let menitOptions = "";
 
-    for (let i = 0; i < 24; i++) {
-        const value = String(i).padStart(2, "0");
-        jamOptions += `<option value="${value}">${value}</option>`;
-    }
 
-    for (let i = 0; i < 60; i++) {
-        const value = String(i).padStart(2, "0");
-        menitOptions += `<option value="${value}">${value}</option>`;
-    }
+/* =====================================================
+   CLOCK
+===================================================== */
 
-    jam.innerHTML = jamOptions;
-    menit.innerHTML = menitOptions;
-}
-function formatTanggal(val) {
-    if (!val) return "";
 
-    const d = new Date(val);
-    if (isNaN(d)) return val;
+function updateClock(){
 
-    return d.toLocaleDateString("id-ID");
-}
 
-function formatJam(val) {
-    if (!val) return "";
 
-    const d = new Date(val);
+    const el =
 
-    if (!isNaN(d)) {
-        return d.toLocaleTimeString("id-ID", {
-            hour: "2-digit",
-            minute: "2-digit"
-        });
-    }
+    document
 
-    return val;
-}
+    .getElementById(
+        "clockIndo"
+    );
 
-function setJamSekarang() {
-    const jam = document.getElementById("jam");
-    const menit = document.getElementById("menit");
 
-    if (!jam || !menit) return;
 
-    const now = new Date();
+    if(el){
 
-    jam.value = now.getHours().toString().padStart(2, "0");
-    menit.value = now.getMinutes().toString().padStart(2, "0");
-}
-	function formatLastEdit(dateString) {
-    if (!dateString) return "-";
 
-    const date = new Date(dateString);
+        el.textContent =
 
-    return date.toLocaleString("id-ID", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
-    });
-}
-function updateDashboard() {
-    const data = allData || [];
+        new Date()
 
-    let open = 0;
-    let progress = 0;
-    let done = 0;
-
-    data.forEach(item => {
-        const status = String(item[6] || "").toLowerCase();
-
-        if (status === "open") open++;
-        else if (status === "progress") progress++;
-        else if (status === "done") done++;
-    });
-
-    const openEl = document.getElementById("openCount");
-    const progressEl = document.getElementById("progressCount");
-    const doneEl = document.getElementById("doneCount");
-
-    if (openEl) openEl.innerText = open;
-    if (progressEl) progressEl.innerText = progress;
-    if (doneEl) doneEl.innerText = done;
-}
-function applyFormRoleUI() {
-    const role = localStorage.getItem("userRole");
-
-    const keteranganGroup = document.getElementById("keteranganGroup");
-    const statusSelect = document.getElementById("status");
-
-    if (role === "requestor") {
-
-        // HIDE KETERANGAN
-        if (keteranganGroup) {
-            keteranganGroup.style.display = "none";
-        }
-
-        // LOCK STATUS jadi OPEN
-        if (statusSelect) {
-            statusSelect.value = "Open";
-            statusSelect.disabled = true;
-        }
-
-    } else {
-
-        // admin normal
-        if (keteranganGroup) {
-            keteranganGroup.style.display = "block";
-        }
-
-        if (statusSelect) {
-            statusSelect.disabled = false;
-        }
-    }
-}
-function applyRoleUI() {
-    const role = localStorage.getItem("userRole");
-
-    const headerKeterangan = document.getElementById("headerKeterangan");
-    const headerLastEdit = document.getElementById("headerLastEdit");
-    const doneCard = document.getElementById("doneCard");
-
-    if (role === "requestor") {
-
-        // HEADER
-        if (headerKeterangan) headerKeterangan.style.display = "none";
-        if (headerLastEdit) headerLastEdit.style.display = "none";
-
-        // DASHBOARD CARD (opsional)
-        if (doneCard) doneCard.style.display = "none";
-
-        // OPTIONAL: sembunyikan kolom ACTION header kalau nanti kamu tambah id
-        // document.getElementById("headerAksi").style.display = "none";
-    }
-}
-function renderPaginationInfo() {
-    const totalPages = Math.ceil(allData.length / pageSize);
-
-    document.getElementById("paginationInfo").innerText =
-        `Page ${currentPage} / ${totalPages}`;
-
-    document.getElementById("prevBtn").disabled = currentPage === 1;
-    document.getElementById("nextBtn").disabled = currentPage === totalPages;
-}
-
-function nextPage() {
-    const totalPages = Math.ceil(allData.length / pageSize);
-
-    if (currentPage < totalPages) {
-        currentPage++;
-        renderTable();
-    }
-}
-
-function prevPage() {
-    if (currentPage > 1) {
-        currentPage--;
-        renderTable();
-    }
-}
-window.filterHistory = function () {
-    const input = document.getElementById("searchHistory");
-    if (!input) return;
-
-    const keyword = input.value.toLowerCase();
-
-    const filtered = allData.filter(item => {
-        return (
-            String(item[0]).toLowerCase().includes(keyword) ||
-            String(item[3]).toLowerCase().includes(keyword) ||
-            String(item[4]).toLowerCase().includes(keyword) ||
-            String(item[5]).toLowerCase().includes(keyword)
+        .toLocaleString(
+            "id-ID"
         );
-    });
 
-    currentPage = 1;
-    window.filteredData = filtered;
-    renderTableFiltered();
-};
 
-function renderTable() {
-    renderTableFiltered();
+    }
+
+
+
 }
-function showLoginInfo() {
-    const role = localStorage.getItem("userRole");
-    const isLogin = localStorage.getItem("isLoggedIn");
-    const username = localStorage.getItem("username"); // 🔥 TAMBAH
 
-    const info = document.getElementById("loginInfo");
 
-    if (!info) return;
 
-    if (isLogin === "true") {
 
-        info.innerText = `LOGIN: ${username || role}`;
 
-        if (role === "admin") {
-            info.className = "badge bg-primary";
-        } else if (role === "requestor") {
-            info.className = "badge bg-success";
-        } else {
-            info.className = "badge bg-secondary";
+
+
+
+
+/* =====================================================
+   FORMAT DATE
+===================================================== */
+
+
+function formatTanggal(value){
+
+
+
+    if(!value)return "-";
+
+
+
+
+    const date =
+    new Date(value);
+
+
+
+
+
+    if(isNaN(date))
+
+        return value;
+
+
+
+
+
+    return date.toLocaleDateString(
+        "id-ID"
+    );
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function formatJam(value){
+
+
+
+    if(!value)return "-";
+
+
+
+
+
+    if(
+        /^\d{2}:\d{2}$/
+
+        .test(value)
+    ){
+
+        return value;
+
+    }
+
+
+
+
+
+
+    const date =
+    new Date(value);
+
+
+
+
+
+
+    if(isNaN(date))
+
+        return value;
+
+
+
+
+
+
+
+    return date.toLocaleTimeString(
+
+        "id-ID",
+
+        {
+
+            hour:"2-digit",
+
+            minute:"2-digit"
+
         }
 
-    } else {
-        info.innerText = "";
-    }
+    );
+
+
+
 }
+
+
+
+
+
+
+
+
+
+function formatLastEdit(value){
+
+
+
+    if(!value)return "-";
+
+
+
+
+
+    const date =
+    new Date(value);
+
+
+
+
+
+
+    if(isNaN(date))
+
+        return "-";
+
+
+
+
+
+
+
+    return date.toLocaleString(
+
+        "id-ID",
+
+        {
+
+            day:"2-digit",
+
+            month:"2-digit",
+
+            year:"numeric",
+
+            hour:"2-digit",
+
+            minute:"2-digit"
+
+        }
+
+    );
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   TIME SELECT
+===================================================== */
+
+
+function populateTimeSelects(){
+
+
+
+    const jam =
+    document.getElementById("jam");
+
+
+
+    const menit =
+    document.getElementById("menit");
+
+
+
+
+
+
+    if(!jam || !menit)return;
+
+
+
+
+
+
+    jam.innerHTML="";
+
+
+
+    menit.innerHTML="";
+
+
+
+
+
+
+
+    for(
+        let i=0;
+        i<24;
+        i++
+    ){
+
+
+        const value =
+        String(i)
+        .padStart(2,"0");
+
+
+
+        jam.innerHTML +=
+
+        `<option value="${value}">
+            ${value}
+        </option>`;
+
+
+    }
+
+
+
+
+
+
+    for(
+        let i=0;
+        i<60;
+        i++
+    ){
+
+
+        const value =
+        String(i)
+        .padStart(2,"0");
+
+
+
+        menit.innerHTML +=
+
+        `<option value="${value}">
+            ${value}
+        </option>`;
+
+
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function setJamSekarang(){
+
+
+
+    const now =
+    new Date();
+
+
+
+
+
+    setValue(
+
+        "jam",
+
+        String(
+            now.getHours()
+        )
+
+        .padStart(2,"0")
+
+    );
+
+
+
+
+
+
+    setValue(
+
+        "menit",
+
+        String(
+            now.getMinutes()
+        )
+
+        .padStart(2,"0")
+
+    );
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   ROLE UI
+===================================================== */
+
+
+function applyFormRoleUI(){
+
+
+
+    const role =
+    Auth.getRole();
+
+
+
+
+
+    const requestor =
+    role==="requestor";
+
+
+
+
+
+    const ket =
+    document.getElementById(
+        "keteranganGroup"
+    );
+
+
+
+    const status =
+    document.getElementById(
+        "status"
+    );
+
+
+
+
+
+
+    if(ket){
+
+
+        ket.style.display =
+
+        requestor
+
+        ?
+
+        "none"
+
+        :
+
+        "block";
+
+
+    }
+
+
+
+
+
+
+
+    if(status){
+
+
+        status.disabled =
+        requestor;
+
+
+
+
+        if(requestor)
+
+            status.value="Open";
+
+
+
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function applyRoleUI(){
+
+
+
+    const admin =
+    Auth.getRole()==="admin";
+
+
+
+
+
+    document
+
+    .getElementById(
+        "headerKeterangan"
+    )
+
+    ?.style
+
+    .display =
+    admin ? "" : "none";
+
+
+
+
+
+
+
+    document
+
+    .getElementById(
+        "headerLastEdit"
+    )
+
+    ?.style
+
+    .display =
+    admin ? "" : "none";
+
+
+
+
+
+
+
+    document
+
+    .getElementById(
+        "doneCard"
+    )
+
+    ?.style
+
+    .display =
+    admin ? "" : "none";
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function showLoginInfo(){
+
+
+
+    const el =
+    document.getElementById(
+        "loginInfo"
+    );
+
+
+
+
+
+    if(!el)return;
+
+
+
+
+
+    el.textContent =
+
+    `LOGIN : ${Auth.getName()}`;
+
+
+
+
+
+    el.className =
+
+    Auth.getRole()==="admin"
+
+    ?
+
+    "badge bg-primary"
+
+    :
+
+    "badge bg-success";
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   AUTO UPPERCASE
+===================================================== */
+
+
+function autoUppercase(){
+
+
+
+    [
+
+        "requestor",
+
+        "deskripsi",
+
+        "keterangan"
+
+
+    ]
+
+    .forEach(id=>{
+
+
+
+        const el =
+        document.getElementById(id);
+
+
+
+
+
+        if(!el)return;
+
+
+
+
+
+
+        el.addEventListener(
+            "input",
+            function(){
+
+                this.value =
+                this.value.toUpperCase();
+
+            }
+        );
+
+
+
+    });
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   EVENT LISTENER
+===================================================== */
+
+
+function initEvents(){
+
+
+
+    document
+
+    .getElementById(
+        "btnLogin"
+    )
+
+    ?.addEventListener(
+
+        "click",
+
+        handleLogin
+
+    );
+
+
+
+
+
+
+    document
+
+    .getElementById(
+        "jobForm"
+    )
+
+    ?.addEventListener(
+
+        "submit",
+
+        submitForm
+
+    );
+
+
+
+
+
+
+
+    document
+
+    .getElementById(
+        "searchHistory"
+    )
+
+    ?.addEventListener(
+
+        "input",
+
+        filterHistory
+
+    );
+
+
+
+
+
+
+
+    document
+
+    .getElementById(
+        "prevBtn"
+    )
+
+    ?.addEventListener(
+
+        "click",
+
+        prevPage
+
+    );
+
+
+
+
+
+
+
+    document
+
+    .getElementById(
+        "nextBtn"
+    )
+
+    ?.addEventListener(
+
+        "click",
+
+        nextPage
+
+    );
+
+
+
+
+
+
+
+    document
+
+    .getElementById(
+        "historyTable"
+    )
+
+    ?.addEventListener(
+
+        "click",
+
+        function(e){
+
+
+
+            const edit =
+            e.target.closest(".btn-edit");
+
+
+
+            const del =
+            e.target.closest(".btn-delete");
+
+
+
+
+
+
+            if(edit){
+
+
+                prepareEdit(
+                    edit.dataset.item
+                );
+
+
+            }
+
+
+
+
+
+
+
+            if(del){
+
+
+                hapusData(
+                    del.dataset.id
+                );
+
+
+            }
+
+
+
+        }
+
+    );
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   INITIALIZATION
+===================================================== */
+
+
+document.addEventListener(
+
+"DOMContentLoaded",
+
+()=>{
+
+
+
+    populateTimeSelects();
+
+
+
+    setDefaultFormValue();
+
+
+
+    autoUppercase();
+
+
+
+    initEvents();
+
+
+
+    updateAuthUI();
+
+
+
+    setInterval(
+        updateClock,
+        1000
+    );
+
+
+
+    updateClock();
+
+
+
+
+    if(Auth.isLoggedIn()){
+
+
+        loadData(true);
+
+
+    }
+
+
+
+}
+
+);
+
+
 </script>
 
+
 </body>
+
 </html>
