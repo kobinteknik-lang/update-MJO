@@ -87,25 +87,17 @@ body {
      class="card p-4 mb-4 mx-auto"
      style="max-width:400px">
 
-    <h4 class="text-center mb-3">
-        Login System
-    </h4>
+    <h4 class="text-center mb-3">Login System</h4>
 
-    <input id="username"
-           class="form-control mb-2"
-           placeholder="Username">
+    <input id="username" class="form-control mb-2" placeholder="Username">
+    <input id="password" type="password" class="form-control mb-3" placeholder="Password">
 
-    <input id="password"
-           type="password"
-           class="form-control mb-3"
-           placeholder="Password">
-
-    <button id="btnLogin"
-            class="btn btn-primary w-100">
+    <button class="btn btn-primary w-100" onclick="handleLogin()">
         Login
     </button>
 
 </div>
+
 
 <!-- ================= APP (INI YANG FIX) ================= -->
 <div id="appSection" class="hidden">
@@ -166,7 +158,7 @@ body {
 
         <div class="card-body">
 
-            <form id="jobForm" onsubmit="submitForm(event)">
+            <form id="jobForm">
 
                 <div class="row">
 
@@ -559,1944 +551,633 @@ let isLoading = false;
 let allData = [];
 let currentPage = 1;
 const pageSize = 10;
+
 // =========================
-// AUTH MODULE (FINAL FIX)
+// AUTH
 // =========================
-const Auth = (() => {
-    "use strict";
+function checkAuth() {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
 
-    const KEY_LOGIN = "isLoggedIn";
-    const KEY_ROLE  = "userRole";
-    const KEY_NAME  = "username";
+    const loginSection = document.getElementById("loginSection");
+    const appSection = document.getElementById("appSection");
 
-    let loginSection = null;
-    let appSection = null;
+    if (!loginSection || !appSection) return;
 
+    if (isLoggedIn === "true") {
+        loginSection.classList.add("hidden");
+        appSection.classList.remove("hidden");
 
-    function init() {
-
-        loginSection = document.getElementById("loginSection");
-        appSection   = document.getElementById("appSection");
-
-        if (!loginSection || !appSection) {
-            console.error("loginSection atau appSection tidak ditemukan.");
-            return;
-        }
-
-        check();
-
-
-        window.addEventListener("storage", (e) => {
-
-            if ([KEY_LOGIN, KEY_ROLE, KEY_NAME].includes(e.key)) {
-                check();
-            }
-
-        });
-
+        showLoginInfo(); // 🔥 TAMBAH INI
+    } else {
+        loginSection.classList.remove("hidden");
+        appSection.classList.add("hidden");
     }
+}
 
-
-
-    function isLoggedIn() {
-
-        return localStorage.getItem(KEY_LOGIN) === "true";
-
-    }
-
-
-
-    function login(user) {
-
-
-        if (!user || !user.role || !user.name) {
-
-            console.error("Data user tidak valid.");
-            return false;
-
-        }
-
-
-        localStorage.setItem(KEY_LOGIN, "true");
-        localStorage.setItem(KEY_ROLE, user.role);
-        localStorage.setItem(KEY_NAME, user.name);
-
-
-        check();
-
-
-        return true;
-
-    }
-
-
-
-
-    function logout() {
-
-
-        [
-            KEY_LOGIN,
-            KEY_ROLE,
-            KEY_NAME
-
-        ].forEach(key => {
-
-            localStorage.removeItem(key);
-
-        });
-
-
-
-        check();
-
-
-
-        const username =
-            document.getElementById("username");
-
-
-        const password =
-            document.getElementById("password");
-
-
-
-        if(username){
-
-            username.value = "";
-            username.focus();
-
-        }
-
-
-        if(password){
-
-            password.value = "";
-
-        }
-
-
-
-        console.log("Logout berhasil.");
-
-    }
-
-
-
-
-
-    function check() {
-
-
-        if(!loginSection || !appSection){
-
-            return false;
-
-        }
-
-
-
-        const logged = isLoggedIn();
-
-
-
-        loginSection.classList.toggle(
-            "hidden",
-            logged
-        );
-
-
-        appSection.classList.toggle(
-            "hidden",
-            !logged
-        );
-
-
-
-        if(logged){
-
-
-            if(typeof showLoginInfo === "function"){
-                showLoginInfo();
-            }
-
-
-            if(typeof applyRoleUI === "function"){
-                applyRoleUI();
-            }
-
-
-            if(typeof applyFormRoleUI === "function"){
-                applyFormRoleUI();
-            }
-
-
-        }
-
-
-
-        return logged;
-
-    }
-
-
-
-    return {
-
-        init,
-        login,
-        logout,
-        check,
-        isLoggedIn
-
-    };
-
-
-})();
-
-
-
-
-// =========================
-// USER DATABASE
-// =========================
-const USERS = Object.freeze({
-
-    admin: Object.freeze({
-
-        password: "190626",
-        role: "admin",
-        name: "ADMIN"
-
-    }),
-
-
-    karupn: Object.freeze({
-
-        password: "krpn",
-        role: "requestor",
-        name: "KARUPN"
-
-    })
-
-});
-
-
-
-
-// =========================
-// LOGIN
-// =========================
 function handleLogin() {
+    const userEl = document.getElementById("username");
+    const passEl = document.getElementById("password");
 
+    const user = userEl.value.trim();
+    const pass = passEl.value.trim();
 
-    const usernameInput =
-        document.getElementById("username");
+    if (user === "admin" && pass === "190626") {
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userRole", "admin");
+        localStorage.setItem("username", "ADMIN");
 
+        showLoginInfo(); // 🔥 TAMBAH
+        location.reload();
 
-    const passwordInput =
-        document.getElementById("password");
+    } else if (user === "karupn" && pass === "krpn") {
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userRole", "requestor");
+        localStorage.setItem("username", "KARUPN");
 
+        showLoginInfo(); // 🔥 TAMBAH
+        location.reload();
 
-
-    if(!usernameInput || !passwordInput){
-
-        console.error(
-            "Input login tidak ditemukan."
-        );
-
-        return;
-
+    } else {
+        alert("Login gagal");
     }
-
-
-
-    const username =
-        usernameInput.value
-        .trim()
-        .toLowerCase();
-
-
-
-    const password =
-        passwordInput.value.trim();
-
-
-
-
-    if(!username || !password){
-
-        alert(
-            "Username dan Password harus diisi."
-        );
-
-        usernameInput.focus();
-
-        return;
-
-    }
-
-
-
-
-    const account =
-        USERS[username];
-
-
-
-    if(!account){
-
-        alert(
-            "Username tidak ditemukan."
-        );
-
-        usernameInput.focus();
-
-        return;
-
-    }
-
-
-
-
-    if(account.password !== password){
-
-
-        alert(
-            "Password salah."
-        );
-
-
-        passwordInput.value = "";
-        passwordInput.focus();
-
-
-        return;
-
-    }
-
-
-
-
-    // SIMPAN LOGIN
-    Auth.login(account);
-
-
-
-    // UPDATE UI
-    applyRoleUI?.();
-    applyFormRoleUI?.();
-    showLoginInfo?.();
-
-
-
-    // LOAD DATA
-    loadData?.(true);
-
-
-
-    // RESET INPUT LOGIN
-    usernameInput.value = "";
-    passwordInput.value = "";
-
-
-
-    showToast?.(
-        `Selamat datang ${account.name}`,
-        "success"
-    );
-
-
-    console.log(
-        "Login berhasil:",
-        account.name
-    );
-
 }
-
-
-
-
-// =========================
-// LOGOUT
-// =========================
-function logout(){
-
-    Auth.logout();
-
+function logout() {
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("userRole");
+    location.reload();
 }
-
-
 // =========================
-// LOAD DATA (FIXED)
+// INIT
 // =========================
+document.addEventListener("DOMContentLoaded", () => {
+    populateTimeSelects();
+    setTanggalHariIni();
+    checkAuth();
+	  applyRoleUI();
+	   applyFormRoleUI();
 
-let isLoading = false;
-let loadController = null;
-
-
-async function loadData(forceRefresh = false) {
-
-
-    // Pastikan user sudah login
-    if (typeof Auth !== "undefined" && !Auth.isLoggedIn()) {
-        console.warn("User belum login.");
-        return;
+    if (localStorage.getItem("isLoggedIn") === "true") {
+        loadData();
+		showLoginInfo();
     }
 
+    setInterval(loadData, 15000);
+    setInterval(updateClock, 1000);
 
+    autoUppercase();
 
-    // Cegah request ganda
-    if (isLoading && !forceRefresh) {
-        console.warn("Load masih berjalan...");
-        return;
+    // tombol submit (opsional debug)
+    const submitBtn = document.getElementById("submitBtn");
+    if (submitBtn) {
+        submitBtn.addEventListener("click", () => {
+            console.log("TOMBOL DIKLIK");
+        });
     }
 
+    // FORM SUBMIT (INI YANG UTAMA)
+    const jobForm = document.getElementById("jobForm");
 
+    if (jobForm) {
+        jobForm.addEventListener("submit", function (e) {
+            e.preventDefault();
 
-    // Batalkan request sebelumnya
-    if (loadController) {
+            const jam = document.getElementById("jam")?.value || "00";
+            const menit = document.getElementById("menit")?.value || "00";
 
-        try {
-            loadController.abort();
-        } catch(e){}
+            const role = localStorage.getItem("userRole");
 
+const payload = {
+    tanggal: document.getElementById("tanggal").value,
+    jam: `${jam}:${menit}`,
+    requestor: document.getElementById("requestor").value,
+    area: document.getElementById("area").value,
+    deskripsi: document.getElementById("deskripsi").value,
+
+    // 🔒 LOCK STATUS UNTUK REQUESTOR
+    status: role === "requestor"
+        ? "Open"
+        : document.getElementById("status").value,
+
+    keterangan: document.getElementById("keterangan").value
+};
+
+            console.log("KIRIM DATA", payload);
+
+            kirimData("add", payload);
+        });
     }
-
-
-
-    loadController = new AbortController();
-
-    const signal = loadController.signal;
-
-
+});
+// =========================
+// LOAD DATA (FIXED anti double request)
+// =========================
+async function loadData() {
+    if (isLoading) return;
     isLoading = true;
 
-
-
     try {
+        const res = await fetch(SCRIPT_URL);
 
-
-        const res = await fetch(
-            SCRIPT_URL,
-            {
-                method: "GET",
-                cache: "no-store",
-                signal
-            }
-        );
-
-
-
-        if(!res.ok){
-
-            throw new Error(
-                `HTTP Error ${res.status}`
-            );
-
+        if (!res.ok) {
+            throw new Error("HTTP Error: " + res.status);
         }
-
-
-
 
         const result = await res.json();
 
+        console.log("RESPONSE:", result);
 
-
-        console.log(
-            "LOAD RESPONSE:",
-            result
-        );
-
-
-
-
-        if(!result || result.success !== true){
-
-            throw new Error(
-                result?.message ||
-                "Data gagal dimuat"
-            );
-
+        if (!result.success) {
+            throw new Error(result.message || "Load data gagal");
         }
 
+        // data utama
+       allData = result.data.slice(1).sort((a, b) => {
+    return (b[1] + " " + b[2]).localeCompare(a[1] + " " + a[2]);
+});
 
-
-
-        const rawData =
-            Array.isArray(result.data)
-            ? result.data
-            : [];
-
-
-
-
-        // Hapus header Google Sheet
-        allData =
-            rawData
-            .slice(1)
-            .filter(row =>
-                Array.isArray(row) &&
-                row.length > 0 &&
-                row[0]
-            )
-            .sort((a,b)=>{
-
-
-                const dateA =
-                    new Date(
-                        `${a[1] || ""} ${a[2] || ""}`
-                    );
-
-
-                const dateB =
-                    new Date(
-                        `${b[1] || ""} ${b[2] || ""}`
-                    );
-
-
-
-                return (
-                    (isNaN(dateB) ? 0 : dateB)
-                    -
-                    (isNaN(dateA) ? 0 : dateA)
-                );
-
-
-            });
-
-
-
-
-
-        // Reset filter dan halaman
-
+        // 🔥 reset filter setiap reload
         window.filteredData = null;
 
+        // 🔥 reset pagination
         currentPage = 1;
 
-
-
         renderTable();
+		updateDashboard();
 
-        updateDashboard();
+    } catch (err) {
+        console.error("loadData error:", err);
 
-
-
-        console.log(
-            `Berhasil memuat ${allData.length} data`
-        );
-
-
-
+    } finally {
+        isLoading = false;
     }
-    catch(err){
-
-
-
-        if(err.name === "AbortError"){
-
-            console.log(
-                "Request dibatalkan"
-            );
-
-            return;
-
-        }
-
-
-
-        console.error(
-            "loadData error:",
-            err
-        );
-
-
-
-        if(typeof showToast === "function"){
-
-            showToast(
-                "Gagal mengambil data",
-                "danger"
-            );
-
-        }
-
-
-    }
-    finally{
-
-
-        // Pastikan hanya reset controller aktif
-
-        if(loadController?.signal === signal){
-
-            loadController = null;
-            isLoading = false;
-
-        }
-
-
-    }
-
-
 }
 
 // =========================
-// SEND DATA
+// SEND DATA (FIXED safe submit)
 // =========================
-
-let isSubmitting = false;
-let submitController = null;
-
-
 async function kirimData(action, obj = {}) {
-
-    // Cegah double submit
-    if (isSubmitting) {
-        console.warn("Submit sedang berjalan...");
-        return;
-    }
-
-
+    if (isSubmitting) return;
     isSubmitting = true;
 
-
-    // Disable tombol submit
-    const submitBtn = document.getElementById("submitBtn");
-
-    if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = "Mengirim...";
-    }
-
-
-    submitController = new AbortController();
-
-
     try {
-
-        const payload = {
-            action,
-            ...obj
-        };
-
-
-        console.log("SEND DATA:", payload);
-
-
         const res = await fetch(SCRIPT_URL, {
             method: "POST",
-
             headers: {
                 "Content-Type": "text/plain;charset=utf-8"
             },
-
-            body: JSON.stringify(payload),
-
-            signal: submitController.signal
+            body: JSON.stringify({ action, ...obj })
         });
 
-
-
         if (!res.ok) {
-            throw new Error(
-                `HTTP Error: ${res.status}`
-            );
+            throw new Error("HTTP Error: " + res.status);
         }
-
-
 
         const result = await res.json();
 
-
-        console.log(
-            "SERVER RESPONSE:",
-            result
-        );
-
-
+        console.log("SERVER RESPONSE:", result);
 
         if (!result.success) {
-            throw new Error(
-                result.message || "Request gagal"
-            );
+            throw new Error(result.message || "Request gagal");
         }
-function submitForm(e){
-    e.preventDefault();
 
-    kirimData("add",{
-        tanggal:getValue("tanggal"),
-        jam:`${getValue("jam")}:${getValue("menit")}`,
-        requestor:getValue("requestor"),
-        area:getValue("area"),
-        deskripsi:getValue("deskripsi"),
-        status:getValue("status"),
-        keterangan:getValue("keterangan")
-    });
-}
+        showToast(result.message, "success");
 
-
-        // =====================
-        // SUCCESS
-        // =====================
-
-        showToast(
-            result.message || "Data berhasil disimpan",
-            "success"
-        );
-
-
-        // Reset form hanya jika berhasil
+        // reset hanya kalau sukses
         resetForm();
 
-
-        // Refresh data terbaru
-        await loadData(true);
-
-
+        // refresh data
+        await loadData();
 
     } catch (err) {
+        console.error("kirimData error:", err);
 
-
-        if (err.name === "AbortError") {
-
-            console.warn(
-                "Request dibatalkan"
-            );
-
-            return;
-        }
-
-
-        console.error(
-            "kirimData error:",
-            err
-        );
-
-
-        showToast(
-            err.message || "Terjadi kesalahan",
-            "danger"
-        );
-
-
+        showToast(err.message || "Terjadi kesalahan", "danger");
 
     } finally {
-
-
         isSubmitting = false;
-
-
-        submitController = null;
-
-
-        // Aktifkan tombol kembali
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = "Simpan";
-        }
-
     }
 }
-
 // =========================
-// RENDER TABLE FILTERED
+// RENDER TABLE (FIXED STATUS + SAFE EDIT)
 // =========================
-
 function renderTableFiltered() {
-
     const role = localStorage.getItem("userRole");
     const tbody = document.getElementById("historyTable");
 
-    if (!tbody) return;
-
-
-    const dataSource = Array.isArray(window.filteredData)
-        ? window.filteredData
-        : allData;
-
-
-    if (!dataSource || dataSource.length === 0) {
-
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="12" class="text-center">
-                    Data tidak tersedia
-                </td>
-            </tr>
-        `;
-
-        renderPaginationInfo();
-        return;
-    }
-
-
+    const dataSource = window.filteredData || allData;
 
     const start = (currentPage - 1) * pageSize;
-
-    const pageData = dataSource.slice(
-        start,
-        start + pageSize
-    );
-
-
+    const pageData = dataSource.slice(start, start + pageSize);
 
     let html = "";
 
-
-
     pageData.forEach((item, index) => {
 
+        const statusRaw = String(item[6] || "").toLowerCase();
 
-        const statusRaw =
-            String(item[6] || "")
-            .toLowerCase()
-            .trim();
+        let statusClass = "";
+        if (statusRaw === "open") statusClass = "text-danger";
+        else if (statusRaw === "progress") statusClass = "text-warning";
+        else if (statusRaw === "done") statusClass = "text-success";
 
-
-
-        const statusClass = {
-
-            open: "text-danger",
-
-            progress: "text-warning",
-
-            done: "text-success"
-
-        }[statusRaw] || "";
-
-
-
-        /*
-            Encode data untuk edit
-            menggunakan UTF-8 base64
-        */
-
-        const safeItem = encodeURIComponent(
-            btoa(
-                unescape(
-                    encodeURIComponent(
-                        JSON.stringify(item)
-                    )
-                )
-            )
+        const safeItem = btoa(
+            unescape(encodeURIComponent(JSON.stringify(item)))
         );
-
-
 
         let keteranganCol = "";
         let aksiCol = "";
         let lastEditCol = "";
 
-
-
-        // =====================
-        // ADMIN VIEW
-        // =====================
+        // 🔒 hanya admin / non-requestor
         if (role !== "requestor") {
-
-
-            keteranganCol = `
-                <td>
-                    ${escapeHTML(item[7] || "-")}
-                </td>
-            `;
-
-
+            keteranganCol = `<td>${item[7] || "-"}</td>`;
 
             aksiCol = `
                 <td>
-
-                    <button 
-                        class="btn btn-warning btn-sm"
-                        onclick="prepareEdit(decodeURIComponent('${safeItem}'))">
+                    <button class="btn btn-warning btn-sm"
+                        onclick="prepareEdit('${safeItem}')">
                         Edit
                     </button>
 
-
-                    <button 
-                        class="btn btn-danger btn-sm"
-                        onclick="hapusData('${escapeHTML(item[0] || "")}')">
+                    <button class="btn btn-danger btn-sm"
+                        onclick="hapusData('${item[0] || ""}')">
                         Hapus
                     </button>
-
                 </td>
             `;
 
-
-
-            lastEditCol = `
-                <td>
-                    ${formatLastEdit(item[8])}
-                </td>
-            `;
-
+            lastEditCol = `<td>${formatLastEdit(item[8])}</td>`;
         }
 
-
-
         html += `
-
         <tr>
+            <td><span class="ticket-badge">${item[0] || ""}</span></td>
+            <td>${start + index + 1}</td>
+            <td>${formatTanggal(item[1])}</td>
+            <td>${formatJam(item[2])}</td>
+            <td>${item[5] || ""}</td>
+            <td>${item[3] || ""}</td>
+            <td>${item[4] || ""}</td>
 
-            <td>
-                <span class="ticket-badge">
-                    ${escapeHTML(item[0] || "")}
-                </span>
-            </td>
-
-
-            <td>
-                ${start + index + 1}
-            </td>
-
-
-            <td>
-                ${formatTanggal(item[1])}
-            </td>
-
-
-            <td>
-                ${formatJam(item[2])}
-            </td>
-
-
-            <td>
-                ${escapeHTML(item[5] || "")}
-            </td>
-
-
-            <td>
-                ${escapeHTML(item[3] || "")}
-            </td>
-
-
-            <td>
-                ${escapeHTML(item[4] || "")}
-            </td>
-
-
-            <td>
-                <b class="${statusClass}">
-                    ${(statusRaw || "-").toUpperCase()}
-                </b>
-            </td>
-
+            <td><b class="${statusClass}">
+                ${(statusRaw || "-").toUpperCase()}
+            </b></td>
 
             ${keteranganCol}
-
             ${aksiCol}
-
             ${lastEditCol}
-
-
-        </tr>
-
-        `;
-
+        </tr>`;
     });
-
-
 
     tbody.innerHTML = html;
 
-
     renderPaginationInfo();
-
-}
-	function escapeHTML(value) {
-
-    return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-
 }
 // =========================
 // EDIT (FIXED SAFE VERSION)
 // =========================
-// =========================
-// PREPARE EDIT
-// =========================
-
 function prepareEdit(encoded) {
+    const item = JSON.parse(
+        decodeURIComponent(escape(atob(encoded)))
+    );
 
-    try {
+    editId = item[0];
 
-        const item = JSON.parse(
-            decodeURIComponent(
-                atob(encoded)
-            )
-        );
+    document.getElementById("tanggal").value = item[1];
 
+    const j = (item[2] || "00:00").split(":");
+    document.getElementById("jam").value = j[0];
+    document.getElementById("menit").value = j[1];
 
-        if (!item || !item[0]) {
-            throw new Error("Data edit tidak valid");
-        }
+    document.getElementById("requestor").value = item[3];
+    document.getElementById("area").value = item[4];
+    document.getElementById("deskripsi").value = item[5];
+    document.getElementById("status").value = item[6];
+    document.getElementById("keterangan").value = item[7] || "";
 
-
-        editId = item[0];
-
-
-        setValue("tanggal", item[1] || "");
-
-
-        const time = (item[2] || "00:00").split(":");
-
-        setValue("jam", time[0] || "00");
-        setValue("menit", time[1] || "00");
-
-
-        setValue("requestor", item[3] || "");
-        setValue("area", item[4] || "");
-        setValue("deskripsi", item[5] || "");
-        setValue("status", item[6] || "Open");
-        setValue("keterangan", item[7] || "");
-
-
-
-        // Toggle tombol
-        document.getElementById("submitBtn")
-            ?.classList.add("hidden");
-
-
-        document.getElementById("updateBtn")
-            ?.classList.remove("hidden");
-
-
-
-        // Scroll ke form
-        document.getElementById("jobForm")
-            ?.scrollIntoView({
-                behavior: "smooth"
-            });
-
-
-
-    } catch (err) {
-
-        console.error(
-            "prepareEdit error:",
-            err
-        );
-
-        alert(
-            "Data edit tidak dapat dibuka"
-        );
-
-    }
-
+    document.getElementById("submitBtn").classList.add("hidden");
+    document.getElementById("updateBtn").classList.remove("hidden");
 }
-
-
-
-// =========================
-// UPDATE DATA
-// =========================
-
-function updateData() {
-
-
+	function updateData() {
     if (!editId) {
-
-        alert(
-            "ID tidak ditemukan, silakan pilih Edit ulang."
-        );
-
+        alert("ID tidak ditemukan, ulangi klik Edit");
         return;
     }
 
-
-
-    const role =
-        localStorage.getItem("userRole");
-
-
-
     const payload = {
-
-        tanggal:
-            getValue("tanggal"),
-
-
-        jam:
-            `${getValue("jam")}:${getValue("menit")}`,
-
-
-        requestor:
-            getValue("requestor"),
-
-
-        area:
-            getValue("area"),
-
-
-        deskripsi:
-            getValue("deskripsi"),
-
-
-        // 🔒 Requestor tidak boleh mengubah status
-        status:
-            role === "requestor"
-                ? "Open"
-                : getValue("status"),
-
-
-        keterangan:
-            getValue("keterangan")
-
+        tanggal: document.getElementById("tanggal").value,
+        jam: document.getElementById("jam").value + ":" + document.getElementById("menit").value,
+        requestor: document.getElementById("requestor").value,
+        area: document.getElementById("area").value,
+        deskripsi: document.getElementById("deskripsi").value,
+        status: document.getElementById("status").value,
+        keterangan: document.getElementById("keterangan").value
     };
 
+    console.log("UPDATE PAYLOAD:", { id: editId, ...payload });
 
-
-    console.log(
-        "UPDATE PAYLOAD:",
-        {
-            id: editId,
-            ...payload
-        }
-    );
-
-
-
-    kirimData(
-        "update",
-        {
-            id: editId,
-            ...payload
-        }
-    );
-
-
-    resetEditMode();
-
-}
-
-
-
-// =========================
-// HELPER FORM
-// =========================
-
-function setValue(id, value) {
-
-    const el = document.getElementById(id);
-
-    if (el) {
-        el.value = value;
-    }
-
-}
-
-
-function getValue(id) {
-
-    return document.getElementById(id)?.value || "";
-
-}
-
-
-
-// =========================
-// RESET MODE EDIT
-// =========================
-
-function resetEditMode() {
-
-    editId = null;
-
-
-    document.getElementById("submitBtn")
-        ?.classList.remove("hidden");
-
-
-    document.getElementById("updateBtn")
-        ?.classList.add("hidden");
-
+    kirimData("update", { id: editId, ...payload });
 }
 // =========================
 // DELETE
 // =========================
-
 let isDeleting = false;
 
-
-async function hapusData(id) {
-
+function hapusData(id) {
     if (!id) {
         alert("ID tidak valid");
         return;
     }
 
+    if (isDeleting) return;
 
-    if (isDeleting) {
-        return;
-    }
-
-
-    const confirmDelete = confirm(
-        "Yakin ingin menghapus data ini?"
-    );
-
-
-    if (!confirmDelete) {
-        return;
-    }
-
-
+    const confirmDelete = confirm("Yakin hapus data ini?");
+    if (!confirmDelete) return;
 
     isDeleting = true;
 
-
-
     try {
-
-        await kirimData(
-            "delete",
-            {
-                id
-            }
-        );
-
-
-    } catch (err) {
-
-        console.error(
-            "hapusData error:",
-            err
-        );
-
-
+        kirimData("delete", { id });
     } finally {
-
-        isDeleting = false;
-
+        // dikembalikan setelah request selesai (lebih aman di kirimData juga)
+        setTimeout(() => {
+            isDeleting = false;
+        }, 1000);
     }
-
 }
-
-
-
 // =========================
-// RESET FORM
+// RESET
 // =========================
-
 function resetForm() {
-
-
     editId = null;
 
+    const form = document.getElementById("jobForm");
+    if (form) form.reset();
 
+    const submitBtn = document.getElementById("submitBtn");
+    const updateBtn = document.getElementById("updateBtn");
 
-    const form =
-        document.getElementById("jobForm");
-
-
-    if (form) {
-        form.reset();
-    }
-
-
-
-    // Tombol mode
-    document.getElementById("submitBtn")
-        ?.classList.remove("hidden");
-
-
-    document.getElementById("updateBtn")
-        ?.classList.add("hidden");
-
-
-
-    // Default value
-    setDefaultFormValue();
-
-
-
+    if (submitBtn) submitBtn.classList.remove("hidden");
+    if (updateBtn) updateBtn.classList.add("hidden");
 }
-
-
-
 // =========================
-// DEFAULT FORM VALUE
-// =========================
-
-function setDefaultFormValue() {
-
-
-    const tanggal =
-        document.getElementById("tanggal");
-
-
-    const status =
-        document.getElementById("status");
-
-
-    if (tanggal) {
-
-        const today =
-            new Date()
-            .toISOString()
-            .split("T")[0];
-
-
-        tanggal.value = today;
-
-    }
-
-
-
-    if (status) {
-
-        status.value = "Open";
-
-    }
-
-
-
-    document.getElementById("keterangan")
-        ?.value = "";
-
-}
-
-
-	
-// =========================
-// UTIL FUNCTIONS
-// =========================
-
-
-// =========================
-// AUTO UPPERCASE
+// UTIL
 // =========================
 function autoUppercase() {
-
-    [
-        "requestor",
-        "deskripsi",
-        "keterangan"
-    ].forEach(id => {
-
+    ["requestor", "deskripsi", "keterangan"].forEach(id => {
         const el = document.getElementById(id);
-
         if (!el) return;
 
-
         el.addEventListener("input", function () {
-
-            this.value =
-                this.value.toUpperCase();
-
+            this.value = this.value.toUpperCase();
         });
-
     });
-
 }
 
-
-
-// =========================
-// TOAST
-// =========================
-function showToast(msg, type = "info") {
-
-    const oldToast =
-        document.querySelector(".app-toast");
-
-
-    if (oldToast) {
-        oldToast.remove();
-    }
-
-
-
-    const toast =
-        document.createElement("div");
-
-
-    toast.className =
-        `alert alert-${type} app-toast`;
-
-
-    Object.assign(toast.style, {
-
-        position: "fixed",
-        top: "15px",
-        right: "15px",
-        zIndex: "9999",
-        minWidth: "250px"
-
-    });
-
-
-
+function showToast(msg, type) {
+    const toast = document.createElement("div");
+    toast.className = `alert alert-${type}`;
+    toast.style.position = "fixed";
+    toast.style.top = "10px";
+    toast.style.right = "10px";
+    toast.style.zIndex = 9999;
     toast.innerText = msg;
-
 
     document.body.appendChild(toast);
 
-
-
-    setTimeout(() => {
-
-        toast.remove();
-
-    }, 3000);
-
+    setTimeout(() => toast.remove(), 2500);
 }
 
-
-
-// =========================
-// CLOCK
-// =========================
 function updateClock() {
-
-    const el =
-        document.getElementById("clockIndo");
-
-
+    const el = document.getElementById("clockIndo");
     if (!el) return;
 
-
-    el.textContent =
-        new Date().toLocaleString(
-            "id-ID"
-        );
-
+    el.innerText = new Date().toLocaleString("id-ID");
 }
 
-
-
-// =========================
-// DEFAULT DATE
-// =========================
 function setTanggalHariIni() {
-
-    const el =
-        document.getElementById("tanggal");
-
-
+    const el = document.getElementById("tanggal");
     if (!el) return;
 
-
-    el.value =
-        new Date()
-        .toISOString()
-        .split("T")[0];
-
+    el.value = new Date().toISOString().split("T")[0];
 }
 
-
-
-// =========================
-// TIME SELECT
-// =========================
 function populateTimeSelects() {
-
-
-    const jam =
-        document.getElementById("jam");
-
-
-    const menit =
-        document.getElementById("menit");
-
-
+    const jam = document.getElementById("jam");
+    const menit = document.getElementById("menit");
 
     if (!jam || !menit) return;
 
+    let jamOptions = "";
+    let menitOptions = "";
 
+    for (let i = 0; i < 24; i++) {
+        const value = String(i).padStart(2, "0");
+        jamOptions += `<option value="${value}">${value}</option>`;
+    }
 
-    jam.innerHTML =
-        Array.from(
-            { length: 24 },
-            (_, i) => {
+    for (let i = 0; i < 60; i++) {
+        const value = String(i).padStart(2, "0");
+        menitOptions += `<option value="${value}">${value}</option>`;
+    }
 
-                const v =
-                    String(i)
-                    .padStart(2, "0");
-
-
-                return `
-                <option value="${v}">
-                    ${v}
-                </option>`;
-
-            }
-        ).join("");
-
-
-
-    menit.innerHTML =
-        Array.from(
-            { length: 60 },
-            (_, i) => {
-
-                const v =
-                    String(i)
-                    .padStart(2, "0");
-
-
-                return `
-                <option value="${v}">
-                    ${v}
-                </option>`;
-
-            }
-        ).join("");
-
+    jam.innerHTML = jamOptions;
+    menit.innerHTML = menitOptions;
 }
-
-
-
-// =========================
-// FORMAT DATE
-// =========================
 function formatTanggal(val) {
+    if (!val) return "";
 
-    if (!val) return "-";
+    const d = new Date(val);
+    if (isNaN(d)) return val;
 
-
-    const d =
-        new Date(val);
-
-
-    if (isNaN(d)) {
-        return val;
-    }
-
-
-    return d.toLocaleDateString(
-        "id-ID"
-    );
-
+    return d.toLocaleDateString("id-ID");
 }
 
-
-
-// =========================
-// FORMAT TIME
-// =========================
 function formatJam(val) {
+    if (!val) return "";
 
-    if (!val) return "-";
+    const d = new Date(val);
 
-
-    if (
-        /^\d{2}:\d{2}$/.test(val)
-    ) {
-        return val;
-    }
-
-
-
-    const d =
-        new Date(val);
-
-
-    if (isNaN(d)) {
-        return val;
-    }
-
-
-
-    return d.toLocaleTimeString(
-        "id-ID",
-        {
+    if (!isNaN(d)) {
+        return d.toLocaleTimeString("id-ID", {
             hour: "2-digit",
             minute: "2-digit"
-        }
-    );
+        });
+    }
 
+    return val;
 }
 
-
-
-// =========================
-// CURRENT TIME
-// =========================
 function setJamSekarang() {
-
-
-    const now =
-        new Date();
-
-
-    const jam =
-        document.getElementById("jam");
-
-
-    const menit =
-        document.getElementById("menit");
-
+    const jam = document.getElementById("jam");
+    const menit = document.getElementById("menit");
 
     if (!jam || !menit) return;
 
+    const now = new Date();
 
-    jam.value =
-        String(now.getHours())
-        .padStart(2, "0");
-
-
-    menit.value =
-        String(now.getMinutes())
-        .padStart(2, "0");
-
+    jam.value = now.getHours().toString().padStart(2, "0");
+    menit.value = now.getMinutes().toString().padStart(2, "0");
 }
-
-
-
-// =========================
-// LAST EDIT
-// =========================
-function formatLastEdit(dateString) {
-
+	function formatLastEdit(dateString) {
     if (!dateString) return "-";
 
+    const date = new Date(dateString);
 
-    const date =
-        new Date(dateString);
-
-
-    if (isNaN(date)) {
-        return "-";
-    }
-
-
-    return date.toLocaleString(
-        "id-ID",
-        {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-        }
-    );
-
+    return date.toLocaleString("id-ID", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
 }
-
-
-
-// =========================
-// DASHBOARD
-// =========================
 function updateDashboard() {
+    const data = allData || [];
 
+    let open = 0;
+    let progress = 0;
+    let done = 0;
 
-    const counter = {
+    data.forEach(item => {
+        const status = String(item[6] || "").toLowerCase();
 
-        open: 0,
-        progress: 0,
-        done: 0
-
-    };
-
-
-
-    (allData || [])
-    .forEach(item => {
-
-
-        const status =
-            String(item[6] || "")
-            .toLowerCase();
-
-
-
-        if (counter[status] !== undefined) {
-            counter[status]++;
-        }
-
-
+        if (status === "open") open++;
+        else if (status === "progress") progress++;
+        else if (status === "done") done++;
     });
 
+    const openEl = document.getElementById("openCount");
+    const progressEl = document.getElementById("progressCount");
+    const doneEl = document.getElementById("doneCount");
 
-
-    document.getElementById("openCount")
-        ?.textContent = counter.open;
-
-
-    document.getElementById("progressCount")
-        ?.textContent = counter.progress;
-
-
-    document.getElementById("doneCount")
-        ?.textContent = counter.done;
-
+    if (openEl) openEl.innerText = open;
+    if (progressEl) progressEl.innerText = progress;
+    if (doneEl) doneEl.innerText = done;
 }
-
-
-
-// =========================
-// ROLE FORM UI
-// =========================
 function applyFormRoleUI() {
+    const role = localStorage.getItem("userRole");
 
+    const keteranganGroup = document.getElementById("keteranganGroup");
+    const statusSelect = document.getElementById("status");
 
-    const role =
-        localStorage.getItem("userRole");
+    if (role === "requestor") {
 
-
-
-    const group =
-        document.getElementById(
-            "keteranganGroup"
-        );
-
-
-    const status =
-        document.getElementById(
-            "status"
-        );
-
-
-
-    const requestor =
-        role === "requestor";
-
-
-
-    if (group) {
-        group.style.display =
-            requestor
-            ? "none"
-            : "block";
-    }
-
-
-
-    if (status) {
-
-        status.disabled =
-            requestor;
-
-
-        if (requestor) {
-            status.value = "Open";
+        // HIDE KETERANGAN
+        if (keteranganGroup) {
+            keteranganGroup.style.display = "none";
         }
 
+        // LOCK STATUS jadi OPEN
+        if (statusSelect) {
+            statusSelect.value = "Open";
+            statusSelect.disabled = true;
+        }
+
+    } else {
+
+        // admin normal
+        if (keteranganGroup) {
+            keteranganGroup.style.display = "block";
+        }
+
+        if (statusSelect) {
+            statusSelect.disabled = false;
+        }
     }
-
 }
-
-
-
-// =========================
-// ROLE TABLE UI
-// =========================
 function applyRoleUI() {
+    const role = localStorage.getItem("userRole");
 
+    const headerKeterangan = document.getElementById("headerKeterangan");
+    const headerLastEdit = document.getElementById("headerLastEdit");
+    const doneCard = document.getElementById("doneCard");
 
-    const role =
-        localStorage.getItem("userRole");
+    if (role === "requestor") {
 
+        // HEADER
+        if (headerKeterangan) headerKeterangan.style.display = "none";
+        if (headerLastEdit) headerLastEdit.style.display = "none";
 
-    const hide =
-        role === "requestor";
+        // DASHBOARD CARD (opsional)
+        if (doneCard) doneCard.style.display = "none";
 
-
-
-    document.getElementById(
-        "headerKeterangan"
-    )?.style.display =
-        hide ? "none" : "";
-
-
-
-    document.getElementById(
-        "headerLastEdit"
-    )?.style.display =
-        hide ? "none" : "";
-
-
-
-    document.getElementById(
-        "doneCard"
-    )?.style.display =
-        hide ? "none" : "";
-
-}
-
-
-
-// =========================
-// PAGINATION
-// =========================
-function renderPaginationInfo() {
-
-
-    const totalPages =
-        Math.max(
-            1,
-            Math.ceil(
-                allData.length / pageSize
-            )
-        );
-
-
-    const info =
-        document.getElementById(
-            "paginationInfo"
-        );
-
-
-    if (info) {
-        info.textContent =
-            `Page ${currentPage} / ${totalPages}`;
+        // OPTIONAL: sembunyikan kolom ACTION header kalau nanti kamu tambah id
+        // document.getElementById("headerAksi").style.display = "none";
     }
+}
+function renderPaginationInfo() {
+    const totalPages = Math.ceil(allData.length / pageSize);
 
+    document.getElementById("paginationInfo").innerText =
+        `Page ${currentPage} / ${totalPages}`;
 
-
-    document.getElementById("prevBtn")
-        ?.toggleAttribute(
-            "disabled",
-            currentPage === 1
-        );
-
-
-    document.getElementById("nextBtn")
-        ?.toggleAttribute(
-            "disabled",
-            currentPage === totalPages
-        );
-
+    document.getElementById("prevBtn").disabled = currentPage === 1;
+    document.getElementById("nextBtn").disabled = currentPage === totalPages;
 }
 
+function nextPage() {
+    const totalPages = Math.ceil(allData.length / pageSize);
 
+    if (currentPage < totalPages) {
+        currentPage++;
+        renderTable();
+    }
+}
 
-// =========================
-// SEARCH
-// =========================
+function prevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        renderTable();
+    }
+}
 window.filterHistory = function () {
+    const input = document.getElementById("searchHistory");
+    if (!input) return;
 
+    const keyword = input.value.toLowerCase();
 
-    const keyword =
-        document.getElementById(
-            "searchHistory"
-        )?.value
-        .toLowerCase()
-        .trim();
-
-
-
-    window.filteredData =
-        !keyword
-        ? null
-        : allData.filter(item => {
-
-
-            return [
-                item[0],
-                item[3],
-                item[4],
-                item[5]
-            ]
-            .some(v =>
-                String(v || "")
-                .toLowerCase()
-                .includes(keyword)
-            );
-
-
-        });
-
-
+    const filtered = allData.filter(item => {
+        return (
+            String(item[0]).toLowerCase().includes(keyword) ||
+            String(item[3]).toLowerCase().includes(keyword) ||
+            String(item[4]).toLowerCase().includes(keyword) ||
+            String(item[5]).toLowerCase().includes(keyword)
+        );
+    });
 
     currentPage = 1;
-
+    window.filteredData = filtered;
     renderTableFiltered();
-
 };
 
-
-
-// =========================
-// TABLE
-// =========================
 function renderTable() {
     renderTableFiltered();
 }
-
-
-
-// =========================
-// LOGIN INFO
-// =========================
 function showLoginInfo() {
+    const role = localStorage.getItem("userRole");
+    const isLogin = localStorage.getItem("isLoggedIn");
+    const username = localStorage.getItem("username"); // 🔥 TAMBAH
 
-
-    const info =
-        document.getElementById(
-            "loginInfo"
-        );
-
+    const info = document.getElementById("loginInfo");
 
     if (!info) return;
 
+    if (isLogin === "true") {
 
+        info.innerText = `LOGIN: ${username || role}`;
 
-    const role =
-        localStorage.getItem("userRole");
-
-
-    const username =
-        localStorage.getItem("username");
-
-
-
-    if (!Auth.isLoggedIn()) {
-
-        info.textContent = "";
-
-        return;
-
-    }
-
-
-
-    info.textContent =
-        `LOGIN: ${username || role}`;
-
-
-
-    info.className =
-        role === "admin"
-        ? "badge bg-primary"
-        :
-        role === "requestor"
-        ? "badge bg-success"
-        :
-        "badge bg-secondary";
-
-}
-document.addEventListener("DOMContentLoaded",()=>{
-
-    Auth.init();
-
-
-    document.getElementById("btnLogin")
-    ?.addEventListener(
-        "click",
-        handleLogin
-    );
-
-
-    document.getElementById("password")
-    ?.addEventListener(
-        "keydown",
-        e=>{
-            if(e.key==="Enter"){
-                handleLogin();
-            }
+        if (role === "admin") {
+            info.className = "badge bg-primary";
+        } else if (role === "requestor") {
+            info.className = "badge bg-success";
+        } else {
+            info.className = "badge bg-secondary";
         }
-    );
 
-});
+    } else {
+        info.innerText = "";
+    }
+}
 </script>
 
 </body>
