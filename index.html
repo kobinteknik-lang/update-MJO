@@ -790,26 +790,54 @@ function renderTable() {
    SEARCH / FILTER HISTORY
 ===================================================== */
 function filterHistory() {
+    // 1. Ambil keyword dan validasi elemen input
     const keyword = document.getElementById("searchHistory")?.value.toLowerCase().trim();
 
-    if (!keyword) {
+    // 2. Proteksi: Pastikan AppState.allData adalah array yang valid sebelum di-filter
+    if (!Array.isArray(AppState.allData)) {
         AppState.filteredData = null;
-    } else {
-        AppState.filteredData = AppState.allData.filter(row =>
-            row.some(value => String(value ?? "").toLowerCase().includes(keyword))
-        );
+        AppState.currentPage = 1;
+        if (typeof renderTable === "function") renderTable();
+        return;
     }
 
-    AppState.currentPage = 1;
-    renderTable();
-}
+    // 3. Proses filtering data
+    if (!keyword) {
+        AppState.filteredData = null; // Kembali menampilkan semua data
+    } else {
+        AppState.filteredData = AppState.allData.filter(row => {
+            // Pastikan baris (row) berbentuk array sebelum diproses
+            if (!Array.isArray(row)) return false;
+            
+            return row.some(value => 
+                String(value ?? "").toLowerCase().includes(keyword)
+            );
+        });
+    }
 
+    // 4. Reset ke halaman 1 dan gambar ulang tabel
+    AppState.currentPage = 1;
+    if (typeof renderTable === "function") {
+        renderTable();
+    }
+}
 /* =====================================================
    PAGINATION
 ===================================================== */
-function renderPagination() {
+// Fungsi Helper: Menghitung total halaman secara konsisten
+function getTotalPages() {
     const data = Array.isArray(AppState.filteredData) ? AppState.filteredData : AppState.allData;
-    const totalPage = Math.max(1, Math.ceil(data.length / AppState.pageSize));
+    const itemsCount = Array.isArray(data) ? data.length : 0;
+    return Math.max(1, Math.ceil(itemsCount / (AppState.pageSize || 10)));
+}
+
+function renderPagination() {
+    const totalPage = getTotalPages();
+
+    // Proteksi: Jika halaman saat ini melompat melebihi total halaman (misal setelah filter/hapus data)
+    if (AppState.currentPage > totalPage) {
+        AppState.currentPage = totalPage;
+    }
 
     const info = document.getElementById("paginationInfo");
     if (info) {
@@ -824,19 +852,19 @@ function renderPagination() {
 }
 
 function nextPage() {
-    const data = Array.isArray(AppState.filteredData) ? AppState.filteredData : AppState.allData;
-    const totalPage = Math.max(1, Math.ceil(data.length / AppState.pageSize));
+    const totalPage = getTotalPages();
     
     if (AppState.currentPage < totalPage) {
         AppState.currentPage++;
-        renderTable();
+        // Pastikan renderTable() mengambil potongan data (slice) berdasarkan AppState.currentPage terbaru
+        if (typeof renderTable === "function") renderTable();
     }
 }
 
 function prevPage() {
     if (AppState.currentPage > 1) {
         AppState.currentPage--;
-        renderTable();
+        if (typeof renderTable === "function") renderTable();
     }
 }
 
@@ -939,24 +967,42 @@ function prepareEdit(encoded) {
             throw new Error("String encoded kosong atau undefined");
         }
 
-        // 2. Bersihkan string dari spasi/baris baru, dan konversi format URL-safe Base64 ke Standar
-        let cleanEncoded = String(encoded)
-            .trim()
-            .replace(/-/g, '+')
-            .replace(/_/g, '/');
+        let rawString = String(encoded).trim();
+        let decodedStr = "";
 
-        // 3. Perbaiki padding '=' jika hilang di backend
-        const padNeeded = (4 - (cleanEncoded.length % 4)) % 4;
-        if (padNeeded) {
-            cleanEncoded += '='.repeat(padNeeded);
+        // =================================================================
+        // UPGRADE PENANGANAN DECODE (Mengatasi InvalidCharacterError)
+        // =================================================================
+        
+        // Cek apakah string didominasi URL-encoded (mengandung banyak '%')
+        // Data Anda: JTVCJTIyVEt...%3D memiliki '%' di ujungnya karena URL-safe padding (%3D)
+        if (rawString.includes('%')) {
+            // Lakukan decode URL-encode pertama untuk membersihkan '%'
+            rawString = decodeURIComponent(rawString);
         }
 
-        // 4. Proses decode dan parsing JSON
-        const item = JSON.parse(
-            decodeURIComponent(
-                atob(cleanEncoded)
-            )
-        );
+        // Cek apakah ini Base64 (Masih diawali 'JTVD' setelah di-decode URL)
+        if (rawString.startsWith('JTVD') || !rawString.startsWith('[')) {
+            // Bersihkan format URL-safe Base64 ke Standar
+            let cleanEncoded = rawString
+                .replace(/-/g, '+')
+                .replace(/_/g, '/');
+
+            // Perbaiki padding '=' jika hilang
+            const padNeeded = (4 - (cleanEncoded.length % 4)) % 4;
+            if (padNeeded) {
+                cleanEncoded += '='.repeat(padNeeded);
+            }
+
+            // Decode Base64, lalu bersihkan URL komponen di dalamnya
+            decodedStr = decodeURIComponent(atob(cleanEncoded));
+        } else {
+            // Jika data ternyata sudah berupa string JSON murni setelah decode URL
+            decodedStr = rawString;
+        }
+
+        // 2. Parsing ke JSON Array
+        const item = JSON.parse(decodedStr);
 
         if (!item || !item[0]) {
             throw new Error("Data tidak valid atau format array salah");
@@ -965,11 +1011,29 @@ function prepareEdit(encoded) {
         // --- Sisa kode Anda ke bawah tetap sama ---
         AppState.editId = item[0];
 
-        setValue("tanggal", item[1] || "");
+        // Format tanggal (menghindari error jika format ISO)
+        let tglValue = item[1] || "";
+        if (tglValue.includes("T")) tglValue = tglValue.split("T")[0]; 
+        setValue("tanggal", tglValue);
 
-        const time = String(item[2] || "00:00").split(":");
-        setValue("jam", time[0] || "00");
-        setValue("menit", time[1] || "00");
+        // Format Jam & Menit
+        let jamStr = "00";
+        let menitStr = "00";
+        if (item[2]) {
+            // Jika formatnya ISO (e.g., 1899-12-30T10:17:48.000Z)
+            if (item[2].includes("T")) {
+                const timePart = item[2].split("T")[1];
+                const splitTime = timePart.split(":");
+                jamStr = splitTime[0] || "00";
+                menitStr = splitTime[1] || "00";
+            } else {
+                const splitTime = String(item[2]).split(":");
+                jamStr = splitTime[0] || "00";
+                menitStr = splitTime[1] || "00";
+            }
+        }
+        setValue("jam", jamStr);
+        setValue("menit", menitStr);
 
         setValue("requestor", item[3] || "");
         setValue("area", item[4] || "");
@@ -982,16 +1046,10 @@ function prepareEdit(encoded) {
         document.getElementById("jobForm")?.scrollIntoView({ behavior: "smooth" });
 
     } catch (err) {
-        // Cetak string asli ke console agar Anda bisa tahu isi data yang rusak
         console.error("EDIT ERROR (Data Asli:", encoded, ") Detail:", err);
-
-        showToast(
-            "Data edit gagal dibuka",
-            "danger"
-        );
+        showToast("Data edit gagal dibuka", "danger");
     }
 }
-
 
 /* =====================================================
    UPDATE DATA
@@ -1003,12 +1061,11 @@ async function updateData() {
         return;
     }
 
-    // 2. Cegah double-submit menggunakan state loading (jika ada di AppState Anda)
-    // Atau jika tombolnya ingin di-disable secara langsung:
+    // 2. Cegah double-submit
     const updateBtn = document.getElementById("updateBtn");
-    if (updateBtn && updateBtn.disabled) return; // Jika sedang loading, hentikan eksekusi
+    if (updateBtn && updateBtn.disabled) return; 
 
-    // 3. Validasi Form Dasar (Contoh: Deskripsi & Tanggal wajib diisi)
+    // 3. Validasi Form Dasar
     if (!getValue("tanggal") || !getValue("deskripsi")) {
         showToast("Tanggal dan Deskripsi wajib diisi!", "warning");
         return;
@@ -1022,25 +1079,38 @@ async function updateData() {
         }
 
         const role = Auth.getRole();
+        
+        // Format jam agar sesuai standar HH:mm (e.g. 1899-12-30T10:17:48.000Z atau string waktu)
+        // Menyesuaikan dengan kebutuhan backend Anda, di sini kita buat string gabungan jam:menit
+        const jamMenit = `${getValue("jam")}:${getValue("menit")}`;
+        
+        // Tentukan status berdasarkan role pengguna
+        const statusData = role === "requestor" ? "Open" : getValue("status");
 
-        // Menyusun data yang akan dikirim
-        const payload = {
-            id: AppState.editId,
-            tanggal: getValue("tanggal"),
-            jam: `${getValue("jam")}:${getValue("menit")}`,
-            requestor: getValue("requestor"),
-            area: getValue("area"),
-            deskripsi: getValue("deskripsi"),
-            status: role === "requestor" ? "Open" : getValue("status"),
-            keterangan: getValue("keterangan")
-        };
+        // =================================================================
+        // PERBAIKAN STRUKTUR PAYLOAD (Mengikuti format Array Asli)
+        // =================================================================
+        const payload = [
+            AppState.editId,                  // 0: ID (TKT110726132801)
+            getValue("tanggal"),              // 1: Tanggal Request
+            jamMenit,                         // 2: Jam
+            getValue("requestor"),            // 3: Nama Requestor
+            getValue("area"),                 // 4: Area Kerja (e.g. PACKING 2A)
+            getValue("deskripsi"),            // 5: Deskripsi Kerusakan
+            statusData,                       // 6: Status (e.g. DONE / Open)
+            getValue("keterangan"),           // 7: Catatan (e.g. DIKERJAKAN OLEH...)
+            new Date().toISOString()          // 8: Waktu Update Terbaru (2026-07-11T...)
+        ];
 
         // 4. Kirim data ke backend/server
         const success = await kirimData("update", payload);
 
         if (success) {
             showToast("Data berhasil diperbarui!", "success");
-            resetEditMode();
+            // Pastikan fungsi ini mereset AppState.editId, form input, dan menyembunyikan updateBtn
+            if (typeof resetEditMode === "function") {
+                resetEditMode();
+            }
         } else {
             showToast("Gagal memperbarui data di server", "danger");
         }
@@ -1049,10 +1119,10 @@ async function updateData() {
         console.error("Error saat updateData:", error);
         showToast("Terjadi kesalahan sistem", "danger");
     } finally {
-        // 5. Kembalikan status tombol ke semula setelah selesai (sukses maupun gagal)
+        // 5. Kembalikan status tombol ke semula
         if (updateBtn) {
             updateBtn.disabled = false;
-            updateBtn.innerText = "Update"; // Sesuaikan dengan teks asli tombol Anda
+            updateBtn.innerText = "Update"; 
         }
     }
 }
@@ -1066,26 +1136,38 @@ async function hapusData(id) {
     if (AppState.isDeleting) return;
 
     // Konfirmasi dari pengguna
-    if (!confirm("Yakin ingin menghapus data ini?")) {
+    if (!confirm("Apakah Anda yakin ingin menghapus data dengan ID " + id + "?")) {
         return;
     }
 
     AppState.isDeleting = true;
 
     try {
-        // PENTING: Tangkap nilai return (true/false) dari fungsi kirimData
-        const success = await kirimData("delete", { id });
+        // =================================================================
+        // PENYESUAIAN PAYLOAD: 
+        // Pastikan apakah backend Anda meminta objek { id } atau string ID murni.
+        // Jika backend Anda memproses baris Excel/Spreadsheet berdasarkan string ID, 
+        // mengirim `id` secara langsung biasanya jauh lebih aman.
+        // =================================================================
+        const success = await kirimData("delete", id); 
+        // Catatan: Jika backend Anda mutlak minta objek, kembalikan ke: { id: id }
 
         if (success) {
             showToast("Data berhasil dihapus", "success");
             
-            // Opsional: Jika Anda sedang dalam mode edit untuk data yang DILAPORKAN dihapus ini, reset formnya.
+            // Jika data yang dihapus kebetulan sedang dibuka di form edit, bersihkan form
             if (AppState.editId === id) {
-                resetEditMode();
+                if (typeof resetEditMode === "function") {
+                    resetEditMode();
+                }
             }
             
-            // Jalankan fungsi refresh data tabel Anda di sini jika ada, contoh:
-            // loadData();
+            // PENTING: Aktifkan fungsi refresh tabel Anda di sini agar data langsung hilang dari layar
+            if (typeof loadData === "function") {
+                await loadData();
+            } else if (typeof renderTabel === "function") {
+                renderTabel(); // panggil jika fungsi render Anda lokal
+            }
         } else {
             showToast("Gagal menghapus data dari server", "danger");
         }
