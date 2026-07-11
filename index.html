@@ -870,532 +870,234 @@ function updateDashboard() {
 /* =====================================================
    FORM SUBMIT - TAMBAH DATA
 ===================================================== */
-
-
-async function submitForm(e){
-
-
+async function submitForm(e) {
     e.preventDefault();
 
-
-
+    // 1. Ambil elemen tombol submit untuk kontrol state loading
+    const submitBtn = document.getElementById("submitBtn");
+    if (submitBtn && submitBtn.disabled) return; // Cegah spam klik jika sedang loading
 
     const payload = {
-
-
-        tanggal:
-        getValue("tanggal"),
-
-
-
-        jam:
-        `${getValue("jam")}:${getValue("menit")}`,
-
-
-
-        requestor:
-        getValue("requestor"),
-
-
-
-        area:
-        getValue("area"),
-
-
-
-        deskripsi:
-        getValue("deskripsi"),
-
-
-
-        status:
-        getValue("status"),
-
-
-
-        keterangan:
-        getValue("keterangan")
-
-
-
+        tanggal: getValue("tanggal"),
+        jam: `${getValue("jam")}:${getValue("menit")}`,
+        requestor: getValue("requestor"),
+        area: getValue("area"),
+        deskripsi: getValue("deskripsi"),
+        status: getValue("status") || "Open", // Default ke Open jika kosong
+        keterangan: getValue("keterangan")
     };
 
-
-
-
-
-
-    if(
-        !payload.tanggal ||
-        !payload.requestor ||
-        !payload.area ||
-        !payload.deskripsi
-    ){
-
-
-        showToast(
-
-            "Data wajib belum lengkap",
-
-            "warning"
-
-        );
-
-
+    // 2. Validasi field wajib
+    if (!payload.tanggal || !payload.requestor || !payload.area || !payload.deskripsi) {
+        showToast("Data wajib belum lengkap", "warning");
         return;
-
     }
 
+    try {
+        // 3. Ubah tombol ke mode loading
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Menyimpan...";
+        }
 
+        // 4. Kirim data ke server dan tangkap hasilnya
+        const success = await kirimData("add", payload);
 
+        if (success) {
+            showToast("Data berhasil ditambahkan!", "success");
+            
+            // 5. Reset form ke kondisi semula jika fungsi reset sudah tersedia
+            if (typeof resetForm === "function") {
+                resetForm(); 
+            } else {
+                e.target.reset(); // Reset bawaan form HTML HTML
+            }
+        } else {
+            showToast("Gagal menyimpan data ke server", "danger");
+        }
 
-
-
-
-    await kirimData(
-        "add",
-        payload
-    );
-
-
-
+    } catch (error) {
+        console.error("Error saat submitForm:", error);
+        showToast("Terjadi kesalahan pada sistem", "danger");
+    } finally {
+        // 6. Kembalikan tombol ke kondisi aktif semula
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Simpan"; // Sesuaikan teks asli tombol Anda
+        }
+    }
 }
-
-
-
-
-
-
-
-
-
 /* =====================================================
    PREPARE EDIT
 ===================================================== */
 
 
-function prepareEdit(encoded){
-
-
-
-    try{
-
-
-
-        const item =
-
-        JSON.parse(
-
-            decodeURIComponent(
-
-                atob(encoded)
-
-            )
-
-        );
-
-
-
-
-
-
-        if(
-            !item ||
-            !item[0]
-        ){
-
-            throw new Error(
-                "Data tidak valid"
-            );
-
+function prepareEdit(encoded) {
+    try {
+        // 1. Validasi awal jika data kosong
+        if (!encoded) {
+            throw new Error("String encoded kosong atau undefined");
         }
 
+        // 2. Bersihkan string dari spasi/baris baru, dan konversi format URL-safe Base64 ke Standar
+        let cleanEncoded = String(encoded)
+            .trim()
+            .replace(/-/g, '+')
+            .replace(/_/g, '/');
 
+        // 3. Perbaiki padding '=' jika hilang di backend
+        const padNeeded = (4 - (cleanEncoded.length % 4)) % 4;
+        if (padNeeded) {
+            cleanEncoded += '='.repeat(padNeeded);
+        }
 
-
-
-
-
-        AppState.editId =
-            item[0];
-
-
-
-
-
-
-
-        setValue(
-            "tanggal",
-            item[1] || ""
+        // 4. Proses decode dan parsing JSON
+        const item = JSON.parse(
+            decodeURIComponent(
+                atob(cleanEncoded)
+            )
         );
 
-
-
-
-
-
-        const time =
-
-        String(item[2] || "00:00")
-
-        .split(":");
-
-
-
-
-
-        setValue(
-            "jam",
-            time[0] || "00"
-        );
-
-
-
-        setValue(
-            "menit",
-            time[1] || "00"
-        );
-
-
-
-
-
-
-
-        setValue(
-            "requestor",
-            item[3] || ""
-        );
-
-
-
-        setValue(
-            "area",
-            item[4] || ""
-        );
-
-
-
-        setValue(
-            "deskripsi",
-            item[5] || ""
-        );
-
-
-
-        setValue(
-            "status",
-            item[6] || "Open"
-        );
-
-
-
-        setValue(
-            "keterangan",
-            item[7] || ""
-        );
-
-
-
-
-
-
-
-        document
-
-        .getElementById(
-            "submitBtn"
-        )
-
-        ?.classList
-
-        .add("hidden");
-
-
-
-
-
-
-        document
-
-        .getElementById(
-            "updateBtn"
-        )
-
-        ?.classList
-
-        .remove("hidden");
-
-
-
-
-
-
-
-        document
-
-        .getElementById(
-            "jobForm"
-        )
-
-        ?.scrollIntoView({
-
-            behavior:"smooth"
-
-        });
-
-
-
-
-
-
-    }
-
-    catch(err){
-
-
-
-        console.error(
-            "EDIT ERROR",
-            err
-        );
-
-
+        if (!item || !item[0]) {
+            throw new Error("Data tidak valid atau format array salah");
+        }
+
+        // --- Sisa kode Anda ke bawah tetap sama ---
+        AppState.editId = item[0];
+
+        setValue("tanggal", item[1] || "");
+
+        const time = String(item[2] || "00:00").split(":");
+        setValue("jam", time[0] || "00");
+        setValue("menit", time[1] || "00");
+
+        setValue("requestor", item[3] || "");
+        setValue("area", item[4] || "");
+        setValue("deskripsi", item[5] || "");
+        setValue("status", item[6] || "Open");
+        setValue("keterangan", item[7] || "");
+
+        document.getElementById("submitBtn")?.classList.add("hidden");
+        document.getElementById("updateBtn")?.classList.remove("hidden");
+        document.getElementById("jobForm")?.scrollIntoView({ behavior: "smooth" });
+
+    } catch (err) {
+        // Cetak string asli ke console agar Anda bisa tahu isi data yang rusak
+        console.error("EDIT ERROR (Data Asli:", encoded, ") Detail:", err);
 
         showToast(
             "Data edit gagal dibuka",
             "danger"
         );
-
-
-
     }
-
-
 }
-
-
-
-
-
-
-
 
 
 /* =====================================================
    UPDATE DATA
 ===================================================== */
-
-
-async function updateData(){
-
-
-
-    if(!AppState.editId){
-
-
-
-        showToast(
-            "ID data tidak ditemukan",
-            "warning"
-        );
-
-
+async function updateData() {
+    // 1. Validasi ID
+    if (!AppState.editId) {
+        showToast("ID data tidak ditemukan", "warning");
         return;
-
-
     }
 
-
-
-
-
-
-
-    const role =
-        Auth.getRole();
-
-
-
-
-
-
-
-    const payload={
-
-
-
-        id:
-        AppState.editId,
-
-
-
-        tanggal:
-        getValue("tanggal"),
-
-
-
-        jam:
-        `${getValue("jam")}:${getValue("menit")}`,
-
-
-
-        requestor:
-        getValue("requestor"),
-
-
-
-        area:
-        getValue("area"),
-
-
-
-        deskripsi:
-        getValue("deskripsi"),
-
-
-
-
-        status:
-
-        role === "requestor"
-
-        ?
-
-        "Open"
-
-        :
-
-        getValue("status"),
-
-
-
-
-        keterangan:
-        getValue("keterangan")
-
-
-
-    };
-
-
-
-
-
-
-
-
-    const success =
-
-    await kirimData(
-        "update",
-        payload
-    );
-
-
-
-
-
-
-
-    if(success){
-
-
-        resetEditMode();
-
-
+    // 2. Cegah double-submit menggunakan state loading (jika ada di AppState Anda)
+    // Atau jika tombolnya ingin di-disable secara langsung:
+    const updateBtn = document.getElementById("updateBtn");
+    if (updateBtn && updateBtn.disabled) return; // Jika sedang loading, hentikan eksekusi
+
+    // 3. Validasi Form Dasar (Contoh: Deskripsi & Tanggal wajib diisi)
+    if (!getValue("tanggal") || !getValue("deskripsi")) {
+        showToast("Tanggal dan Deskripsi wajib diisi!", "warning");
+        return;
     }
 
+    try {
+        // Aktifkan efek loading pada tombol
+        if (updateBtn) {
+            updateBtn.disabled = true;
+            updateBtn.innerText = "Memperbarui...";
+        }
 
+        const role = Auth.getRole();
+
+        // Menyusun data yang akan dikirim
+        const payload = {
+            id: AppState.editId,
+            tanggal: getValue("tanggal"),
+            jam: `${getValue("jam")}:${getValue("menit")}`,
+            requestor: getValue("requestor"),
+            area: getValue("area"),
+            deskripsi: getValue("deskripsi"),
+            status: role === "requestor" ? "Open" : getValue("status"),
+            keterangan: getValue("keterangan")
+        };
+
+        // 4. Kirim data ke backend/server
+        const success = await kirimData("update", payload);
+
+        if (success) {
+            showToast("Data berhasil diperbarui!", "success");
+            resetEditMode();
+        } else {
+            showToast("Gagal memperbarui data di server", "danger");
+        }
+
+    } catch (error) {
+        console.error("Error saat updateData:", error);
+        showToast("Terjadi kesalahan sistem", "danger");
+    } finally {
+        // 5. Kembalikan status tombol ke semula setelah selesai (sukses maupun gagal)
+        if (updateBtn) {
+            updateBtn.disabled = false;
+            updateBtn.innerText = "Update"; // Sesuaikan dengan teks asli tombol Anda
+        }
+    }
 }
-
-
-
-
-
-
-
-
-
 /* =====================================================
    DELETE DATA
 ===================================================== */
+async function hapusData(id) {
+    if (!id) return;
 
+    // Cegah proses ganda jika tombol diklik berkali-kali
+    if (AppState.isDeleting) return;
 
-async function hapusData(id){
-
-
-
-    if(!id)return;
-
-
-
-
-
-    if(AppState.isDeleting)return;
-
-
-
-
-
-    if(
-        !confirm(
-            "Yakin ingin menghapus data ini?"
-        )
-    ){
-
+    // Konfirmasi dari pengguna
+    if (!confirm("Yakin ingin menghapus data ini?")) {
         return;
-
     }
 
+    AppState.isDeleting = true;
 
+    try {
+        // PENTING: Tangkap nilai return (true/false) dari fungsi kirimData
+        const success = await kirimData("delete", { id });
 
-
-
-
-
-    AppState.isDeleting=true;
-
-
-
-
-
-
-    try{
-
-
-
-        await kirimData(
-
-            "delete",
-
-            {
-
-                id
-
+        if (success) {
+            showToast("Data berhasil dihapus", "success");
+            
+            // Opsional: Jika Anda sedang dalam mode edit untuk data yang DILAPORKAN dihapus ini, reset formnya.
+            if (AppState.editId === id) {
+                resetEditMode();
             }
+            
+            // Jalankan fungsi refresh data tabel Anda di sini jika ada, contoh:
+            // loadData();
+        } else {
+            showToast("Gagal menghapus data dari server", "danger");
+        }
 
-        );
-
-
-
+    } catch (error) {
+        console.error("Error saat hapusData:", error);
+        showToast("Terjadi kesalahan saat menghapus data", "danger");
+    } finally {
+        // Pastikan state loading selalu dikembalikan ke false
+        AppState.isDeleting = false;
     }
-
-    finally{
-
-
-        AppState.isDeleting=false;
-
-
-    }
-
-
-
 }
-
-
-
 /* =====================================================
    RESET FORM
 ===================================================== */
