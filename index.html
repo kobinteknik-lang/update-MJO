@@ -538,7 +538,6 @@ function handleLogin() {
 function handleLogout() {
     Auth.logout();
 }
-
 /* =====================================================
    LOAD DATA FROM GOOGLE APPS SCRIPT
 ===================================================== */
@@ -567,15 +566,22 @@ async function loadData(forceRefresh = false) {
 
         const result = await response.json();
 
-        if (!result.success) {
-            throw new Error(result.message || "Gagal mengambil data");
+        // PENGONDISIAN: Antisipasi jika Apps Script langsung mengembalikan Array atau Objek
+        let rawData = [];
+        if (Array.isArray(result)) {
+            rawData = result;
+        } else if (result && Array.isArray(result.data)) {
+            if (result.success === false) {
+                throw new Error(result.message || "Gagal mengambil data");
+            }
+            rawData = result.data;
+        } else {
+            throw new Error("Format data tidak dikenali");
         }
-
-        const rawData = Array.isArray(result.data) ? result.data : [];
 
         /* Cek apakah baris pertama adalah header Google Sheet */
         let dataStart = 0;
-        if (rawData.length && String(rawData[0][0]).toLowerCase().includes("id")) {
+        if (rawData.length && rawData[0][0] && String(rawData[0][0]).toLowerCase().includes("id")) {
             dataStart = 1;
         }
 
@@ -583,8 +589,9 @@ async function loadData(forceRefresh = false) {
             .slice(dataStart)
             .filter(row => Array.isArray(row) && row.length)
             .sort((a, b) => {
-                const dateA = `${a[1] || ""} ${a[2] || ""}`;
-                const dateB = `${b[1] || ""} ${b[2] || ""}`;
+                // Gunakan fallback string kosong untuk menghindari error jika kolom b[1]/b[2] undefined
+                const dateA = `${a[1] || ""} ${a[2] || ""}`.trim();
+                const dateB = `${b[1] || ""} ${b[2] || ""}`.trim();
                 return dateB.localeCompare(dateA);
             });
 
@@ -599,14 +606,13 @@ async function loadData(forceRefresh = false) {
 
         console.error("LOAD ERROR:", error);
         if (typeof showToast === "function") {
-            showToast("Gagal mengambil data", "danger");
+            showToast(error.message || "Gagal mengambil data", "danger");
         }
     } finally {
         AppState.isLoading = false;
         AppState.loadController = null;
     }
 }
-
 /* =====================================================
    SEND DATA TO GOOGLE APPS SCRIPT
 ===================================================== */
