@@ -1086,34 +1086,31 @@ async function updateData() {
 
         const role = Auth.getRole();
         
-        // Format jam agar sesuai standar HH:mm (e.g. 1899-12-30T10:17:48.000Z atau string waktu)
-        // Menyesuaikan dengan kebutuhan backend Anda, di sini kita buat string gabungan jam:menit
+        // Format jam agar sesuai standar HH:mm
         const jamMenit = `${getValue("jam")}:${getValue("menit")}`;
         
         // Tentukan status berdasarkan role pengguna
         const statusData = role === "requestor" ? "Open" : getValue("status");
 
         // =================================================================
-        // PERBAIKAN STRUKTUR PAYLOAD (Mengikuti format Array Asli)
+        // PERBAIKAN: Payload diubah menjadi OBJEK (Bukan Array)
         // =================================================================
-        const payload = [
-            AppState.editId,                  // 0: ID (TKT110726132801)
-            getValue("tanggal"),              // 1: Tanggal Request
-            jamMenit,                         // 2: Jam
-            getValue("requestor"),            // 3: Nama Requestor
-            getValue("area"),                 // 4: Area Kerja (e.g. PACKING 2A)
-            getValue("deskripsi"),            // 5: Deskripsi Kerusakan
-            statusData,                       // 6: Status (e.g. DONE / Open)
-            getValue("keterangan"),           // 7: Catatan (e.g. DIKERJAKAN OLEH...)
-            new Date().toISOString()          // 8: Waktu Update Terbaru (2026-07-11T...)
-        ];
+        const payload = {
+            id: AppState.editId,                  // Sesuai dengan data.id di GAS
+            tanggal: getValue("tanggal"),        // Sesuai dengan data.tanggal
+            jam: jamMenit,                        // Sesuai dengan data.jam
+            requestor: getValue("requestor"),    // Sesuai dengan data.requestor
+            area: getValue("area"),              // Sesuai dengan data.area
+            deskripsi: getValue("deskripsi"),    // Sesuai dengan data.deskripsi
+            status: statusData,                  // Sesuai dengan data.status
+            keterangan: getValue("keterangan")   // Sesuai dengan data.keterangan
+        };
 
         // 4. Kirim data ke backend/server
         const success = await kirimData("update", payload);
 
         if (success) {
             showToast("Data berhasil diperbarui!", "success");
-            // Pastikan fungsi ini mereset AppState.editId, form input, dan menyembunyikan updateBtn
             if (typeof resetEditMode === "function") {
                 resetEditMode();
             }
@@ -1150,13 +1147,9 @@ async function hapusData(id) {
 
     try {
         // =================================================================
-        // PENYESUAIAN PAYLOAD: 
-        // Pastikan apakah backend Anda meminta objek { id } atau string ID murni.
-        // Jika backend Anda memproses baris Excel/Spreadsheet berdasarkan string ID, 
-        // mengirim `id` secara langsung biasanya jauh lebih aman.
+        // PERBAIKAN PAYLOAD: Diubah menjadi OBJEK agar terbaca oleh data.id di GAS
         // =================================================================
-        const success = await kirimData("delete", id); 
-        // Catatan: Jika backend Anda mutlak minta objek, kembalikan ke: { id: id }
+        const success = await kirimData("delete", { id: id }); 
 
         if (success) {
             showToast("Data berhasil dihapus", "success");
