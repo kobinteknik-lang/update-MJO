@@ -1,59 +1,246 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Work Request System PRO</title>
 
-    <!-- Bootstrap 5 CSS & FontAwesome Icons -->
+    <!-- Google Fonts & Bootstrap 5 & FontAwesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+    /* ==========================================
+       TEMA TERANG (LIGHT MODE) - DEFAULT
+    ========================================== */
     :root {
-        --bg-main: #f4f6f9;
-        --shadow: 0 4px 12px rgba(0,0,0,.08);
+        --bg-gradient: linear-gradient(135deg, #e0f2fe 0%, #e0e7ff 50%, #f1f5f9 100%);
+        --card-bg: #ffffff;
+        --card-header-bg: #ffffff;
+        --primary: #3b82f6;
+        --primary-hover: #2563eb;
+        --primary-light: #eff6ff;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
+        --border-color: #cbd5e1;
+        --input-bg: #ffffff;
+        --table-header-bg: #f8fafc;
+        --table-hover-bg: #f1f5f9;
+        --radius-lg: 16px;
+        --radius-md: 10px;
+        --shadow-md: 0 10px 25px -5px rgba(59, 130, 246, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+    }
+
+    /* ==========================================
+       TEMA GELAP (DARK MODE)
+    ========================================== */
+    [data-theme="dark"] {
+        --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #020617 100%);
+        --card-bg: #1e293b;
+        --card-header-bg: #1e293b;
+        --primary: #6366f1;
+        --primary-hover: #4f46e5;
+        --primary-light: #312e81;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --border-color: #334155;
+        --input-bg: #0f172a;
+        --table-header-bg: #0f172a;
+        --table-hover-bg: #334155;
+        --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
     }
 
     body {
-        background: var(--bg-main);
-        font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+        background: var(--bg-gradient);
+        background-attachment: fixed;
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        color: var(--text-main);
+        min-height: 100vh;
+        transition: background 0.3s ease, color 0.3s ease;
     }
 
+    /* CUSTOM CARD STYLING */
     .card {
-        border: none;
-        box-shadow: var(--shadow);
-        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-md);
+        border-radius: var(--radius-lg);
+        background: var(--card-bg);
+        color: var(--text-main);
+        transition: all 0.3s ease;
+    }
+
+    .card-header {
+        background: var(--card-header-bg) !important;
+        border-bottom: 1px solid var(--border-color) !important;
+        color: var(--text-main) !important;
     }
 
     .hidden { display: none !important; }
 
-    .form-label {
-        font-weight: 600;
-        font-size: 13px;
-        color: #444;
+    /* LOGIN CONTAINER */
+    .login-card {
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-md);
+        background: var(--card-bg);
     }
 
+    .brand-icon {
+        width: 54px;
+        height: 54px;
+        background: var(--primary-light);
+        color: var(--primary);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        font-size: 24px;
+    }
+
+    /* DASHBOARD WIDGETS */
+    .stat-widget {
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.25rem;
+        position: relative;
+        overflow: hidden;
+        background: var(--card-bg);
+    }
+
+    .stat-widget::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+    }
+
+    .stat-widget.open::before { background: #ef4444; }
+    .stat-widget.progress-st::before { background: #f59e0b; }
+    .stat-widget.done::before { background: #10b981; }
+
+    .stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+    .stat-widget.open .stat-icon { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+    .stat-widget.progress-st .stat-icon { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+    .stat-widget.done .stat-icon { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+
+    /* FORM STYLING */
+    .form-label {
+        font-weight: 600;
+        font-size: 0.825rem;
+        color: var(--text-main);
+        margin-bottom: 0.4rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        padding: 0.625rem 0.875rem;
+        font-size: 0.9rem;
+        color: var(--text-main);
+        transition: all 0.2s ease;
+        background-color: var(--input-bg);
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        outline: none;
+        background-color: var(--input-bg);
+        color: var(--text-main);
+    }
+
+    /* BUTTONS */
+    .btn-primary {
+        background: var(--primary);
+        border-color: var(--primary);
+        border-radius: var(--radius-md);
+        font-weight: 600;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-hover);
+        border-color: var(--primary-hover);
+    }
+
+    .theme-toggle-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        background: var(--primary-light);
+        color: var(--primary);
+        border: 1px solid var(--border-color);
+        transition: all 0.2s ease;
+    }
+
+    /* BADGES */
     .ticket-badge {
-        font-size: 11px;
-        background: #212529;
-        color: #fff;
-        padding: 4px 8px;
+        font-size: 0.75rem;
+        background: #0f172a;
+        color: #f8fafc;
+        padding: 4px 10px;
         border-radius: 6px;
         font-family: monospace;
+        font-weight: 600;
     }
 
     .priority-badge {
-        font-size: 11px;
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-weight: bold;
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 700;
     }
-    .priority-HIGH { background: #fee2e2; color: #dc2626; }
-    .priority-MEDIUM { background: #fef9c3; color: #ca8a04; }
-    .priority-LOW { background: #dcfce7; color: #16a34a; }
+    .priority-HIGH { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .priority-MEDIUM { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .priority-LOW { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
 
-    /* Mobile Responsive Card Table */
+    /* TABLE STYLING */
+    .table-custom {
+        margin-bottom: 0;
+        color: var(--text-main);
+    }
+
+    .table-custom thead th {
+        background: var(--table-header-bg);
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 1rem;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .table-custom tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        font-size: 0.875rem;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-main);
+    }
+
+    .table-custom tbody tr:hover {
+        background-color: var(--table-hover-bg);
+    }
+
+    /* MOBILE RESPONSIVE CARD TABLE */
     @media (max-width: 768px) {
         .time-picker-wrapper { flex-wrap: wrap; }
         .time-picker-wrapper .btn-now { width: 100%; margin-top: 4px; }
@@ -68,11 +255,12 @@
         .mobile-card-table thead { display: none; }
 
         .mobile-card-table tr {
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
             margin-bottom: 12px;
-            padding: 12px;
+            padding: 14px;
+            box-shadow: var(--shadow-md);
         }
 
         .mobile-card-table td {
@@ -81,16 +269,18 @@
             align-items: center;
             padding: 8px 0;
             border: none;
-            border-bottom: 1px dashed #f1f5f9;
-            font-size: 13px;
+            border-bottom: 1px dashed var(--border-color);
+            font-size: 0.85rem;
         }
 
         .mobile-card-table td:last-child { border-bottom: none; }
 
         .mobile-card-table td::before {
             content: attr(data-label);
-            font-weight: 600;
-            color: #64748b;
+            font-weight: 700;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
         }
     }
     </style>
@@ -98,27 +288,40 @@
 
 <body>
 
-<div class="container my-3 my-md-4">
+<div class="container my-4 my-md-5">
 
     <!-- LOGIN SECTION -->
-    <div id="loginSection" class="card p-4 mx-auto" style="max-width:380px">
-        <div class="text-center mb-3">
-            <i class="fa-solid fa-gears fa-3x text-primary mb-2"></i>
-            <h4 class="fw-bold">Work Request PRO</h4>
-            <small class="text-muted">Sistem Manajemen Pemeliharaan & Fasilitas</small>
+    <div id="loginSection" class="card login-card p-4 p-sm-5 mx-auto" style="max-width: 420px;">
+        <div class="d-flex justify-content-end mb-2">
+            <button class="theme-toggle-btn" id="themeToggleLogin" title="Switch Theme">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+        <div class="text-center mb-4">
+            <div class="brand-icon mb-3">
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <h4 class="fw-extrabold mb-1">Work Request PRO</h4>
+            <p class="text-muted small">Sistem Manajemen Pemeliharaan & Fasilitas</p>
         </div>
         
         <form id="loginForm">
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
-                <input type="text" id="username" class="form-control" placeholder="Username" required>
+                <div class="input-group">
+                    <span class="input-group-text bg-transparent border-end-0 text-muted"><i class="fa-regular fa-user"></i></span>
+                    <input type="text" id="username" class="form-control border-start-0 ps-0" placeholder="Masukkan username" required>
+                </div>
             </div>
             <div class="mb-4">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" id="password" class="form-control" placeholder="Password" required>
+                <div class="input-group">
+                    <span class="input-group-text bg-transparent border-end-0 text-muted"><i class="fa-solid fa-lock"></i></span>
+                    <input type="password" id="password" class="form-control border-start-0 ps-0" placeholder="Masukkan password" required>
+                </div>
             </div>
-            <button type="submit" id="btnLogin" class="btn btn-primary w-100 py-2 fw-semibold">
-                <i class="fa-solid fa-right-to-bracket me-1"></i> Login
+            <button type="submit" id="btnLogin" class="btn btn-primary w-100 py-2.5 fw-bold">
+                <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Masuk ke Sistem
             </button>
         </form>
     </div>
@@ -126,51 +329,84 @@
     <!-- APP SECTION -->
     <div id="appSection" class="hidden">
 
-        <!-- HEADER -->
-        <div class="card p-3 mb-3">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <div>
-                    <h5 class="mb-0 fw-bold"><i class="fa-solid fa-chart-line text-primary me-2"></i>Dashboard Utama</h5>
-                    <small class="text-muted">Work Request Management System</small>
+        <!-- HEADER TOPBAR -->
+        <div class="card p-3 p-md-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="brand-icon" style="width:48px; height:48px; font-size:20px;">
+                        <i class="fa-solid fa-chart-pie"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0 fw-extrabold">Dashboard Utama</h5>
+                        <small class="text-muted">Work Request Management System</small>
+                    </div>
                 </div>
                 <div class="d-flex align-items-center gap-2">
-                    <span id="loginInfo" class="badge bg-success py-2 px-3"></span>
-                    <button id="btnLogout" class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-power-off"></i> Logout</button>
+                    <button class="theme-toggle-btn me-2" id="themeToggleApp" title="Switch Theme">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                    <span id="loginInfo" class="badge bg-primary-light text-primary border py-2 px-3 fw-bold rounded-pill"></span>
+                    <button id="btnLogout" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-semibold">
+                        <i class="fa-solid fa-arrow-right-from-bracket me-1"></i> Logout
+                    </button>
                 </div>
             </div>
-            <div class="text-center mt-2 pt-2 border-top">
-                <small id="clockIndo" class="text-secondary fw-medium"></small>
+            <div class="d-flex align-items-center gap-2 mt-3 pt-3 border-top text-muted small">
+                <i class="fa-regular fa-clock"></i>
+                <span id="clockIndo" class="fw-semibold"></span>
             </div>
         </div>
 
         <!-- COUNTER CARDS -->
-        <div class="row mb-3 text-center g-2">
-            <div class="col-4">
-                <div class="card p-2 bg-danger text-white">
-                    <small class="fw-bold">OPEN</small>
-                    <h3 id="openCount" class="mb-0 fw-bold">0</h3>
+        <div class="row mb-4 g-3">
+            <div class="col-12 col-sm-4">
+                <div class="card stat-widget open">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted fw-bold small uppercase d-block mb-1">Tiket Open</span>
+                            <h2 id="openCount" class="mb-0 fw-extrabold">0</h2>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-4">
-                <div class="card p-2 bg-warning text-dark">
-                    <small class="fw-bold">PROGRESS</small>
-                    <h3 id="progressCount" class="mb-0 fw-bold">0</h3>
+            <div class="col-12 col-sm-4">
+                <div class="card stat-widget progress-st">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted fw-bold small uppercase d-block mb-1">In Progress</span>
+                            <h2 id="progressCount" class="mb-0 fw-extrabold">0</h2>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-4" id="doneCard">
-                <div class="card p-2 bg-success text-white">
-                    <small class="fw-bold">DONE</small>
-                    <h3 id="doneCount" class="mb-0 fw-bold">0</h3>
+            <div class="col-12 col-sm-4" id="doneCard">
+                <div class="card stat-widget done">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted fw-bold small uppercase d-block mb-1">Selesai (Done)</span>
+                            <h2 id="doneCount" class="mb-0 fw-extrabold">0</h2>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- FORM INPUT WORK REQUEST -->
         <div class="card mb-4">
-            <div class="card-header bg-success text-white fw-bold d-flex align-items-center gap-2">
-                <i class="fa-solid fa-pen-to-square"></i> FORM INPUT TIKET
+            <div class="card-header py-3 border-bottom d-flex align-items-center gap-2">
+                <i class="fa-solid fa-pen-to-square text-primary"></i>
+                <h6 class="mb-0 fw-bold">Form Input Tiket Baru</h6>
             </div>
-            <div class="card-body">
+            <div class="card-body p-4">
                 <form id="jobForm">
                     <div class="row g-3">
                         <div class="col-12 col-md-4">
@@ -180,10 +416,10 @@
 
                         <div class="col-12 col-md-4">
                             <label for="jam" class="form-label">Waktu <span class="text-danger">*</span></label>
-                            <div class="d-flex gap-1 time-picker-wrapper">
+                            <div class="d-flex gap-2 time-picker-wrapper">
                                 <select id="jam" class="form-select" required></select>
                                 <select id="menit" class="form-select" required></select>
-                                <button type="button" id="btnNow" class="btn btn-info text-white btn-now">Now</button>
+                                <button type="button" id="btnNow" class="btn btn-outline-secondary border text-nowrap btn-now fw-bold"><i class="fa-solid fa-rotate me-1"></i> Now</button>
                             </div>
                         </div>
 
@@ -294,7 +530,7 @@
                         </div>
 
                         <div class="col-12 col-md-6">
-                            <label for="status" class="form-label">Status</label>
+                            <label for="status" class="form-label">Status Tiket</label>
                             <select id="status" class="form-select">
                                 <option value="Open">Open</option>
                                 <option value="Progress">Progress</option>
@@ -303,15 +539,21 @@
                         </div>
 
                         <div class="col-12 col-md-6" id="keteranganGroup">
-                            <label for="keterangan" class="form-label">Keterangan</label>
-                            <input type="text" id="keterangan" class="form-control" placeholder="Tindakan / Catatan">
+                            <label for="keterangan" class="form-label">Keterangan / Catatan</label>
+                            <input type="text" id="keterangan" class="form-control" placeholder="Tindakan yang diambil">
                         </div>
                     </div>
 
                     <div class="mt-4 d-flex gap-2 flex-wrap">
-                        <button type="submit" id="submitBtn" class="btn btn-success flex-fill py-2"><i class="fa-solid fa-paper-plane me-1"></i> Simpan Data</button>
-                        <button type="button" id="updateBtn" class="btn btn-warning flex-fill py-2 hidden"><i class="fa-solid fa-pen me-1"></i> Update Data</button>
-                        <button type="button" id="resetBtn" class="btn btn-secondary flex-fill py-2"><i class="fa-solid fa-rotate-left me-1"></i> Reset</button>
+                        <button type="submit" id="submitBtn" class="btn btn-primary flex-fill py-2.5">
+                            <i class="fa-solid fa-paper-plane me-1"></i> Simpan Tiket
+                        </button>
+                        <button type="button" id="updateBtn" class="btn btn-warning flex-fill py-2.5 text-white fw-bold hidden">
+                            <i class="fa-solid fa-pen-to-square me-1"></i> Update Tiket
+                        </button>
+                        <button type="button" id="resetBtn" class="btn btn-outline-secondary flex-fill py-2.5 fw-bold">
+                            <i class="fa-solid fa-rotate-left me-1"></i> Reset
+                        </button>
                     </div>
                 </form>
             </div>
@@ -319,16 +561,22 @@
 
         <!-- HISTORY DATA TABLE -->
         <div class="card mb-4">
-            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                <span class="fw-bold"><i class="fa-solid fa-list me-2"></i>RIWAYAT TIKET</span>
-                <button id="btnExport" class="btn btn-success btn-sm"><i class="fa-solid fa-file-excel me-1"></i> Export Excel</button>
+            <div class="card-header py-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-list-check text-primary"></i>
+                    <h6 class="mb-0 fw-bold">Riwayat Permintaan</h6>
+                </div>
+                <button id="btnExport" class="btn btn-success btn-sm px-3"><i class="fa-solid fa-file-excel me-1"></i> Export Excel</button>
             </div>
-            <div class="card-body">
+            <div class="card-body p-4">
                 
                 <!-- ADVANCED FILTER SECTION -->
-                <div class="row g-2 mb-3">
+                <div class="row g-2 mb-4">
                     <div class="col-12 col-md-4">
-                        <input type="text" id="searchHistory" class="form-control form-control-sm" placeholder="🔍 Cari Kata Kunci...">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-transparent border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                            <input type="text" id="searchHistory" class="form-control border-start-0" placeholder="Cari kata kunci...">
+                        </div>
                     </div>
                     <div class="col-6 col-md-4">
                         <select id="filterStatus" class="form-select form-select-sm">
@@ -341,40 +589,40 @@
                     <div class="col-6 col-md-4">
                         <select id="filterPriority" class="form-select form-select-sm">
                             <option value="">-- Semua Prioritas --</option>
-                            <option value="HIGH">🔴 High</option>
-                            <option value="MEDIUM">🟡 Medium</option>
-                            <option value="LOW">🟢 Low</option>
+                            <option value="HIGH">🔴 High Priority</option>
+                            <option value="MEDIUM">🟡 Medium Priority</option>
+                            <option value="LOW">🟢 Low Priority</option>
                         </select>
                     </div>
                 </div>
 
-                <div class="table-responsive mobile-card-table">
-                    <table class="table table-bordered table-hover align-middle mb-0">
-                        <thead class="table-dark">
+                <div class="table-responsive mobile-card-table rounded-3 border">
+                    <table class="table table-custom align-middle mb-0">
+                        <thead>
                             <tr>
-                                <th>Tiket</th>
+                                <th>ID Tiket</th>
                                 <th>Prioritas</th>
                                 <th>Waktu</th>
-                                <th>Deskripsi</th>
+                                <th>Deskripsi Pekerjaan</th>
                                 <th>Requestor</th>
                                 <th>Area</th>
                                 <th>Status</th>
                                 <th id="headerKeterangan">Keterangan</th>
-                                <th id="headerAksi">Aksi</th>
+                                <th id="headerAksi" class="text-end">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="historyTable">
                             <tr>
-                                <td colspan="9" class="text-center py-3">Memuat data...</td>
+                                <td colspan="9" class="text-center py-4 text-muted">Memuat data tiket...</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                    <button id="prevBtn" class="btn btn-secondary btn-sm px-3"><i class="fa-solid fa-chevron-left"></i> Prev</button>
-                    <div id="paginationInfo" class="fw-semibold small"></div>
-                    <button id="nextBtn" class="btn btn-secondary btn-sm px-3">Next <i class="fa-solid fa-chevron-right"></i></button>
+                <div class="d-flex justify-content-between align-items-center mt-4 pt-2">
+                    <button id="prevBtn" class="btn btn-outline-secondary btn-sm px-3 fw-bold"><i class="fa-solid fa-chevron-left me-1"></i> Prev</button>
+                    <div id="paginationInfo" class="fw-bold small text-muted"></div>
+                    <button id="nextBtn" class="btn btn-outline-secondary btn-sm px-3 fw-bold">Next <i class="fa-solid fa-chevron-right ms-1"></i></button>
                 </div>
             </div>
         </div>
@@ -401,7 +649,34 @@ const AppState = {
 };
 
 /* =====================================================
-   AUTH MODULE (AUTHENTICATION VIA SERVER)
+   THEME MANAGER (LIGHT / DARK MODE)
+===================================================== */
+const ThemeManager = {
+    init() {
+        const savedTheme = localStorage.getItem("theme") || "light";
+        this.setTheme(savedTheme);
+
+        document.getElementById("themeToggleLogin")?.addEventListener("click", () => this.toggleTheme());
+        document.getElementById("themeToggleApp")?.addEventListener("click", () => this.toggleTheme());
+    },
+    setTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("theme", theme);
+        this.updateIcons(theme);
+    },
+    toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute("data-theme");
+        const newTheme = currentTheme === "dark" ? "light" : "dark";
+        this.setTheme(newTheme);
+    },
+    updateIcons(theme) {
+        const iconClass = theme === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
+        document.querySelectorAll(".theme-toggle-btn i").forEach(i => i.className = iconClass);
+    }
+};
+
+/* =====================================================
+   AUTH MODULE
 ===================================================== */
 const Auth = {
     login(userData) {
@@ -411,7 +686,9 @@ const Auth = {
         updateAuthUI();
     },
     logout() {
-        localStorage.clear();
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("userRole");
+        localStorage.removeItem("username");
         AppState.allData = [];
         updateAuthUI();
     },
@@ -426,7 +703,7 @@ function updateAuthUI() {
     document.getElementById("appSection")?.classList.toggle("hidden", !logged);
 
     if (logged) {
-        document.getElementById("loginInfo").textContent = `LOGIN: ${Auth.getName()}`;
+        document.getElementById("loginInfo").textContent = `${Auth.getName()}`;
         const isReq = Auth.getRole() === "requestor";
         document.getElementById("keteranganGroup").style.display = isReq ? "none" : "block";
         document.getElementById("status").disabled = isReq;
@@ -439,7 +716,7 @@ async function handleLogin(e) {
     const originalText = btn.innerHTML;
 
     btn.disabled = true;
-    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Checking...`;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Memeriksa...`;
 
     try {
         const res = await fetch(SCRIPT_URL, {
@@ -561,7 +838,7 @@ function renderTable() {
     const isAdmin = Auth.getRole() === "admin";
 
     if (!data.length) {
-        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-3">Tidak ada data ditemukan</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted">Tidak ada data ditemukan</td></tr>`;
         return;
     }
 
@@ -571,25 +848,38 @@ function renderTable() {
     let html = "";
     pageData.forEach((item) => {
         const priority = item[9] || "MEDIUM";
+        const status = String(item[7] || "").toLowerCase();
+        let statusBadge = "";
+
+        if (status === "open") {
+            statusBadge = `<span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-bold">OPEN</span>`;
+        } else if (status === "progress") {
+            statusBadge = `<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-bold">PROGRESS</span>`;
+        } else {
+            statusBadge = `<span class="badge bg-success-subtle text-success border border-success-subtle fw-bold">DONE</span>`;
+        }
 
         html += `
         <tr>
             <td data-label="ID Tiket"><span class="ticket-badge">${item[0]}</span></td>
             <td data-label="Prioritas"><span class="priority-badge priority-${priority}">${priority}</span></td>
-            <td data-label="Waktu">${item[1]} ${item[2]}</td>
-            <td data-label="Deskripsi">${escapeHTML(item[5])}</td>
-            <td data-label="Requestor">${escapeHTML(item[3])}</td>
-            <td data-label="Area">${escapeHTML(item[4])}</td>
-            <td data-label="Status"><b>${item[7]}</b></td>
-            <td data-label="Keterangan">${escapeHTML(item[8] || "-")}</td>
-            <td data-label="Aksi">
-                ${isAdmin ? `<button class="btn btn-warning btn-sm py-0 me-1" onclick="prepareEdit('${item[0]}')">Edit</button><button class="btn btn-danger btn-sm py-0" onclick="deleteData('${item[0]}')">Hapus</button>` : "-"}
+            <td data-label="Waktu" class="text-nowrap"><span class="fw-semibold">${item[1]}</span> <small class="text-muted">${item[2]}</small></td>
+            <td data-label="Deskripsi" style="max-width: 250px;">${escapeHTML(item[5])}</td>
+            <td data-label="Requestor"><span class="fw-semibold">${escapeHTML(item[3])}</span></td>
+            <td data-label="Area"><span class="badge bg-secondary-subtle text-body border">${escapeHTML(item[4])}</span></td>
+            <td data-label="Status">${statusBadge}</td>
+            <td data-label="Keterangan"><small class="text-muted">${escapeHTML(item[8] || "-")}</small></td>
+            <td data-label="Aksi" class="text-md-end">
+                ${isAdmin ? `
+                    <button class="btn btn-outline-warning btn-sm py-1 px-2" onclick="prepareEdit('${item[0]}')" title="Edit Tiket"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn btn-outline-danger btn-sm py-1 px-2" onclick="deleteData('${item[0]}')" title="Hapus Tiket"><i class="fa-solid fa-trash"></i></button>
+                ` : "-"}
             </td>
         </tr>`;
     });
 
     tbody.innerHTML = html;
-    document.getElementById("paginationInfo").textContent = `Halaman ${AppState.currentPage} / ${Math.ceil(data.length / AppState.pageSize)}`;
+    document.getElementById("paginationInfo").textContent = `Halaman ${AppState.currentPage} dari ${Math.ceil(data.length / AppState.pageSize)}`;
 }
 
 function prepareEdit(id) {
@@ -693,13 +983,15 @@ function updateDashboard() {
 
 function showToast(msg, type = "info") {
     const toast = document.createElement("div");
-    toast.className = `alert alert-${type} position-fixed top-0 end-0 m-3 shadow z-3`;
+    toast.className = `alert alert-${type} position-fixed top-0 end-0 m-3 shadow z-3 rounded-3`;
     toast.textContent = msg;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    ThemeManager.init();
+
     const jam = document.getElementById("jam"), menit = document.getElementById("menit");
     for(let i=0; i<24; i++) jam.add(new Option(String(i).padStart(2,"0"), String(i).padStart(2,"0")));
     for(let i=0; i<60; i++) menit.add(new Option(String(i).padStart(2,"0"), String(i).padStart(2,"0")));
