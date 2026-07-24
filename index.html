@@ -240,7 +240,7 @@
         background-color: var(--table-hover-bg);
     }
 
-    /* MOBILE RESPONSIVE CARD TABLE */
+    /* MOBILE RESPONSIVE CARD TABLE - PERBAIKAN TABRAKAN LABEL */
     @media (max-width: 768px) {
         .time-picker-wrapper { flex-wrap: wrap; }
         .time-picker-wrapper .btn-now { width: 100%; margin-top: 4px; }
@@ -267,10 +267,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 0;
+            padding: 10px 0;
             border: none;
             border-bottom: 1px dashed var(--border-color);
             font-size: 0.85rem;
+            gap: 12px; /* Mencegah bentrok antar kolom */
+            text-align: right;
         }
 
         .mobile-card-table td:last-child { border-bottom: none; }
@@ -281,6 +283,9 @@
             color: var(--text-muted);
             font-size: 0.75rem;
             text-transform: uppercase;
+            min-width: 105px; /* Memberikan area khusus untuk label kiri */
+            text-align: left;
+            flex-shrink: 0;
         }
     }
     </style>
@@ -676,6 +681,29 @@ const ThemeManager = {
 };
 
 /* =====================================================
+   DATE & TIME CLEANER HELPER (MENCEGAH ANOMALI TANGGAL ISO)
+===================================================== */
+function formatTanggalClean(val) {
+    if (!val) return "-";
+    let str = String(val);
+    if (str.includes("T")) str = str.split("T")[0];
+    const d = new Date(str);
+    return isNaN(d) ? str : d.toLocaleDateString("id-ID", { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function formatJamClean(val) {
+    if (!val) return "-";
+    let str = String(val);
+    if (str.includes("T")) {
+        const timePart = str.split("T")[1];
+        str = timePart ? timePart.substring(0, 5) : str;
+    } else if (str.length > 5 && str.includes(":")) {
+        str = str.substring(0, 5);
+    }
+    return str;
+}
+
+/* =====================================================
    AUTH MODULE
 ===================================================== */
 const Auth = {
@@ -814,7 +842,7 @@ async function submitForm(e) {
 }
 
 /* =====================================================
-   RENDER TABLE & FILTERING
+   RENDER TABLE & FILTERING (BERSIH DARI ERROR TANGGAL)
 ===================================================== */
 function applyFilters() {
     const key = getValue("searchHistory").toLowerCase();
@@ -849,8 +877,12 @@ function renderTable() {
     pageData.forEach((item) => {
         const priority = item[9] || "MEDIUM";
         const status = String(item[7] || "").toLowerCase();
-        let statusBadge = "";
+        
+        // Pembersihan format Tanggal dan Jam agar tidak bertumpuk
+        const tglClean = formatTanggalClean(item[1]);
+        const jamClean = formatJamClean(item[2]);
 
+        let statusBadge = "";
         if (status === "open") {
             statusBadge = `<span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-bold">OPEN</span>`;
         } else if (status === "progress") {
@@ -863,9 +895,9 @@ function renderTable() {
         <tr>
             <td data-label="ID Tiket"><span class="ticket-badge">${item[0]}</span></td>
             <td data-label="Prioritas"><span class="priority-badge priority-${priority}">${priority}</span></td>
-            <td data-label="Waktu" class="text-nowrap"><span class="fw-semibold">${item[1]}</span> <small class="text-muted">${item[2]}</small></td>
+            <td data-label="Waktu" class="text-nowrap"><span class="fw-semibold">${tglClean}</span> <small class="text-muted">(${jamClean})</small></td>
             <td data-label="Deskripsi" style="max-width: 250px;">${escapeHTML(item[5])}</td>
-            <td data-label="Requestor"><span class="fw-semibold">${escapeHTML(item[3])}</span></td>
+            <td data-label="Requestor"><span class="fw-semibold">${escapeHTML(item[3] || "-")}</span></td>
             <td data-label="Area"><span class="badge bg-secondary-subtle text-body border">${escapeHTML(item[4])}</span></td>
             <td data-label="Status">${statusBadge}</td>
             <td data-label="Keterangan"><small class="text-muted">${escapeHTML(item[8] || "-")}</small></td>
@@ -887,9 +919,14 @@ function prepareEdit(id) {
     if (!item) return;
 
     AppState.editId = item[0];
-    setValue("tanggal", item[1]);
     
-    const timeParts = String(item[2]).split(":");
+    // Format ISO di-clean sebelum dipasang ke input date
+    let tglIso = item[1] || "";
+    if (tglIso.includes("T")) tglIso = tglIso.split("T")[0];
+    setValue("tanggal", tglIso);
+    
+    const jamClean = formatJamClean(item[2]);
+    const timeParts = jamClean.split(":");
     setValue("jam", timeParts[0] || "00");
     setValue("menit", timeParts[1] || "00");
 
@@ -934,7 +971,9 @@ function exportCSV() {
 
     let csvContent = "data:text/csv;charset=utf-8,ID Tiket,Tanggal,Jam,Requestor,Area,Deskripsi,Prioritas,Status,Keterangan\n";
     data.forEach(row => {
-        csvContent += `"${row[0]}","${row[1]}","${row[2]}","${row[3]}","${row[4]}","${row[5]}","${row[9] || 'MEDIUM'}","${row[7]}","${row[8] || ''}"\n`;
+        const tglClean = formatTanggalClean(row[1]);
+        const jamClean = formatJamClean(row[2]);
+        csvContent += `"${row[0]}","${tglClean}","${jamClean}","${row[3]}","${row[4]}","${row[5]}","${row[9] || 'MEDIUM'}","${row[7]}","${row[8] || ''}"\n`;
     });
 
     const encodedUri = encodeURI(csvContent);
