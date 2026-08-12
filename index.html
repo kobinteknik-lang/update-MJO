@@ -893,22 +893,36 @@ async function loadData() {
         
         let rawData = result.data ? result.data : (Array.isArray(result) ? result : []);
 
+        // Normalisasi data baik dalam bentuk Array 2D maupun Array of Objects
         if (rawData.length > 0 && Array.isArray(rawData[0])) {
             let dataStart = String(rawData[0][0]).toLowerCase().includes("id") ? 1 : 0;
             AppState.allData = rawData.slice(dataStart).map(row => ({
-                id: row[0] || "",
-                tanggal: row[1] || "",
-                jam: row[2] || "",
-                requestor: row[3] || "",
-                area: row[4] || "",
-                deskripsi: row[5] || "",
-                createdAt: row[6] || "",
-                status: row[7] || "Open",
-                keterangan: row[8] || "",
-                priority: row[9] || "MEDIUM"
+                id: String(row[0] || "").trim(),
+                tanggal: String(row[1] || "").trim(),
+                jam: String(row[2] || "").trim(),
+                requestor: String(row[3] || "").trim(),
+                area: String(row[4] || "").trim(),
+                deskripsi: String(row[5] || "").trim(),
+                createdAt: String(row[6] || "").trim(),
+                status: String(row[7] || "Open").trim(),
+                keterangan: String(row[8] || "").trim(),
+                priority: String(row[9] || "MEDIUM").trim()
+            }));
+        } else if (Array.isArray(rawData)) {
+            AppState.allData = rawData.map(item => ({
+                id: String(item.id || "").trim(),
+                tanggal: String(item.tanggal || "").trim(),
+                jam: String(item.jam || "").trim(),
+                requestor: String(item.requestor || "").trim(),
+                area: String(item.area || "").trim(),
+                deskripsi: String(item.deskripsi || "").trim(),
+                createdAt: String(item.createdAt || "").trim(),
+                status: String(item.status || "Open").trim(),
+                keterangan: String(item.keterangan || "").trim(),
+                priority: String(item.priority || "MEDIUM").trim()
             }));
         } else {
-            AppState.allData = rawData;
+            AppState.allData = [];
         }
         
         applyFilters();
@@ -972,15 +986,15 @@ function applyFilters() {
     const pr = getValue("filterPriority").toUpperCase().trim();
 
     AppState.filteredData = AppState.allData.filter(row => {
-        const rawStatus = row.status || (Array.isArray(row) ? row[7] : "") || "Open";
-        const rawPriority = row.priority || (Array.isArray(row) ? row[9] : "") || "MEDIUM";
-
-        const rowStatus = String(rawStatus).toLowerCase().trim();
-        const rowPriority = String(rawPriority).toUpperCase().trim();
+        // Normalisasi status dan priority ke lowercase/uppercase standar
+        const rowStatus = String(row.status || "").toLowerCase().trim();
+        const rowPriority = String(row.priority || "").toUpperCase().trim();
         
-        const matchKey = !key || (Array.isArray(row) ? row : Object.values(row)).some(val => 
+        const matchKey = !key || Object.values(row).some(val => 
             String(val ?? "").toLowerCase().includes(key)
         );
+        
+        // Pencocokan fleksibel untuk "open" vs "OPEN"
         const matchSt = !st || rowStatus === st;
         const matchPr = !pr || rowPriority === pr;
         
@@ -990,7 +1004,6 @@ function applyFilters() {
     AppState.currentPage = 1;
     renderTable();
 }
-
 function renderTable() {
     const tbody = document.getElementById("historyTable");
     const data = AppState.filteredData || AppState.allData;
