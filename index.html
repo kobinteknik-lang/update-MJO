@@ -54,7 +54,6 @@
         --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
     }
 
-    /* Mencegah Teks Dipilih (Text Selection) */
     body {
         background-color: var(--bg-main);
         font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
@@ -715,18 +714,11 @@
 document.addEventListener("contextmenu", (e) => e.preventDefault());
 
 document.addEventListener("keydown", (e) => {
-    if (e.key === "F12") {
-        e.preventDefault();
-        return false;
-    }
+    if (e.key === "F12") { e.preventDefault(); return false; }
     if (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "i" || e.key === "J" || e.key === "j" || e.key === "C" || e.key === "c")) {
-        e.preventDefault();
-        return false;
+        e.preventDefault(); return false;
     }
-    if (e.ctrlKey && (e.key === "U" || e.key === "u")) {
-        e.preventDefault();
-        return false;
-    }
+    if (e.ctrlKey && (e.key === "U" || e.key === "u")) { e.preventDefault(); return false; }
 });
 
 setInterval(() => {
@@ -905,8 +897,13 @@ async function loadData() {
         const result = await response.json();
         let rawData = Array.isArray(result) ? result : (result?.data || []);
 
-        let dataStart = (rawData.length && String(rawData[0][0]).toLowerCase().includes("id")) ? 1 : 0;
-        AppState.allData = rawData.slice(dataStart);
+        // Jika data dikembalikan berupa array 2D
+        if (rawData.length > 0 && Array.isArray(rawData[0])) {
+            let dataStart = String(rawData[0][0]).toLowerCase().includes("id") ? 1 : 0;
+            AppState.allData = rawData.slice(dataStart);
+        } else {
+            AppState.allData = rawData;
+        }
         
         applyFilters();
         updateDashboard();
@@ -964,13 +961,17 @@ async function submitForm(e) {
 ===================================================== */
 function applyFilters() {
     const key = getValue("searchHistory").toLowerCase();
-    const st = getValue("filterStatus");
-    const pr = getValue("filterPriority");
+    const st = getValue("filterStatus").toLowerCase();
+    const pr = getValue("filterPriority").toUpperCase();
 
     AppState.filteredData = AppState.allData.filter(row => {
-        const matchKey = !key || row.some(val => String(val).toLowerCase().includes(key));
-        const matchSt = !st || String(row[7]).toLowerCase() === st.toLowerCase();
-        const matchPr = !pr || String(row[9] || "MEDIUM").toUpperCase() === pr.toUpperCase();
+        const rowStatus = String(row.status || (Array.isArray(row) ? row[7] : "") || "Open").toLowerCase();
+        const rowPriority = String(row.priority || (Array.isArray(row) ? row[9] : "") || "MEDIUM").toUpperCase();
+        
+        const matchKey = !key || (Array.isArray(row) ? row : Object.values(row)).some(val => String(val).toLowerCase().includes(key));
+        const matchSt = !st || rowStatus === st;
+        const matchPr = !pr || rowPriority === pr;
+        
         return matchKey && matchSt && matchPr;
     });
 
@@ -983,7 +984,7 @@ function renderTable() {
     const data = AppState.filteredData || AppState.allData;
     const isAdmin = Auth.getRole() === "admin";
 
-    if (!data.length) {
+    if (!data || !data.length) {
         tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted">Tidak ada riwayat tiket ditemukan.</td></tr>`;
         return;
     }
@@ -993,11 +994,15 @@ function renderTable() {
 
     let html = "";
     pageData.forEach((item) => {
-        const priority = item[9] || "MEDIUM";
-        const status = String(item[7] || "").toLowerCase();
-        
-        const tglClean = formatTanggalClean(item[1]);
-        const jamClean = formatJamClean(item[2]);
+        const id = item.id || (Array.isArray(item) ? item[0] : "-");
+        const tglClean = formatTanggalClean(item.tanggal || (Array.isArray(item) ? item[1] : ""));
+        const jamClean = formatJamClean(item.jam || (Array.isArray(item) ? item[2] : ""));
+        const req = item.requestor || (Array.isArray(item) ? item[3] : "-");
+        const area = item.area || (Array.isArray(item) ? item[4] : "-");
+        const desk = item.deskripsi || (Array.isArray(item) ? item[5] : "-");
+        const status = String(item.status || (Array.isArray(item) ? item[7] : "") || "Open").toLowerCase();
+        const ket = item.keterangan || (Array.isArray(item) ? item[8] : "-");
+        const priority = String(item.priority || (Array.isArray(item) ? item[9] : "") || "MEDIUM").toUpperCase();
 
         let statusBadge = "";
         if (status === "open") {
@@ -1010,18 +1015,18 @@ function renderTable() {
 
         html += `
         <tr>
-            <td data-label="ID Tiket"><span class="ticket-badge">${item[0]}</span></td>
-            <td data-label="Prioritas"><span class="priority-badge priority-${priority}">${priority}</span></td>
+            <td data-label="ID Tiket"><span class="ticket-badge">${escapeHTML(id)}</span></td>
+            <td data-label="Prioritas"><span class="priority-badge priority-${priority}">${escapeHTML(priority)}</span></td>
             <td data-label="Waktu" class="text-nowrap"><span class="fw-semibold">${tglClean}</span> <small class="text-muted">(${jamClean})</small></td>
-            <td data-label="Deskripsi" style="max-width: 250px;">${escapeHTML(item[5])}</td>
-            <td data-label="Requestor"><span class="fw-semibold">${escapeHTML(item[3] || "-")}</span></td>
-            <td data-label="Area"><span class="badge bg-secondary-subtle text-body border">${escapeHTML(item[4])}</span></td>
+            <td data-label="Deskripsi" style="max-width: 250px;">${escapeHTML(desk)}</td>
+            <td data-label="Requestor"><span class="fw-semibold">${escapeHTML(req)}</span></td>
+            <td data-label="Area"><span class="badge bg-secondary-subtle text-body border">${escapeHTML(area)}</span></td>
             <td data-label="Status">${statusBadge}</td>
-            <td data-label="Keterangan"><small class="text-muted">${escapeHTML(item[8] || "-")}</small></td>
+            <td data-label="Keterangan"><small class="text-muted">${escapeHTML(ket)}</small></td>
             <td data-label="Aksi" class="text-md-end">
                 ${isAdmin ? `
-                    <button class="btn btn-outline-warning btn-sm py-1 px-2" onclick="prepareEdit('${item[0]}')" title="Edit Tiket"><i class="fa-solid fa-pen"></i></button>
-                    <button class="btn btn-outline-danger btn-sm py-1 px-2" onclick="deleteData('${item[0]}')" title="Hapus Tiket"><i class="fa-solid fa-trash"></i></button>
+                    <button class="btn btn-outline-warning btn-sm py-1 px-2" onclick="prepareEdit('${id}')" title="Edit Tiket"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn btn-outline-danger btn-sm py-1 px-2" onclick="deleteData('${id}')" title="Hapus Tiket"><i class="fa-solid fa-trash"></i></button>
                 ` : "-"}
             </td>
         </tr>`;
@@ -1032,23 +1037,26 @@ function renderTable() {
 }
 
 function prepareEdit(id) {
-    const item = AppState.allData.find(row => String(row[0]) === String(id));
+    const item = AppState.allData.find(row => {
+        const rowId = row.id || (Array.isArray(row) ? row[0] : "");
+        return String(rowId) === String(id);
+    });
     if (!item) return;
 
-    AppState.editId = item[0];
-    setValue("tanggal", parseTanggalToISO(item[1]));
+    AppState.editId = item.id || (Array.isArray(item) ? item[0] : "");
+    setValue("tanggal", parseTanggalToISO(item.tanggal || (Array.isArray(item) ? item[1] : "")));
     
-    const jamClean = formatJamClean(item[2]);
+    const jamClean = formatJamClean(item.jam || (Array.isArray(item) ? item[2] : ""));
     const timeParts = jamClean.split(":");
     setValue("jam", timeParts[0] ? String(timeParts[0]).padStart(2, "0") : "00");
     setValue("menit", timeParts[1] ? String(timeParts[1]).padStart(2, "0") : "00");
 
-    setValue("requestor", item[3]);
-    setValue("area", item[4]);
-    setValue("deskripsi", item[5]);
-    setValue("status", item[7]);
-    setValue("keterangan", item[8] || "");
-    setValue("priority", item[9] || "MEDIUM");
+    setValue("requestor", item.requestor || (Array.isArray(item) ? item[3] : ""));
+    setValue("area", item.area || (Array.isArray(item) ? item[4] : ""));
+    setValue("deskripsi", item.deskripsi || (Array.isArray(item) ? item[5] : ""));
+    setValue("status", item.status || (Array.isArray(item) ? item[7] : "Open"));
+    setValue("keterangan", item.keterangan || (Array.isArray(item) ? item[8] : ""));
+    setValue("priority", item.priority || (Array.isArray(item) ? item[9] : "MEDIUM"));
 
     document.getElementById("submitBtn").classList.add("hidden");
     document.getElementById("updateBtn").classList.remove("hidden");
@@ -1093,7 +1101,7 @@ function setDefaultTime() {
 function updateDashboard() {
     let open = 0, progress = 0, done = 0;
     AppState.allData.forEach(row => {
-        const status = String(row[7]).toLowerCase();
+        const status = String(row.status || (Array.isArray(row) ? row[7] : "") || "").toLowerCase();
         if(status === 'open') open++;
         else if(status === 'progress') progress++;
         else if(status === 'done') done++;
