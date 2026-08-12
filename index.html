@@ -25,7 +25,7 @@
         --card-border: #e2e8f0;
         --primary: #4f46e5;
         --primary-hover: #4338ca;
-        --primary-light: #eeef2ff;
+        --primary-light: #e0e7ff;
         --text-main: #0f172a;
         --text-muted: #64748b;
         --input-bg: #ffffff;
@@ -447,7 +447,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#historyTable" class="nav-link-custom">
+                    <a href="#historySection" class="nav-link-custom">
                         <i class="fa-solid fa-list-check"></i>
                         <span class="link-text">Daftar Tiket</span>
                     </a>
@@ -636,7 +636,7 @@
         </div>
 
         <!-- RIWAYAT & TABLE TIKET -->
-        <div class="card-pro">
+        <div id="historySection" class="card-pro">
             <div class="card-header-pro flex-wrap gap-2">
                 <div class="d-flex align-items-center gap-2">
                     <i class="fa-solid fa-list-check text-primary"></i>
@@ -709,7 +709,7 @@
 
 <script>
 /* =====================================================
-   PROTEKSI SECURITY: MENCEGAH INSPECT ELEMENT & DEVTOOLS
+   PROTEKSI SECURITY
 ===================================================== */
 document.addEventListener("contextmenu", (e) => e.preventDefault());
 
@@ -720,15 +720,6 @@ document.addEventListener("keydown", (e) => {
     }
     if (e.ctrlKey && (e.key === "U" || e.key === "u")) { e.preventDefault(); return false; }
 });
-
-setInterval(() => {
-    const startTime = performance.now();
-    debugger;
-    const endTime = performance.now();
-    if (endTime - startTime > 100) {
-        document.body.innerHTML = "<h2 style='text-align:center; margin-top:20vh; color:red;'>Akses Ditolak: Developer Tools Tidak Diizinkan.</h2>";
-    }
-}, 1000);
 
 /* =====================================================
    CONFIG & APP STATE
@@ -845,6 +836,10 @@ function updateAuthUI() {
         const isReq = Auth.getRole() === "requestor";
         document.getElementById("keteranganGroup").style.display = isReq ? "none" : "block";
         document.getElementById("status").disabled = isReq;
+        
+        if (isReq) {
+            setValue("requestor", Auth.getName());
+        }
     }
 }
 
@@ -886,7 +881,7 @@ async function handleLogin(e) {
 }
 
 /* =====================================================
-   DATA FETCH & SUBMIT (DIPERBARUI)
+   DATA FETCH & SUBMIT
 ===================================================== */
 async function loadData() {
     if (AppState.isLoading) return;
@@ -969,7 +964,7 @@ async function submitForm(e) {
 }
 
 /* =====================================================
-   RENDERING & TABLES (DIPERBARUI)
+   RENDERING, TABLES & EXPORT
 ===================================================== */
 function applyFilters() {
     const key = getValue("searchHistory").toLowerCase().trim();
@@ -1052,6 +1047,37 @@ function renderTable() {
 
     tbody.innerHTML = html;
     document.getElementById("paginationInfo").textContent = `Halaman ${AppState.currentPage} dari ${Math.ceil(data.length / AppState.pageSize) || 1}`;
+}
+
+function exportToExcel() {
+    if (!AppState.allData || AppState.allData.length === 0) {
+        showToast("Tidak ada data untuk diexport!", "warning");
+        return;
+    }
+
+    let csv = "ID Tiket,Prioritas,Tanggal,Jam,Requestor,Area,Deskripsi,Status,Keterangan\n";
+    
+    AppState.allData.forEach(row => {
+        const id = row.id || (Array.isArray(row) ? row[0] : "");
+        const tgl = row.tanggal || (Array.isArray(row) ? row[1] : "");
+        const jam = row.jam || (Array.isArray(row) ? row[2] : "");
+        const req = row.requestor || (Array.isArray(row) ? row[3] : "");
+        const area = row.area || (Array.isArray(row) ? row[4] : "");
+        const desk = (row.deskripsi || (Array.isArray(row) ? row[5] : "")).replace(/"/g, '""');
+        const st = row.status || (Array.isArray(row) ? row[7] : "");
+        const ket = (row.keterangan || (Array.isArray(row) ? row[8] : "")).replace(/"/g, '""');
+        const pr = row.priority || (Array.isArray(row) ? row[9] : "");
+
+        csv += `"${id}","${pr}","${tgl}","${jam}","${req}","${area}","${desk}","${st}","${ket}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", `Work_Requests_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 function prepareEdit(id) {
@@ -1152,6 +1178,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("jobForm").onsubmit = submitForm;
     document.getElementById("resetBtn").onclick = resetForm;
     document.getElementById("btnNow").onclick = setDefaultTime;
+    document.getElementById("btnExport").onclick = exportToExcel;
 
     document.getElementById("searchHistory").oninput = applyFilters;
     document.getElementById("filterStatus").onchange = applyFilters;
