@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Work Request System PRO</title>
+    <title>Work Request System PRO - Enterprise Edition</title>
 
-    <!-- Google Fonts & Bootstrap 5 & FontAwesome Icons -->
+    <!-- Google Fonts, Bootstrap 5 & FontAwesome Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,300 +14,388 @@
 
     <style>
     /* ==========================================
-       TEMA TERANG (LIGHT MODE) - DEFAULT
+       DESIGN SYSTEM & THEME VARIABLES
     ========================================== */
     :root {
-        --bg-gradient: linear-gradient(135deg, #e0f2fe 0%, #e0e7ff 50%, #f1f5f9 100%);
+        --bg-main: #f8fafc;
+        --sidebar-bg: #0f172a;
+        --sidebar-text: #94a3b8;
+        --sidebar-active: #6366f1;
         --card-bg: #ffffff;
-        --card-header-bg: #ffffff;
-        --primary: #3b82f6;
-        --primary-hover: #2563eb;
-        --primary-light: #eff6ff;
+        --card-border: #e2e8f0;
+        --primary: #4f46e5;
+        --primary-hover: #4338ca;
+        --primary-light: #eeef2ff;
         --text-main: #0f172a;
         --text-muted: #64748b;
-        --border-color: #cbd5e1;
         --input-bg: #ffffff;
         --table-header-bg: #f8fafc;
         --table-hover-bg: #f1f5f9;
         --radius-lg: 16px;
         --radius-md: 10px;
-        --shadow-md: 0 10px 25px -5px rgba(59, 130, 246, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+        --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     }
 
-    /* ==========================================
-       TEMA GELAP (DARK MODE)
-    ========================================== */
     [data-theme="dark"] {
-        --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #020617 100%);
-        --card-bg: #1e293b;
-        --card-header-bg: #1e293b;
+        --bg-main: #090d16;
+        --sidebar-bg: #030712;
+        --sidebar-text: #64748b;
+        --card-bg: #111827;
+        --card-border: #1f2937;
         --primary: #6366f1;
         --primary-hover: #4f46e5;
-        --primary-light: #312e81;
-        --text-main: #f8fafc;
-        --text-muted: #94a3b8;
-        --border-color: #334155;
-        --input-bg: #0f172a;
-        --table-header-bg: #0f172a;
-        --table-hover-bg: #334155;
+        --text-main: #f9fafb;
+        --text-muted: #9ca3af;
+        --input-bg: #0b0f19;
+        --table-header-bg: #1f2937;
+        --table-hover-bg: #1f2937;
         --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
     }
 
+    /* Mencegah Teks Dipilih (Text Selection) */
     body {
-        background: var(--bg-gradient);
-        background-attachment: fixed;
+        background-color: var(--bg-main);
         font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
         color: var(--text-main);
         min-height: 100vh;
-        transition: background 0.3s ease, color 0.3s ease;
-    }
-
-    /* CUSTOM CARD STYLING */
-    .card {
-        border: 1px solid var(--border-color);
-        box-shadow: var(--shadow-md);
-        border-radius: var(--radius-lg);
-        background: var(--card-bg);
-        color: var(--text-main);
-        transition: all 0.3s ease;
-    }
-
-    .card-header {
-        background: var(--card-header-bg) !important;
-        border-bottom: 1px solid var(--border-color) !important;
-        color: var(--text-main) !important;
+        margin: 0;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
     }
 
     .hidden { display: none !important; }
 
-    /* LOGIN CONTAINER */
-    .login-card {
-        border: 1px solid var(--border-color);
-        box-shadow: var(--shadow-md);
-        background: var(--card-bg);
+    /* LAYOUT STRUCTURE */
+    .app-layout {
+        display: flex;
+        min-height: 100vh;
     }
 
+    .sidebar {
+        width: 260px;
+        background: var(--sidebar-bg);
+        padding: 1.5rem 1rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: fixed;
+        height: 100vh;
+        z-index: 100;
+        transition: all 0.3s ease;
+    }
+
+    .main-content {
+        margin-left: 260px;
+        flex: 1;
+        padding: 2rem;
+        width: calc(100% - 260px);
+    }
+
+    /* BRANDING */
+    .brand-title {
+        color: #ffffff;
+        font-weight: 800;
+        font-size: 1.25rem;
+        letter-spacing: -0.5px;
+    }
+    
     .brand-icon {
-        width: 54px;
-        height: 54px;
-        background: var(--primary-light);
-        color: var(--primary);
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        color: #ffffff;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border-radius: 16px;
-        font-size: 24px;
+        border-radius: 12px;
+        font-size: 18px;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
     }
 
-    /* DASHBOARD WIDGETS */
-    .stat-widget {
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius-lg);
-        padding: 1.25rem;
-        position: relative;
-        overflow: hidden;
+    /* NAVIGATION */
+    .nav-label {
+        color: var(--sidebar-text);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 1.5rem 0 0.5rem 0.75rem;
+    }
+
+    .nav-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .nav-link-custom {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0.75rem 1rem;
+        color: var(--sidebar-text);
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .nav-link-custom:hover, .nav-link-custom.active {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-link-custom.active {
+        background: var(--primary);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+
+    /* TOPBAR HEADER */
+    .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    /* CARDS & CONTAINERS */
+    .card-pro {
         background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.2s ease;
     }
 
-    .stat-widget::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 4px;
-        height: 100%;
+    .card-pro:hover {
+        box-shadow: var(--shadow-md);
     }
 
-    .stat-widget.open::before { background: #ef4444; }
-    .stat-widget.progress-st::before { background: #f59e0b; }
-    .stat-widget.done::before { background: #10b981; }
+    .card-header-pro {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--card-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
 
-    .stat-icon {
-        width: 42px;
-        height: 42px;
+    /* STATS WIDGETS */
+    .stat-card {
+        padding: 1.5rem;
+        border-radius: var(--radius-lg);
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        position: relative;
+    }
+
+    .stat-icon-wrapper {
+        width: 48px;
+        height: 48px;
         border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
+        font-size: 20px;
     }
 
-    .stat-widget.open .stat-icon { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
-    .stat-widget.progress-st .stat-icon { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
-    .stat-widget.done .stat-icon { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+    .stat-open .stat-icon-wrapper { background: #fef2f2; color: #ef4444; }
+    .stat-progress .stat-icon-wrapper { background: #fffbeb; color: #f59e0b; }
+    .stat-done .stat-icon-wrapper { background: #ecfdf5; color: #10b981; }
 
-    /* FORM STYLING */
+    [data-theme="dark"] .stat-open .stat-icon-wrapper { background: rgba(239, 68, 68, 0.15); }
+    [data-theme="dark"] .stat-progress .stat-icon-wrapper { background: rgba(245, 158, 11, 0.15); }
+    [data-theme="dark"] .stat-done .stat-icon-wrapper { background: rgba(16, 185, 129, 0.15); }
+
+    /* FORMS & INPUTS */
     .form-label {
-        font-weight: 600;
-        font-size: 0.825rem;
-        color: var(--text-main);
-        margin-bottom: 0.4rem;
+        font-weight: 700;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
 
     .form-control, .form-select {
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--card-border);
         border-radius: var(--radius-md);
-        padding: 0.625rem 0.875rem;
+        padding: 0.65rem 0.9rem;
         font-size: 0.9rem;
         color: var(--text-main);
-        transition: all 0.2s ease;
         background-color: var(--input-bg);
+        font-weight: 500;
     }
 
     .form-control:focus, .form-select:focus {
         border-color: var(--primary);
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
-        outline: none;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
         background-color: var(--input-bg);
         color: var(--text-main);
     }
 
     /* BUTTONS */
-    .btn-primary {
+    .btn-primary-pro {
         background: var(--primary);
-        border-color: var(--primary);
+        color: #ffffff;
+        border: none;
         border-radius: var(--radius-md);
+        padding: 0.65rem 1.25rem;
         font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
     }
 
-    .btn-primary:hover {
+    .btn-primary-pro:hover {
         background: var(--primary-hover);
-        border-color: var(--primary-hover);
+        color: #ffffff;
+        transform: translateY(-1px);
     }
 
     .theme-toggle-btn {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        background: var(--primary-light);
-        color: var(--primary);
-        border: 1px solid var(--border-color);
+        background: var(--card-bg);
+        color: var(--text-main);
+        border: 1px solid var(--card-border);
         transition: all 0.2s ease;
     }
 
-    /* BADGES */
+    /* BADGES & TABLES */
     .ticket-badge {
         font-size: 0.75rem;
         background: #0f172a;
         color: #f8fafc;
-        padding: 4px 10px;
+        padding: 4px 8px;
         border-radius: 6px;
         font-family: monospace;
         font-weight: 600;
     }
 
     .priority-badge {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         padding: 4px 10px;
         border-radius: 20px;
         font-weight: 700;
+        letter-spacing: 0.3px;
     }
-    .priority-HIGH { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
-    .priority-MEDIUM { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
-    .priority-LOW { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .priority-HIGH { background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; }
+    .priority-MEDIUM { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+    .priority-LOW { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
 
-    /* TABLE STYLING */
-    .table-custom {
+    [data-theme="dark"] .priority-HIGH { background: rgba(239, 68, 68, 0.2); color: #f87171; border-color: rgba(239, 68, 68, 0.3); }
+    [data-theme="dark"] .priority-MEDIUM { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3); }
+    [data-theme="dark"] .priority-LOW { background: rgba(16, 185, 129, 0.2); color: #34d399; border-color: rgba(16, 185, 129, 0.3); }
+
+    .table-pro {
+        width: 100%;
         margin-bottom: 0;
         color: var(--text-main);
+        vertical-align: middle;
     }
 
-    .table-custom thead th {
+    .table-pro thead th {
         background: var(--table-header-bg);
         color: var(--text-muted);
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        padding: 1rem;
-        border-bottom: 2px solid var(--border-color);
+        letter-spacing: 0.8px;
+        padding: 0.9rem 1.25rem;
+        border-bottom: 1px solid var(--card-border);
+        font-weight: 700;
     }
 
-    .table-custom tbody td {
-        padding: 1rem;
-        vertical-align: middle;
+    .table-pro tbody td {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--card-border);
         font-size: 0.875rem;
-        border-bottom: 1px solid var(--border-color);
-        color: var(--text-main);
     }
 
-    .table-custom tbody tr:hover {
+    .table-pro tbody tr:hover {
         background-color: var(--table-hover-bg);
     }
 
-    /* MOBILE RESPONSIVE CARD TABLE - PERBAIKAN TABRAKAN LABEL */
+    /* LOGIN SCREEN MODERNISED */
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle at top right, #312e81, #0f172a);
+        padding: 1.5rem;
+    }
+
+    .login-card-pro {
+        width: 100%;
+        max-width: 400px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(12px);
+        border-radius: var(--radius-lg);
+        padding: 2.5rem;
+        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3);
+    }
+
+    [data-theme="dark"] .login-card-pro {
+        background: rgba(17, 24, 39, 0.95);
+        border: 1px solid var(--card-border);
+    }
+
+    /* RESPONSIVE DESIGN */
+    @media (max-width: 992px) {
+        .sidebar { width: 80px; padding: 1rem 0.5rem; align-items: center; }
+        .sidebar .brand-title, .sidebar .nav-label, .sidebar .link-text { display: none; }
+        .main-content { margin-left: 80px; width: calc(100% - 80px); padding: 1rem; }
+    }
+
     @media (max-width: 768px) {
-        .time-picker-wrapper { flex-wrap: wrap; }
-        .time-picker-wrapper .btn-now { width: 100%; margin-top: 4px; }
-
-        .mobile-card-table table, 
-        .mobile-card-table thead, 
-        .mobile-card-table tbody, 
-        .mobile-card-table th, 
-        .mobile-card-table td, 
-        .mobile-card-table tr { display: block; }
-
+        .app-layout { flex-direction: column; }
+        .sidebar { width: 100%; height: auto; position: relative; flex-direction: row; }
+        .main-content { margin-left: 0; width: 100%; }
+        
+        .mobile-card-table table, .mobile-card-table thead, .mobile-card-table tbody, .mobile-card-table th, .mobile-card-table td, .mobile-card-table tr { display: block; }
         .mobile-card-table thead { display: none; }
-
-        .mobile-card-table tr {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            margin-bottom: 12px;
-            padding: 14px;
-            box-shadow: var(--shadow-md);
-        }
-
-        .mobile-card-table td {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border: none;
-            border-bottom: 1px dashed var(--border-color);
-            font-size: 0.85rem;
-            gap: 12px; /* Mencegah bentrok antar kolom */
-            text-align: right;
-        }
-
+        .mobile-card-table tr { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); margin-bottom: 12px; padding: 14px; }
+        .mobile-card-table td { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border: none; border-bottom: 1px dashed var(--card-border); font-size: 0.85rem; }
         .mobile-card-table td:last-child { border-bottom: none; }
-
-        .mobile-card-table td::before {
-            content: attr(data-label);
-            font-weight: 700;
-            color: var(--text-muted);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            min-width: 105px; /* Memberikan area khusus untuk label kiri */
-            text-align: left;
-            flex-shrink: 0;
-        }
+        .mobile-card-table td::before { content: attr(data-label); font-weight: 700; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; }
     }
     </style>
 </head>
 
 <body>
 
-<div class="container my-4 my-md-5">
-
-    <!-- LOGIN SECTION -->
-    <div id="loginSection" class="card login-card p-4 p-sm-5 mx-auto" style="max-width: 420px;">
-        <div class="d-flex justify-content-end mb-2">
+<!-- LOGIN SECTION -->
+<div id="loginSection" class="login-container">
+    <div class="login-card-pro">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center gap-2">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0">WorkRequest</h5>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill" style="font-size: 10px;">PRO v2.5</span>
+                </div>
+            </div>
             <button class="theme-toggle-btn" id="themeToggleLogin" title="Switch Theme">
                 <i class="fa-solid fa-moon"></i>
             </button>
         </div>
-        <div class="text-center mb-4">
-            <div class="brand-icon mb-3">
-                <i class="fa-solid fa-layer-group"></i>
-            </div>
-            <h4 class="fw-extrabold mb-1">Work Request PRO</h4>
-            <p class="text-muted small">Sistem Manajemen Pemeliharaan & Fasilitas</p>
+
+        <div class="mb-4">
+            <h5 class="fw-bold mb-1">Selamat Datang</h5>
+            <p class="text-muted small">Silakan masuk ke akun manajemen fasilitas Anda.</p>
         </div>
         
         <form id="loginForm">
@@ -315,121 +403,172 @@
                 <label for="username" class="form-label">Username</label>
                 <div class="input-group">
                     <span class="input-group-text bg-transparent border-end-0 text-muted"><i class="fa-regular fa-user"></i></span>
-                    <input type="text" id="username" class="form-control border-start-0 ps-0" placeholder="Masukkan username" required>
+                    <input type="text" id="username" class="form-control border-start-0 ps-0" placeholder="Contoh: admin / user1" required>
                 </div>
             </div>
             <div class="mb-4">
                 <label for="password" class="form-label">Password</label>
                 <div class="input-group">
                     <span class="input-group-text bg-transparent border-end-0 text-muted"><i class="fa-solid fa-lock"></i></span>
-                    <input type="password" id="password" class="form-control border-start-0 ps-0" placeholder="Masukkan password" required>
+                    <input type="password" id="password" class="form-control border-start-0 ps-0" placeholder="••••••••" required>
                 </div>
             </div>
-            <button type="submit" id="btnLogin" class="btn btn-primary w-100 py-2.5 fw-bold">
-                <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Masuk ke Sistem
+            <button type="submit" id="btnLogin" class="btn btn-primary-pro w-100 py-2.5">
+                <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Masuk Sekarang
             </button>
         </form>
     </div>
+</div>
 
-    <!-- APP SECTION -->
-    <div id="appSection" class="hidden">
+<!-- MAIN APPLICATION DASHBOARD -->
+<div id="appSection" class="app-layout hidden">
 
-        <!-- HEADER TOPBAR -->
-        <div class="card p-3 p-md-4 mb-4">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="brand-icon" style="width:48px; height:48px; font-size:20px;">
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+        <div>
+            <div class="d-flex align-items-center gap-3 px-2 mb-4">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div class="brand-title">WR-System</div>
+            </div>
+
+            <div class="nav-label">Menu Utama</div>
+            <ul class="nav-menu">
+                <li>
+                    <a href="#" class="nav-link-custom active">
                         <i class="fa-solid fa-chart-pie"></i>
-                    </div>
-                    <div>
-                        <h5 class="mb-0 fw-extrabold">Dashboard Utama</h5>
-                        <small class="text-muted">Work Request Management System</small>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                    <button class="theme-toggle-btn me-2" id="themeToggleApp" title="Switch Theme">
-                        <i class="fa-solid fa-moon"></i>
-                    </button>
-                    <span id="loginInfo" class="badge bg-primary-light text-primary border py-2 px-3 fw-bold rounded-pill"></span>
-                    <button id="btnLogout" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-semibold">
-                        <i class="fa-solid fa-arrow-right-from-bracket me-1"></i> Logout
-                    </button>
-                </div>
-            </div>
-            <div class="d-flex align-items-center gap-2 mt-3 pt-3 border-top text-muted small">
-                <i class="fa-regular fa-clock"></i>
-                <span id="clockIndo" class="fw-semibold"></span>
-            </div>
+                        <span class="link-text">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#jobForm" class="nav-link-custom">
+                        <i class="fa-solid fa-plus-circle"></i>
+                        <span class="link-text">Tiket Baru</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#historyTable" class="nav-link-custom">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span class="link-text">Daftar Tiket</span>
+                    </a>
+                </li>
+            </ul>
         </div>
 
-        <!-- COUNTER CARDS -->
-        <div class="row mb-4 g-3">
-            <div class="col-12 col-sm-4">
-                <div class="card stat-widget open">
+        <div class="px-2">
+            <button id="btnLogout" class="btn btn-outline-danger w-100 border-0 text-start rounded-3 d-flex align-items-center gap-2 px-3 py-2 fw-semibold">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span class="link-text">Keluar</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content">
+
+        <!-- TOPBAR STATUS HEADER -->
+        <header class="topbar">
+            <div>
+                <h4 class="fw-bold mb-0">Dashboard Operasional</h4>
+                <div class="text-muted small d-flex align-items-center gap-2 mt-1">
+                    <i class="fa-regular fa-clock"></i>
+                    <span id="clockIndo" class="fw-semibold"></span>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+                <button class="theme-toggle-btn" id="themeToggleApp" title="Switch Theme">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <div class="vr"></div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 38px; height: 38px;">
+                        <i class="fa-solid fa-user-gear"></i>
+                    </div>
+                    <div>
+                        <div id="loginInfo" class="fw-bold small lh-1">User</div>
+                        <span class="text-muted" style="font-size: 11px;">Aktif</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- STATS KPI WIDGETS -->
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-md-4">
+                <div class="stat-card stat-open card-pro">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <span class="text-muted fw-bold small uppercase d-block mb-1">Tiket Open</span>
-                            <h2 id="openCount" class="mb-0 fw-extrabold">0</h2>
+                            <span class="text-muted fw-bold small text-uppercase">Permintaan Open</span>
+                            <h2 id="openCount" class="fw-extrabold my-1">0</h2>
+                            <small class="text-danger fw-semibold"><i class="fa-solid fa-triangle-exclamation me-1"></i> Perlu Penanganan</small>
                         </div>
-                        <div class="stat-icon">
+                        <div class="stat-icon-wrapper">
                             <i class="fa-solid fa-circle-exclamation"></i>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-sm-4">
-                <div class="card stat-widget progress-st">
+
+            <div class="col-12 col-md-4">
+                <div class="stat-card stat-progress card-pro">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <span class="text-muted fw-bold small uppercase d-block mb-1">In Progress</span>
-                            <h2 id="progressCount" class="mb-0 fw-extrabold">0</h2>
+                            <span class="text-muted fw-bold small text-uppercase">Sedang Diproses</span>
+                            <h2 id="progressCount" class="fw-extrabold my-1">0</h2>
+                            <small class="text-warning fw-semibold"><i class="fa-solid fa-spinner fa-spin me-1"></i> Dalam Pengerjaan</small>
                         </div>
-                        <div class="stat-icon">
-                            <i class="fa-solid fa-spinner fa-spin"></i>
+                        <div class="stat-icon-wrapper">
+                            <i class="fa-solid fa-gears"></i>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-sm-4" id="doneCard">
-                <div class="card stat-widget done">
+
+            <div class="col-12 col-md-4">
+                <div class="stat-card stat-done card-pro">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <span class="text-muted fw-bold small uppercase d-block mb-1">Selesai (Done)</span>
-                            <h2 id="doneCount" class="mb-0 fw-extrabold">0</h2>
+                            <span class="text-muted fw-bold small text-uppercase">Selesai Ditangani</span>
+                            <h2 id="doneCount" class="fw-extrabold my-1">0</h2>
+                            <small class="text-success fw-semibold"><i class="fa-solid fa-circle-check me-1"></i> Tuntas</small>
                         </div>
-                        <div class="stat-icon">
-                            <i class="fa-solid fa-circle-check"></i>
+                        <div class="stat-icon-wrapper">
+                            <i class="fa-solid fa-check-double"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- FORM INPUT WORK REQUEST -->
-        <div class="card mb-4">
-            <div class="card-header py-3 border-bottom d-flex align-items-center gap-2">
-                <i class="fa-solid fa-pen-to-square text-primary"></i>
-                <h6 class="mb-0 fw-bold">Form Input Tiket Baru</h6>
+        <!-- FORM TIKET BARU -->
+        <div class="card-pro mb-4">
+            <div class="card-header-pro">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square text-primary"></i>
+                    <h6 class="mb-0 fw-bold">Buat Tiket Permintaan Pekerjaan</h6>
+                </div>
             </div>
-            <div class="card-body p-4">
+            <div class="p-4">
                 <form id="jobForm">
                     <div class="row g-3">
                         <div class="col-12 col-md-4">
-                            <label for="tanggal" class="form-label">Tanggal <span class="text-danger">*</span></label>
+                            <label for="tanggal" class="form-label">Tanggal Pelaporan</label>
                             <input type="date" id="tanggal" class="form-control" required>
                         </div>
 
                         <div class="col-12 col-md-4">
-                            <label for="jam" class="form-label">Waktu <span class="text-danger">*</span></label>
-                            <div class="d-flex gap-2 time-picker-wrapper">
+                            <label for="jam" class="form-label">Waktu Jam & Menit</label>
+                            <div class="d-flex gap-2">
                                 <select id="jam" class="form-select" required></select>
                                 <select id="menit" class="form-select" required></select>
-                                <button type="button" id="btnNow" class="btn btn-outline-secondary border text-nowrap btn-now fw-bold"><i class="fa-solid fa-rotate me-1"></i> Now</button>
+                                <button type="button" id="btnNow" class="btn btn-outline-secondary text-nowrap"><i class="fa-solid fa-clock me-1"></i> Sekarang</button>
                             </div>
                         </div>
 
                         <div class="col-12 col-md-4">
-                            <label for="priority" class="form-label">Prioritas <span class="text-danger">*</span></label>
+                            <label for="priority" class="form-label">Tingkat Prioritas</label>
                             <select id="priority" class="form-select" required>
                                 <option value="LOW">🟢 LOW (Biasa)</option>
                                 <option value="MEDIUM" selected>🟡 MEDIUM (Sedang)</option>
@@ -438,12 +577,12 @@
                         </div>
 
                         <div class="col-12 col-md-6">
-                            <label for="requestor" class="form-label">Requestor <span class="text-danger">*</span></label>
-                            <input type="text" id="requestor" class="form-control" placeholder="Nama Requestor" required>
+                            <label for="requestor" class="form-label">Nama Pelapor / Requestor</label>
+                            <input type="text" id="requestor" class="form-control" placeholder="Nama Lengkap" required>
                         </div>
 
                         <div class="col-12 col-md-6">
-                            <label for="area" class="form-label">Area Kerja <span class="text-danger">*</span></label>
+                            <label for="area" class="form-label">Lokasi / Area Kerja</label>
                             <select id="area" class="form-select" required>
                                 <option value="LINE 1A">LINE 1A</option>
                                 <option value="LINE 1B">LINE 1B</option>
@@ -454,84 +593,17 @@
                                 <option value="PRESS01 PN1">PRESS01 PN1</option>
                                 <option value="PRESS02 PN1">PRESS02 PN1</option>
                                 <option value="PRESS03 PN1">PRESS03 PN1</option>
-                                <option value="PRESS05 PN1">PRESS05 PN1</option>
-                                <option value="PRESS10 PN1C">PRESS10 PN1C</option>
-                                <option value="PRESS12 PN1C">PRESS12 PN1C</option>
-                                <option value="PRESS11">PRESS11</option>
-                                <option value="PRESS01 PN2B">PRESS01 PN2B</option>
-                                <option value="PRESS02 PN2A">PRESS02 PN2A</option>
-                                <option value="PRESS03 PN2C">PRESS03 PN2C</option>
-                                <option value="PRESS02 PN2B">PRESS02 PN2B</option>
-                                <option value="SQUARING 1C">SQUARING 1C</option>
-                                <option value="POLESHING 1C">POLESHING 1C</option>
-                                <option value="PACKING 1A">PACKING 1A</option>
-                                <option value="PACKING 1B">PACKING 1B</option>
-                                <option value="PACKING 1C">PACKING 1C</option>
-                                <option value="PACKING 2A">PACKING 2A</option>
-                                <option value="PACKING 2B">PACKING 2B</option>
-                                <option value="PACKING 2C">PACKING 2C</option>
-                                <option value="KILN 1A">KILN 1A</option>
-                                <option value="KILN 1B">KILN 1B</option>
-                                <option value="KILN 1C">KILN 1C</option>
-                                <option value="KILN 2A">KILN 2A</option>
-                                <option value="KILN 2B">KILN 2B</option>
-                                <option value="KILN 2C">KILN 2C</option>
-                                <option value="HD 1A">HD 1A</option>
-                                <option value="HD 1B">HD 1B</option>
-                                <option value="HD 1C">HD 1C</option>
-                                <option value="HD 2A">HD 2A</option>
-                                <option value="HD 2B">HD 2B</option>
-                                <option value="HD 2C">HD 2C</option>
-                                <option value="DRYER 1A">DRYER 1A</option>
-                                <option value="DRYER 1B">DRYER 1B</option>
-                                <option value="DRYER 1C">DRYER 1C</option>
-                                <option value="DRYER 2A">DRYER 2A</option>
-                                <option value="DRYER 2B">DRYER 2B</option>
-                                <option value="DRYER 2C">DRYER 2C</option>
-                                <option value="PRINT ROTOCOLOR PN1">PRINT ROTOCOLOR PN1</option>
-                                <option value="PRINT ROTOCOLOR PN2">PRINT ROTOCOLOR PN2</option>
-                                <option value="ATM 10000A">ATM 10000A</option>
-                                <option value="ATM 10000B">ATM 10000B</option>
-                                <option value="ATM 7000">ATM 7000</option>
-                                <option value="GLAZE MOLEN PN1">GLAZE MOLEN PN1</option>
-                                <option value="GLAZE MOLEN PN2">GLAZE MOLEN PN2</option>
-                                <option value="DP 1A">DP 1A</option>
-                                <option value="DP 1B">DP 1B</option>
-                                <option value="DP 1C">DP 1C</option>
-                                <option value="DP 2A">DP 2A</option>
-                                <option value="DP 2B">DP 2B</option>
-                                <option value="DP 2C">DP 2C</option>
-                                <option value="TANGKI WATERGLAZE">TANGKI WATERGLAZE</option>
-                                <option value="GLAZING LINE 1A">GLAZING LINE 1A</option>
-                                <option value="GLAZING LINE 1B">GLAZING LINE 1B</option>
-                                <option value="GLAZING LINE 1C">GLAZING LINE 1C</option>
-                                <option value="GLAZING LINE 2A">GLAZING LINE 2A</option>
-                                <option value="GLAZING LINE 2B">GLAZING LINE 2B</option>
-                                <option value="GLAZING LINE 2C">GLAZING LINE 2C</option>
-                                <option value="GENSET PN1">GENSET PN1</option>
-                                <option value="GENSET PN2">GENSET PN2</option>
-                                <option value="KOMPRESSOR PN1">KOMPRESSOR PN1</option>
-                                <option value="KOMPRESSOR PN2">KOMPRESSOR PN2</option>
-                                <option value="SILO PN1">SILO PN1</option>
-                                <option value="SILO PN2">SILO PN2</option>
-                                <option value="BMSD">BMSD</option>
                                 <option value="WORKSHOP">WORKSHOP</option>
                                 <option value="UTILITY">UTILITY</option>
                                 <option value="PRODUKSI">PRODUKSI</option>
-                                <option value="WHFG">WHFG</option>
-                                <option value="WHRM">WHRM</option>
-                                <option value="WHSP">WHSP</option>
-                                <option value="GA">GA</option>
-                                <option value="RND">RND</option>
-                                <option value="PROYEK">PROYEK</option>
                                 <option value="OFFICE">OFFICE</option>
                                 <option value="ENGINEERING">ENGINEERING</option>
                             </select>
                         </div>
 
                         <div class="col-12">
-                            <label for="deskripsi" class="form-label">Deskripsi Pekerjaan <span class="text-danger">*</span></label>
-                            <textarea id="deskripsi" class="form-control" rows="3" placeholder="Jelaskan detail kerusakan/pekerjaan" required></textarea>
+                            <label for="deskripsi" class="form-label">Rincian Kerusakan / Pekerjaan</label>
+                            <textarea id="deskripsi" class="form-control" rows="3" placeholder="Tuliskan deskripsi masalah secara jelas..." required></textarea>
                         </div>
 
                         <div class="col-12 col-md-6">
@@ -544,43 +616,42 @@
                         </div>
 
                         <div class="col-12 col-md-6" id="keteranganGroup">
-                            <label for="keterangan" class="form-label">Keterangan / Catatan</label>
-                            <input type="text" id="keterangan" class="form-control" placeholder="Tindakan yang diambil">
+                            <label for="keterangan" class="form-label">Catatan Perbaikan / Tindakan</label>
+                            <input type="text" id="keterangan" class="form-control" placeholder="Tindakan awal / progres teknisi">
                         </div>
                     </div>
 
-                    <div class="mt-4 d-flex gap-2 flex-wrap">
-                        <button type="submit" id="submitBtn" class="btn btn-primary flex-fill py-2.5">
+                    <div class="mt-4 d-flex gap-2 flex-wrap justify-content-end border-top pt-3">
+                        <button type="button" id="resetBtn" class="btn btn-light fw-bold border">
+                            <i class="fa-solid fa-rotate-left me-1"></i> Reset
+                        </button>
+                        <button type="submit" id="submitBtn" class="btn btn-primary-pro">
                             <i class="fa-solid fa-paper-plane me-1"></i> Simpan Tiket
                         </button>
-                        <button type="button" id="updateBtn" class="btn btn-warning flex-fill py-2.5 text-white fw-bold hidden">
-                            <i class="fa-solid fa-pen-to-square me-1"></i> Update Tiket
-                        </button>
-                        <button type="button" id="resetBtn" class="btn btn-outline-secondary flex-fill py-2.5 fw-bold">
-                            <i class="fa-solid fa-rotate-left me-1"></i> Reset
+                        <button type="submit" id="updateBtn" class="btn btn-warning text-white fw-bold hidden">
+                            <i class="fa-solid fa-pen-to-square me-1"></i> Perbarui Tiket
                         </button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- HISTORY DATA TABLE -->
-        <div class="card mb-4">
-            <div class="card-header py-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <!-- RIWAYAT & TABLE TIKET -->
+        <div class="card-pro">
+            <div class="card-header-pro flex-wrap gap-2">
                 <div class="d-flex align-items-center gap-2">
                     <i class="fa-solid fa-list-check text-primary"></i>
-                    <h6 class="mb-0 fw-bold">Riwayat Permintaan</h6>
+                    <h6 class="mb-0 fw-bold">Daftar Tiket Terdaftar</h6>
                 </div>
-                <button id="btnExport" class="btn btn-success btn-sm px-3"><i class="fa-solid fa-file-excel me-1"></i> Export Excel</button>
+                <button id="btnExport" class="btn btn-outline-success btn-sm font-semibold"><i class="fa-solid fa-file-excel me-1"></i> Export Excel</button>
             </div>
-            <div class="card-body p-4">
-                
-                <!-- ADVANCED FILTER SECTION -->
-                <div class="row g-2 mb-4">
+
+            <div class="p-4">
+                <div class="row g-2 mb-3">
                     <div class="col-12 col-md-4">
                         <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-transparent border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
-                            <input type="text" id="searchHistory" class="form-control border-start-0" placeholder="Cari kata kunci...">
+                            <span class="input-group-text bg-transparent border-end-0 text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
+                            <input type="text" id="searchHistory" class="form-control border-start-0" placeholder="Cari ID, pelapor, atau area...">
                         </div>
                     </div>
                     <div class="col-6 col-md-4">
@@ -602,17 +673,17 @@
                 </div>
 
                 <div class="table-responsive mobile-card-table rounded-3 border">
-                    <table class="table table-custom align-middle mb-0">
+                    <table class="table table-pro">
                         <thead>
                             <tr>
                                 <th>ID Tiket</th>
                                 <th>Prioritas</th>
-                                <th>Waktu</th>
+                                <th>Waktu Pelaporan</th>
                                 <th>Deskripsi Pekerjaan</th>
                                 <th>Requestor</th>
                                 <th>Area</th>
                                 <th>Status</th>
-                                <th id="headerKeterangan">Keterangan</th>
+                                <th id="headerKeterangan">Catatan</th>
                                 <th id="headerAksi" class="text-end">Aksi</th>
                             </tr>
                         </thead>
@@ -624,20 +695,49 @@
                     </table>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center mt-4 pt-2">
-                    <button id="prevBtn" class="btn btn-outline-secondary btn-sm px-3 fw-bold"><i class="fa-solid fa-chevron-left me-1"></i> Prev</button>
-                    <div id="paginationInfo" class="fw-bold small text-muted"></div>
-                    <button id="nextBtn" class="btn btn-outline-secondary btn-sm px-3 fw-bold">Next <i class="fa-solid fa-chevron-right ms-1"></i></button>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <button id="prevBtn" class="btn btn-sm btn-outline-secondary fw-semibold"><i class="fa-solid fa-chevron-left me-1"></i> Sebelumnya</button>
+                    <div id="paginationInfo" class="small font-semibold text-muted"></div>
+                    <button id="nextBtn" class="btn btn-sm btn-outline-secondary fw-semibold">Berikutnya <i class="fa-solid fa-chevron-right ms-1"></i></button>
                 </div>
             </div>
         </div>
 
-    </div> 
+    </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+/* =====================================================
+   PROTEKSI SECURITY: MENCEGAH INSPECT ELEMENT & DEVTOOLS
+===================================================== */
+document.addEventListener("contextmenu", (e) => e.preventDefault());
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "F12") {
+        e.preventDefault();
+        return false;
+    }
+    if (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "i" || e.key === "J" || e.key === "j" || e.key === "C" || e.key === "c")) {
+        e.preventDefault();
+        return false;
+    }
+    if (e.ctrlKey && (e.key === "U" || e.key === "u")) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+setInterval(() => {
+    const startTime = performance.now();
+    debugger;
+    const endTime = performance.now();
+    if (endTime - startTime > 100) {
+        document.body.innerHTML = "<h2 style='text-align:center; margin-top:20vh; color:red;'>Akses Ditolak: Developer Tools Tidak Diizinkan.</h2>";
+    }
+}, 1000);
+
 /* =====================================================
    CONFIG & APP STATE
 ===================================================== */
@@ -654,7 +754,7 @@ const AppState = {
 };
 
 /* =====================================================
-   THEME MANAGER (LIGHT / DARK MODE)
+   THEME MANAGER
 ===================================================== */
 const ThemeManager = {
     init() {
@@ -681,7 +781,7 @@ const ThemeManager = {
 };
 
 /* =====================================================
-   DATE & TIME CLEANER HELPER (MENCEGAH ANOMALI TANGGAL ISO)
+   HELPERS & PARSERS
 ===================================================== */
 function formatTanggalClean(val) {
     if (!val) return "-";
@@ -689,6 +789,20 @@ function formatTanggalClean(val) {
     if (str.includes("T")) str = str.split("T")[0];
     const d = new Date(str);
     return isNaN(d) ? str : d.toLocaleDateString("id-ID", { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function parseTanggalToISO(val) {
+    if (!val) return "";
+    let str = String(val);
+    if (str.includes("T")) return str.split("T")[0];
+    const d = new Date(str);
+    if (!isNaN(d.getTime())) {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    return str;
 }
 
 function formatJamClean(val) {
@@ -703,8 +817,12 @@ function formatJamClean(val) {
     return str;
 }
 
+function getValue(id) { return document.getElementById(id)?.value || ""; }
+function setValue(id, val) { if(document.getElementById(id)) document.getElementById(id).value = val; }
+function escapeHTML(str) { return String(str ?? "").replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m])); }
+
 /* =====================================================
-   AUTH MODULE
+   AUTHENTICATION MODULE
 ===================================================== */
 const Auth = {
     login(userData) {
@@ -744,7 +862,7 @@ async function handleLogin(e) {
     const originalText = btn.innerHTML;
 
     btn.disabled = true;
-    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Memeriksa...`;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Autentikasi...`;
 
     try {
         const res = await fetch(SCRIPT_URL, {
@@ -760,15 +878,15 @@ async function handleLogin(e) {
         const result = await res.json();
 
         if (result.success) {
-            showToast("Login Berhasil!", "success");
+            showToast("Akses Diberikan. Selamat Datang!", "success");
             Auth.login(result.user);
             loadData();
         } else {
-            showToast(result.message || "Login Gagal!", "danger");
+            showToast(result.message || "Gagal Otentikasi!", "danger");
             setValue("password", "");
         }
     } catch (err) {
-        showToast("Terjadi kesalahan koneksi!", "danger");
+        showToast("Terjadi kendala koneksi ke server!", "danger");
     } finally {
         btn.disabled = false;
         btn.innerHTML = originalText;
@@ -776,7 +894,7 @@ async function handleLogin(e) {
 }
 
 /* =====================================================
-   FETCH DATA & API INTERACTION
+   DATA FETCH & SUBMIT
 ===================================================== */
 async function loadData() {
     if (AppState.isLoading) return;
@@ -793,7 +911,7 @@ async function loadData() {
         applyFilters();
         updateDashboard();
     } catch (e) {
-        showToast("Gagal memuat data!", "danger");
+        showToast("Gagal menyinkronkan data!", "danger");
     } finally {
         AppState.isLoading = false;
     }
@@ -817,7 +935,7 @@ async function submitForm(e) {
     };
 
     AppState.isSubmitting = true;
-    showToast("Memproses data...", "info");
+    showToast("Mengirimkan data...", "info");
 
     try {
         const res = await fetch(SCRIPT_URL, {
@@ -828,21 +946,21 @@ async function submitForm(e) {
         const result = await res.json();
         
         if (result.success) {
-            showToast("Berhasil menyimpan!", "success");
+            showToast("Data berhasil diperbarui!", "success");
             resetForm();
             loadData();
         } else {
-            showToast(result.message || "Gagal!", "danger");
+            showToast(result.message || "Proses gagal!", "danger");
         }
     } catch(err) {
-        showToast("Terjadi kesalahan jaringan!", "danger");
+        showToast("Gagal terhubung ke jaringan!", "danger");
     } finally {
         AppState.isSubmitting = false;
     }
 }
 
 /* =====================================================
-   RENDER TABLE & FILTERING (BERSIH DARI ERROR TANGGAL)
+   RENDERING & TABLES
 ===================================================== */
 function applyFilters() {
     const key = getValue("searchHistory").toLowerCase();
@@ -866,7 +984,7 @@ function renderTable() {
     const isAdmin = Auth.getRole() === "admin";
 
     if (!data.length) {
-        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted">Tidak ada data ditemukan</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted">Tidak ada riwayat tiket ditemukan.</td></tr>`;
         return;
     }
 
@@ -878,7 +996,6 @@ function renderTable() {
         const priority = item[9] || "MEDIUM";
         const status = String(item[7] || "").toLowerCase();
         
-        // Pembersihan format Tanggal dan Jam agar tidak bertumpuk
         const tglClean = formatTanggalClean(item[1]);
         const jamClean = formatJamClean(item[2]);
 
@@ -911,7 +1028,7 @@ function renderTable() {
     });
 
     tbody.innerHTML = html;
-    document.getElementById("paginationInfo").textContent = `Halaman ${AppState.currentPage} dari ${Math.ceil(data.length / AppState.pageSize)}`;
+    document.getElementById("paginationInfo").textContent = `Halaman ${AppState.currentPage} dari ${Math.ceil(data.length / AppState.pageSize) || 1}`;
 }
 
 function prepareEdit(id) {
@@ -919,16 +1036,12 @@ function prepareEdit(id) {
     if (!item) return;
 
     AppState.editId = item[0];
-    
-    // Format ISO di-clean sebelum dipasang ke input date
-    let tglIso = item[1] || "";
-    if (tglIso.includes("T")) tglIso = tglIso.split("T")[0];
-    setValue("tanggal", tglIso);
+    setValue("tanggal", parseTanggalToISO(item[1]));
     
     const jamClean = formatJamClean(item[2]);
     const timeParts = jamClean.split(":");
-    setValue("jam", timeParts[0] || "00");
-    setValue("menit", timeParts[1] || "00");
+    setValue("jam", timeParts[0] ? String(timeParts[0]).padStart(2, "0") : "00");
+    setValue("menit", timeParts[1] ? String(timeParts[1]).padStart(2, "0") : "00");
 
     setValue("requestor", item[3]);
     setValue("area", item[4]);
@@ -954,43 +1067,13 @@ async function deleteData(id) {
         });
         const result = await res.json();
         if (result.success) {
-            showToast("Berhasil dihapus!", "success");
+            showToast("Data terhapus!", "success");
             loadData();
         }
     } catch(e) {
-        showToast("Gagal menghapus!", "danger");
+        showToast("Penghapusan gagal!", "danger");
     }
 }
-
-/* =====================================================
-   EXPORT CSV FEATURE
-===================================================== */
-function exportCSV() {
-    const data = AppState.filteredData || AppState.allData;
-    if(!data.length) return showToast("Tidak ada data untuk diexport", "warning");
-
-    let csvContent = "data:text/csv;charset=utf-8,ID Tiket,Tanggal,Jam,Requestor,Area,Deskripsi,Prioritas,Status,Keterangan\n";
-    data.forEach(row => {
-        const tglClean = formatTanggalClean(row[1]);
-        const jamClean = formatJamClean(row[2]);
-        csvContent += `"${row[0]}","${tglClean}","${jamClean}","${row[3]}","${row[4]}","${row[5]}","${row[9] || 'MEDIUM'}","${row[7]}","${row[8] || ''}"\n`;
-    });
-
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `Work_Request_Report_${new Date().toISOString().slice(0,10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-}
-
-/* =====================================================
-   HELPERS & INIT
-===================================================== */
-function getValue(id) { return document.getElementById(id)?.value || ""; }
-function setValue(id, val) { if(document.getElementById(id)) document.getElementById(id).value = val; }
-function escapeHTML(str) { return String(str ?? "").replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m])); }
 
 function resetForm() {
     AppState.editId = null;
@@ -1043,7 +1126,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("jobForm").onsubmit = submitForm;
     document.getElementById("resetBtn").onclick = resetForm;
     document.getElementById("btnNow").onclick = setDefaultTime;
-    document.getElementById("btnExport").onclick = exportCSV;
 
     document.getElementById("searchHistory").oninput = applyFilters;
     document.getElementById("filterStatus").onchange = applyFilters;
