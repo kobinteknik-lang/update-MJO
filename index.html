@@ -709,19 +709,6 @@
 
 <script>
 /* =====================================================
-   PROTEKSI SECURITY
-===================================================== */
-document.addEventListener("contextmenu", (e) => e.preventDefault());
-
-document.addEventListener("keydown", (e) => {
-    if (e.key === "F12") { e.preventDefault(); return false; }
-    if (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "i" || e.key === "J" || e.key === "j" || e.key === "C" || e.key === "c")) {
-        e.preventDefault(); return false;
-    }
-    if (e.ctrlKey && (e.key === "U" || e.key === "u")) { e.preventDefault(); return false; }
-});
-
-/* =====================================================
    CONFIG & APP STATE
 ===================================================== */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzApIiUbjDyTYkaJh5EmotOgyY7OwoxMzA_7HlQ9cf_L6GyZ7A1I_fMDszyKebfSolvAQ/exec";
@@ -881,7 +868,7 @@ async function handleLogin(e) {
 }
 
 /* =====================================================
-   DATA FETCH & SUBMIT
+   DATA FETCH & SUBMIT (PERBAIKAN LOAD DATA)
 ===================================================== */
 async function loadData() {
     if (AppState.isLoading) return;
@@ -893,7 +880,7 @@ async function loadData() {
         
         let rawData = result.data ? result.data : (Array.isArray(result) ? result : []);
 
-        // Normalisasi data baik dalam bentuk Array 2D maupun Array of Objects
+        // Normalisasi data secara universal (Mendukung Objek maupun Array 2D)
         if (rawData.length > 0 && Array.isArray(rawData[0])) {
             let dataStart = String(rawData[0][0]).toLowerCase().includes("id") ? 1 : 0;
             AppState.allData = rawData.slice(dataStart).map(row => ({
@@ -904,9 +891,9 @@ async function loadData() {
                 area: String(row[4] || "").trim(),
                 deskripsi: String(row[5] || "").trim(),
                 createdAt: String(row[6] || "").trim(),
-                status: String(row[7] || "Open").trim(),
+                status: String(row[7] || "OPEN").trim().toUpperCase(),
                 keterangan: String(row[8] || "").trim(),
-                priority: String(row[9] || "MEDIUM").trim()
+                priority: String(row[9] || "MEDIUM").trim().toUpperCase()
             }));
         } else if (Array.isArray(rawData)) {
             AppState.allData = rawData.map(item => ({
@@ -917,9 +904,9 @@ async function loadData() {
                 area: String(item.area || "").trim(),
                 deskripsi: String(item.deskripsi || "").trim(),
                 createdAt: String(item.createdAt || "").trim(),
-                status: String(item.status || "Open").trim(),
+                status: String(item.status || "OPEN").trim().toUpperCase(),
                 keterangan: String(item.keterangan || "").trim(),
-                priority: String(item.priority || "MEDIUM").trim()
+                priority: String(item.priority || "MEDIUM").trim().toUpperCase()
             }));
         } else {
             AppState.allData = [];
@@ -944,11 +931,11 @@ async function submitForm(e) {
         id: AppState.editId,
         tanggal: getValue("tanggal"),
         jam: `${getValue("jam")}:${getValue("menit")}`,
-        priority: getValue("priority"),
+        priority: getValue("priority").toUpperCase(),
         requestor: getValue("requestor"),
         area: getValue("area"),
         deskripsi: getValue("deskripsi"),
-        status: getValue("status") || "Open",
+        status: (getValue("status") || "OPEN").toUpperCase(),
         keterangan: getValue("keterangan")
     };
 
@@ -978,23 +965,20 @@ async function submitForm(e) {
 }
 
 /* =====================================================
-   RENDERING, TABLES & EXPORT
+   RENDERING, TABLES & FILTERS
 ===================================================== */
 function applyFilters() {
     const key = getValue("searchHistory").toLowerCase().trim();
-    const st = getValue("filterStatus").toLowerCase().trim();
+    const st = getValue("filterStatus").toUpperCase().trim();
     const pr = getValue("filterPriority").toUpperCase().trim();
 
     AppState.filteredData = AppState.allData.filter(row => {
-        // Normalisasi status dan priority ke lowercase/uppercase standar
-        const rowStatus = String(row.status || "").toLowerCase().trim();
+        const rowStatus = String(row.status || "").toUpperCase().trim();
         const rowPriority = String(row.priority || "").toUpperCase().trim();
         
         const matchKey = !key || Object.values(row).some(val => 
             String(val ?? "").toLowerCase().includes(key)
         );
-        
-        // Pencocokan fleksibel untuk "open" vs "OPEN"
         const matchSt = !st || rowStatus === st;
         const matchPr = !pr || rowPriority === pr;
         
@@ -1004,6 +988,7 @@ function applyFilters() {
     AppState.currentPage = 1;
     renderTable();
 }
+
 function renderTable() {
     const tbody = document.getElementById("historyTable");
     const data = AppState.filteredData || AppState.allData;
@@ -1020,20 +1005,20 @@ function renderTable() {
 
     let html = "";
     pageData.forEach((item) => {
-        const id = item.id || (Array.isArray(item) ? item[0] : "-");
-        const tglClean = formatTanggalClean(item.tanggal || (Array.isArray(item) ? item[1] : ""));
-        const jamClean = formatJamClean(item.jam || (Array.isArray(item) ? item[2] : ""));
-        const req = item.requestor || (Array.isArray(item) ? item[3] : "-");
-        const area = item.area || (Array.isArray(item) ? item[4] : "-");
-        const desk = item.deskripsi || (Array.isArray(item) ? item[5] : "-");
-        const status = String(item.status || (Array.isArray(item) ? item[7] : "") || "Open").toLowerCase();
-        const ket = item.keterangan || (Array.isArray(item) ? item[8] : "-");
-        const priority = String(item.priority || (Array.isArray(item) ? item[9] : "") || "MEDIUM").toUpperCase();
+        const id = item.id || "-";
+        const tglClean = formatTanggalClean(item.tanggal);
+        const jamClean = formatJamClean(item.jam);
+        const req = item.requestor || "-";
+        const area = item.area || "-";
+        const desk = item.deskripsi || "-";
+        const status = String(item.status || "OPEN").toUpperCase();
+        const ket = item.keterangan || "-";
+        const priority = String(item.priority || "MEDIUM").toUpperCase();
 
         let statusBadge = "";
-        if (status === "open") {
+        if (status === "OPEN") {
             statusBadge = `<span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-bold">OPEN</span>`;
-        } else if (status === "progress") {
+        } else if (status === "PROGRESS") {
             statusBadge = `<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-bold">PROGRESS</span>`;
         } else {
             statusBadge = `<span class="badge bg-success-subtle text-success border border-success-subtle fw-bold">DONE</span>`;
@@ -1071,15 +1056,15 @@ function exportToExcel() {
     let csv = "ID Tiket,Prioritas,Tanggal,Jam,Requestor,Area,Deskripsi,Status,Keterangan\n";
     
     AppState.allData.forEach(row => {
-        const id = row.id || (Array.isArray(row) ? row[0] : "");
-        const tgl = row.tanggal || (Array.isArray(row) ? row[1] : "");
-        const jam = row.jam || (Array.isArray(row) ? row[2] : "");
-        const req = row.requestor || (Array.isArray(row) ? row[3] : "");
-        const area = row.area || (Array.isArray(row) ? row[4] : "");
-        const desk = (row.deskripsi || (Array.isArray(row) ? row[5] : "")).replace(/"/g, '""');
-        const st = row.status || (Array.isArray(row) ? row[7] : "");
-        const ket = (row.keterangan || (Array.isArray(row) ? row[8] : "")).replace(/"/g, '""');
-        const pr = row.priority || (Array.isArray(row) ? row[9] : "");
+        const id = row.id || "";
+        const tgl = row.tanggal || "";
+        const jam = row.jam || "";
+        const req = row.requestor || "";
+        const area = row.area || "";
+        const desk = (row.deskripsi || "").replace(/"/g, '""');
+        const st = row.status || "";
+        const ket = (row.keterangan || "").replace(/"/g, '""');
+        const pr = row.priority || "";
 
         csv += `"${id}","${pr}","${tgl}","${jam}","${req}","${area}","${desk}","${st}","${ket}"\n`;
     });
@@ -1094,26 +1079,23 @@ function exportToExcel() {
 }
 
 function prepareEdit(id) {
-    const item = AppState.allData.find(row => {
-        const rowId = row.id || (Array.isArray(row) ? row[0] : "");
-        return String(rowId).trim() === String(id).trim();
-    });
+    const item = AppState.allData.find(row => String(row.id).trim() === String(id).trim());
     if (!item) return;
 
-    AppState.editId = item.id || (Array.isArray(item) ? item[0] : "");
-    setValue("tanggal", parseTanggalToISO(item.tanggal || (Array.isArray(item) ? item[1] : "")));
+    AppState.editId = item.id;
+    setValue("tanggal", parseTanggalToISO(item.tanggal));
     
-    const jamClean = formatJamClean(item.jam || (Array.isArray(item) ? item[2] : ""));
+    const jamClean = formatJamClean(item.jam);
     const timeParts = jamClean.split(":");
     setValue("jam", timeParts[0] ? String(timeParts[0]).padStart(2, "0") : "00");
     setValue("menit", timeParts[1] ? String(timeParts[1]).padStart(2, "0") : "00");
 
-    setValue("requestor", item.requestor || (Array.isArray(item) ? item[3] : ""));
-    setValue("area", item.area || (Array.isArray(item) ? item[4] : ""));
-    setValue("deskripsi", item.deskripsi || (Array.isArray(item) ? item[5] : ""));
-    setValue("status", item.status || (Array.isArray(item) ? item[7] : "Open"));
-    setValue("keterangan", item.keterangan || (Array.isArray(item) ? item[8] : ""));
-    setValue("priority", item.priority || (Array.isArray(item) ? item[9] : "MEDIUM"));
+    setValue("requestor", item.requestor);
+    setValue("area", item.area);
+    setValue("deskripsi", item.deskripsi);
+    setValue("status", item.status);
+    setValue("keterangan", item.keterangan);
+    setValue("priority", item.priority);
 
     document.getElementById("submitBtn").classList.add("hidden");
     document.getElementById("updateBtn").classList.remove("hidden");
@@ -1158,10 +1140,10 @@ function setDefaultTime() {
 function updateDashboard() {
     let open = 0, progress = 0, done = 0;
     AppState.allData.forEach(row => {
-        const status = String(row.status || (Array.isArray(row) ? row[7] : "") || "").toLowerCase().trim();
-        if(status === 'open') open++;
-        else if(status === 'progress') progress++;
-        else if(status === 'done') done++;
+        const status = String(row.status || "").toUpperCase().trim();
+        if(status === 'OPEN') open++;
+        else if(status === 'PROGRESS') progress++;
+        else if(status === 'DONE') done++;
     });
     document.getElementById("openCount").textContent = open;
     document.getElementById("progressCount").textContent = progress;
