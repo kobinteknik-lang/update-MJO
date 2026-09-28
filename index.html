@@ -3,12 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Work Request System PRO</title>
 
 <style>
 /* =========================================================
-   RESET
+   RESET & VARIABLES
 ========================================================= */
 * {
     box-sizing: border-box;
@@ -20,40 +19,25 @@
     --primary: #1e3a5f;
     --primary-dark: #142b47;
     --primary-light: #eaf1f8;
-
     --accent: #2563eb;
     --accent-light: #eff6ff;
-
     --success: #15803d;
     --success-light: #ecfdf3;
-
     --warning: #b45309;
     --warning-light: #fff7ed;
-
     --danger: #dc2626;
     --danger-light: #fef2f2;
-
     --text: #172033;
     --muted: #667085;
-
     --border: #e4e7ec;
     --bg: #f5f7fa;
     --card: #ffffff;
-
     --radius: 14px;
     --shadow: 0 4px 18px rgba(16, 24, 40, .06);
 }
 
 body {
-    font-family:
-        Inter,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
-
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
@@ -63,18 +47,14 @@ body {
 /* =========================================================
    TOP HEADER
 ========================================================= */
-
 .topbar {
     height: 68px;
     background: var(--card);
     border-bottom: 1px solid var(--border);
-
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     padding: 0 28px;
-
     position: sticky;
     top: 0;
     z-index: 100;
@@ -89,17 +69,12 @@ body {
 .brand-icon {
     width: 40px;
     height: 40px;
-
     border-radius: 11px;
-
     background: var(--primary);
-
     color: white;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     font-size: 18px;
     font-weight: 800;
 }
@@ -126,34 +101,28 @@ body {
     font-size: 12px;
     color: var(--muted);
     padding-right: 8px;
+    font-weight: 600;
 }
 
 .user-box {
     display: flex;
     align-items: center;
     gap: 9px;
-
     padding: 7px 11px;
-
     border: 1px solid var(--border);
     border-radius: 10px;
-
     background: #fafafa;
 }
 
 .user-avatar {
     width: 30px;
     height: 30px;
-
     border-radius: 50%;
-
     background: var(--primary-light);
     color: var(--primary);
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     font-size: 12px;
     font-weight: 800;
 }
@@ -163,60 +132,54 @@ body {
     font-weight: 700;
 }
 
-/* =========================================================
-   PAGE
-========================================================= */
+.user-role-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-left: 4px;
+}
 
+/* =========================================================
+   CONTAINER & LAYOUT
+========================================================= */
 .container {
     max-width: 1450px;
     margin: auto;
     padding: 25px 28px 40px;
 }
 
-/* =========================================================
-   LOGIN
-========================================================= */
-
 .login-wrapper {
     min-height: calc(100vh - 68px);
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     padding: 25px;
 }
 
 .login-card {
     width: 100%;
-    max-width: 420px;
-
+    max-width: 440px;
     background: white;
-
     border: 1px solid var(--border);
     border-radius: 20px;
-
     box-shadow: var(--shadow);
-
     padding: 32px;
 }
 
 .login-logo {
     width: 58px;
     height: 58px;
-
     margin: 0 auto 18px;
-
     border-radius: 16px;
-
     background: var(--primary);
-
     color: white;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     font-size: 24px;
     font-weight: 900;
 }
@@ -231,20 +194,14 @@ body {
     text-align: center;
     font-size: 13px;
     color: var(--muted);
-    margin: 5px 0 25px;
+    margin: 5px 0 22px;
 }
-
-/* =========================================================
-   PAGE TITLE
-========================================================= */
 
 .page-heading {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     gap: 15px;
-
     margin-bottom: 22px;
 }
 
@@ -266,30 +223,21 @@ body {
 }
 
 /* =========================================================
-   KPI
+   KPI DASHBOARD
 ========================================================= */
-
 .kpi-grid {
     display: grid;
-
-    grid-template-columns:
-        repeat(4, minmax(0, 1fr));
-
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 14px;
-
     margin-bottom: 20px;
 }
 
 .kpi-card {
     background: var(--card);
-
     border: 1px solid var(--border);
     border-radius: var(--radius);
-
     padding: 17px;
-
     box-shadow: var(--shadow);
-
     display: flex;
     align-items: center;
     gap: 14px;
@@ -298,35 +246,17 @@ body {
 .kpi-icon {
     width: 42px;
     height: 42px;
-
     border-radius: 11px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     font-weight: 800;
 }
 
-.kpi-total .kpi-icon {
-    background: var(--primary-light);
-    color: var(--primary);
-}
-
-.kpi-open .kpi-icon {
-    background: var(--accent-light);
-    color: var(--accent);
-}
-
-.kpi-progress .kpi-icon {
-    background: var(--warning-light);
-    color: var(--warning);
-}
-
-.kpi-done .kpi-icon {
-    background: var(--success-light);
-    color: var(--success);
-}
+.kpi-total .kpi-icon { background: var(--primary-light); color: var(--primary); }
+.kpi-open .kpi-icon { background: var(--accent-light); color: var(--accent); }
+.kpi-progress .kpi-icon { background: var(--warning-light); color: var(--warning); }
+.kpi-done .kpi-icon { background: var(--success-light); color: var(--success); }
 
 .kpi-label {
     color: var(--muted);
@@ -341,41 +271,26 @@ body {
 }
 
 /* =========================================================
-   MAIN GRID
+   MAIN GRID & CARDS
 ========================================================= */
-
 .main-grid {
     display: grid;
-
-    grid-template-columns:
-        minmax(320px, 390px)
-        minmax(0, 1fr);
-
+    grid-template-columns: minmax(320px, 390px) minmax(0, 1fr);
     gap: 20px;
-
     align-items: start;
 }
 
-/* =========================================================
-   CARD
-========================================================= */
-
 .card {
     background: var(--card);
-
     border: 1px solid var(--border);
     border-radius: var(--radius);
-
     box-shadow: var(--shadow);
-
     overflow: hidden;
 }
 
 .card-header {
     padding: 17px 19px;
-
     border-bottom: 1px solid var(--border);
-
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -398,9 +313,8 @@ body {
 }
 
 /* =========================================================
-   FORM
+   FORMS & CONTROLS
 ========================================================= */
-
 .form-section {
     margin-bottom: 20px;
 }
@@ -411,19 +325,12 @@ body {
 
 .form-section-title {
     font-size: 11px;
-
     text-transform: uppercase;
-
     letter-spacing: .07em;
-
     color: var(--primary);
-
     font-weight: 800;
-
     padding-bottom: 8px;
-
     margin-bottom: 13px;
-
     border-bottom: 1px dashed var(--border);
 }
 
@@ -433,13 +340,9 @@ body {
 
 .form-label {
     display: block;
-
     font-size: 12px;
-
     font-weight: 700;
-
     margin-bottom: 6px;
-
     color: #344054;
 }
 
@@ -447,49 +350,30 @@ body {
     color: var(--danger);
 }
 
-.form-control,
-select,
-textarea {
+.form-control, select, textarea {
     width: 100%;
-
     border: 1px solid #d0d5dd;
-
     background: white;
-
     color: var(--text);
-
     border-radius: 9px;
-
     padding: 10px 12px;
-
     font-family: inherit;
-
     font-size: 13px;
-
     outline: none;
-
-    transition:
-        border .15s,
-        box-shadow .15s,
-        background .15s;
+    transition: border .15s, box-shadow .15s, background .15s;
 }
 
-.form-control:focus,
-select:focus,
-textarea:focus {
+.form-control:focus, select:focus, textarea:focus {
     border-color: var(--accent);
-
-    box-shadow:
-        0 0 0 3px rgba(37, 99, 235, .09);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .09);
 }
 
 textarea {
     resize: vertical;
-    min-height: 100px;
+    min-height: 90px;
 }
 
-.form-control:disabled,
-select:disabled {
+.form-control:disabled, select:disabled, textarea:disabled {
     background: #f2f4f7;
     color: #667085;
     cursor: not-allowed;
@@ -497,20 +381,13 @@ select:disabled {
 
 .form-row {
     display: grid;
-
-    grid-template-columns:
-        1fr 1fr;
-
+    grid-template-columns: 1fr 1fr;
     gap: 10px;
 }
 
 .time-row {
     display: grid;
-
-    grid-template-columns:
-        1fr 1fr
-        auto;
-
+    grid-template-columns: 1fr 1fr auto;
     gap: 7px;
 }
 
@@ -519,3100 +396,1082 @@ select:disabled {
 }
 
 /* =========================================================
-   BUTTON
+   BUTTONS
 ========================================================= */
-
 .btn {
     border: 0;
-
     border-radius: 9px;
-
     padding: 10px 14px;
-
     font-family: inherit;
-
     font-size: 12px;
-
     font-weight: 700;
-
     cursor: pointer;
-
-    transition:
-        transform .1s,
-        background .15s,
-        box-shadow .15s;
-
+    transition: transform .1s, background .15s, box-shadow .15s;
     display: inline-flex;
-
     align-items: center;
-
     justify-content: center;
-
     gap: 6px;
 }
 
-.btn:hover {
-    transform: translateY(-1px);
-}
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
 
-.btn:active {
-    transform: translateY(0);
-}
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--primary-dark); }
 
-.btn-primary {
-    background: var(--primary);
-    color: white;
-}
-
-.btn-primary:hover {
-    background: var(--primary-dark);
-}
-
-.btn-blue {
-    background: var(--accent);
-    color: white;
-}
-
-.btn-success {
-    background: var(--success);
-    color: white;
-}
-
-.btn-danger {
-    background: var(--danger);
-    color: white;
-}
-
-.btn-secondary {
-    background: #f2f4f7;
-    color: #344054;
-}
-
-.btn-outline {
-    background: white;
-    color: #344054;
-    border: 1px solid var(--border);
-}
-
-.btn-block {
-    width: 100%;
-}
-
-.btn-small {
-    padding: 7px 9px;
-    font-size: 11px;
-}
+.btn-success { background: var(--success); color: white; }
+.btn-danger { background: var(--danger); color: white; }
+.btn-secondary { background: #f2f4f7; color: #344054; }
+.btn-outline { background: white; color: #344054; border: 1px solid var(--border); }
+.btn-block { width: 100%; }
+.btn-small { padding: 7px 9px; font-size: 11px; }
 
 .form-actions {
     display: grid;
-
-    grid-template-columns:
-        1fr 1fr;
-
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
-
     margin-top: 18px;
 }
 
-.hidden {
-    display: none !important;
-}
+.hidden { display: none !important; }
 
 /* =========================================================
-   FILTER BAR
+   FILTER & TABLE
 ========================================================= */
-
 .filter-bar {
     padding: 13px 15px;
-
     background: #fafbfc;
-
     border-bottom: 1px solid var(--border);
-
     display: grid;
-
-    grid-template-columns:
-        minmax(180px, 1fr)
-        150px
-        150px
-        auto;
-
+    grid-template-columns: minmax(180px, 1fr) 140px 140px auto;
     gap: 8px;
 }
 
-.search-box {
-    position: relative;
-}
-
-.search-box input {
-    padding-left: 34px;
-}
-
+.search-box { position: relative; }
+.search-box input { padding-left: 34px; }
 .search-icon {
     position: absolute;
-
     left: 12px;
     top: 50%;
-
     transform: translateY(-50%);
-
     color: #98a2b3;
-
     font-size: 13px;
 }
 
-/* =========================================================
-   TABLE
-========================================================= */
-
-.table-wrapper {
-    overflow-x: auto;
-}
-
+.table-wrapper { overflow-x: auto; }
 .data-table {
     width: 100%;
-
     border-collapse: collapse;
-
     min-width: 850px;
 }
 
 .data-table th {
     background: #f8fafc;
-
     color: #475467;
-
     font-size: 10px;
-
     text-transform: uppercase;
-
     letter-spacing: .04em;
-
     font-weight: 800;
-
     padding: 11px 12px;
-
     text-align: left;
-
     border-bottom: 1px solid var(--border);
-
     white-space: nowrap;
 }
 
 .data-table td {
     padding: 12px;
-
     border-bottom: 1px solid #eef0f3;
-
     font-size: 12px;
-
     vertical-align: middle;
 }
 
-.data-table tbody tr {
-    transition: background .12s;
-}
-
-.data-table tbody tr:hover {
-    background: #fafcff;
-}
+.data-table tbody tr:hover { background: #fafcff; }
 
 .ticket-id {
     color: var(--primary);
-
     font-size: 11px;
-
     font-weight: 800;
-
     white-space: nowrap;
 }
 
 .description {
     max-width: 250px;
     line-height: 1.4;
+    word-break: break-word;
 }
 
-.muted {
-    color: var(--muted);
-}
+.muted { color: var(--muted); }
 
 /* =========================================================
-   BADGES
+   BADGES & ACTIONS
 ========================================================= */
-
 .badge {
     display: inline-flex;
-
     align-items: center;
-
     border-radius: 20px;
-
     padding: 4px 8px;
-
     font-size: 10px;
-
     font-weight: 800;
-
     white-space: nowrap;
 }
 
-.badge-open {
-    color: #1d4ed8;
-    background: #eff6ff;
-}
+.badge-open { color: #1d4ed8; background: #eff6ff; }
+.badge-progress { color: #b45309; background: #fff7ed; }
+.badge-done { color: #15803d; background: #ecfdf3; }
 
-.badge-progress {
-    color: #b45309;
-    background: #fff7ed;
-}
+.badge-high { color: #b42318; background: #fef3f2; }
+.badge-medium { color: #b54708; background: #fffaeb; }
+.badge-low { color: #027a48; background: #ecfdf3; }
 
-.badge-done {
-    color: #15803d;
-    background: #ecfdf3;
-}
-
-.badge-high {
-    color: #b42318;
-    background: #fef3f2;
-}
-
-.badge-medium {
-    color: #b54708;
-    background: #fffaeb;
-}
-
-.badge-low {
-    color: #027a48;
-    background: #ecfdf3;
-}
-
-/* =========================================================
-   ACTION
-========================================================= */
-
-.action-group {
-    display: flex;
-    gap: 5px;
-}
-
+.action-group { display: flex; gap: 5px; }
 .action-btn {
     width: 30px;
     height: 30px;
-
     border-radius: 7px;
-
     border: 1px solid var(--border);
-
     background: white;
-
     cursor: pointer;
-
     font-size: 12px;
-
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.action-btn:hover {
-    background: #f2f4f7;
-}
-
-.action-edit {
-    color: var(--accent);
-}
-
-.action-delete {
-    color: var(--danger);
-}
-
-/* =========================================================
-   PAGINATION
-========================================================= */
+.action-btn:hover { background: #f2f4f7; }
+.action-edit { color: var(--accent); }
+.action-delete { color: var(--danger); }
 
 .pagination {
     padding: 13px 15px;
-
     border-top: 1px solid var(--border);
-
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     gap: 10px;
 }
 
-.pagination-info {
-    font-size: 11px;
-    color: var(--muted);
-}
-
-.pagination-buttons {
-    display: flex;
-    gap: 5px;
-}
+.pagination-info { font-size: 11px; color: var(--muted); }
+.pagination-buttons { display: flex; gap: 5px; }
 
 /* =========================================================
-   TOAST
+   TOAST & LOADING OVERLAY
 ========================================================= */
-
 .toast-container {
     position: fixed;
-
     top: 82px;
     right: 20px;
-
     z-index: 9999;
-
     display: flex;
-
     flex-direction: column;
-
     gap: 8px;
-
     width: min(360px, calc(100vw - 30px));
 }
 
 .toast {
     background: white;
-
     border: 1px solid var(--border);
-
     border-left: 4px solid var(--primary);
-
     border-radius: 10px;
-
     padding: 12px 14px;
-
-    box-shadow:
-        0 12px 30px rgba(16, 24, 40, .12);
-
+    box-shadow: 0 12px 30px rgba(16, 24, 40, .12);
     font-size: 12px;
-
     animation: toastIn .2s ease;
 }
 
-.toast.success {
-    border-left-color: var(--success);
-}
-
-.toast.error {
-    border-left-color: var(--danger);
-}
-
-.toast.warning {
-    border-left-color: var(--warning);
-}
+.toast.success { border-left-color: var(--success); }
+.toast.error { border-left-color: var(--danger); }
+.toast.warning { border-left-color: var(--warning); }
 
 @keyframes toastIn {
-    from {
-        opacity: 0;
-        transform: translateY(-7px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-7px); }
+    to { opacity: 1; transform: translateY(0); }
 }
-
-/* =========================================================
-   LOADING
-========================================================= */
 
 .loading-overlay {
     position: fixed;
-
     inset: 0;
-
     background: rgba(255,255,255,.72);
-
     backdrop-filter: blur(3px);
-
     z-index: 9998;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 }
 
 .loading-box {
     background: white;
-
     padding: 20px 25px;
-
     border-radius: 14px;
-
     border: 1px solid var(--border);
-
     box-shadow: var(--shadow);
-
     text-align: center;
-
     font-size: 12px;
-
     color: var(--muted);
 }
 
 .spinner {
     width: 25px;
     height: 25px;
-
     border: 3px solid #e5e7eb;
-
     border-top-color: var(--primary);
-
     border-radius: 50%;
-
     animation: spin .7s linear infinite;
-
     margin: 0 auto 10px;
 }
 
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* =========================================================
-   EMPTY
-========================================================= */
+@keyframes spin { to { transform: rotate(360deg); } }
 
 .empty-state {
     padding: 50px 20px;
-
     text-align: center;
-
     color: var(--muted);
 }
 
-.empty-icon {
-    font-size: 35px;
-    margin-bottom: 10px;
-}
+.empty-icon { font-size: 35px; margin-bottom: 10px; }
+.empty-state strong { display: block; color: #344054; font-size: 13px; margin-bottom: 3px; }
 
-.empty-state strong {
-    display: block;
-
-    color: #344054;
-
-    font-size: 13px;
-
-    margin-bottom: 3px;
-}
-
-/* =========================================================
-   DARK MODE
-========================================================= */
-
-body.dark {
-    --bg: #101828;
-    --card: #182230;
-
-    --text: #f2f4f7;
-
-    --muted: #98a2b3;
-
-    --border: #344054;
-
-    --primary-light: #243b53;
-}
-
-body.dark .topbar,
-body.dark .login-card,
-body.dark .card,
-body.dark .kpi-card {
-    background: #182230;
-}
-
-body.dark .filter-bar,
-body.dark .data-table th {
-    background: #131c29;
-}
-
-body.dark .form-control,
-body.dark select,
-body.dark textarea,
-body.dark .action-btn,
-body.dark .btn-outline {
-    background: #111927;
-
-    color: #f2f4f7;
-
-    border-color: #344054;
-}
-
-body.dark .user-box {
-    background: #111927;
-}
-
-body.dark .data-table tbody tr:hover {
-    background: #1c2939;
-}
-
-body.dark .toast,
-body.dark .loading-box {
-    background: #182230;
-}
-
-/* =========================================================
-   RESPONSIVE
-========================================================= */
-
+/* Responsive adjustments */
 @media (max-width: 1100px) {
-
-    .main-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .kpi-grid {
-        grid-template-columns:
-            repeat(2, 1fr);
-    }
+    .main-grid { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
 }
-
 @media (max-width: 760px) {
-
-    .topbar {
-        height: auto;
-
-        min-height: 62px;
-
-        padding: 10px 14px;
-    }
-
-    .clock {
-        display: none;
-    }
-
-    .brand-subtitle {
-        display: none;
-    }
-
-    .brand-title {
-        font-size: 14px;
-    }
-
-    .container {
-        padding: 16px 12px 30px;
-    }
-
-    .page-heading {
-        align-items: flex-start;
-
-        flex-direction: column;
-
-        margin-bottom: 15px;
-    }
-
-    .page-title h1 {
-        font-size: 21px;
-    }
-
-    .heading-actions {
-        width: 100%;
-    }
-
-    .heading-actions .btn {
-        flex: 1;
-    }
-
-    .kpi-grid {
-        grid-template-columns:
-            repeat(2, 1fr);
-
-        gap: 8px;
-    }
-
-    .kpi-card {
-        padding: 12px;
-
-        gap: 9px;
-    }
-
-    .kpi-icon {
-        width: 36px;
-        height: 36px;
-    }
-
-    .kpi-number {
-        font-size: 19px;
-    }
-
-    .kpi-label {
-        font-size: 10px;
-    }
-
-    .card-header {
-        padding: 14px;
-    }
-
-    .card-body {
-        padding: 14px;
-    }
-
-    .filter-bar {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .filter-bar .search-box {
-        grid-column: 1 / -1;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-
-    .time-row {
-        grid-template-columns:
-            1fr 1fr;
-    }
-
-    .btn-now {
-        grid-column: 1 / -1;
-        height: 40px;
-    }
-
-    .login-card {
-        padding: 25px 20px;
-    }
-}
-
-@media (max-width: 480px) {
-
-    .user-box {
-        padding: 5px;
-        border: 0;
-        background: transparent;
-    }
-
-    .user-box .login-info {
-        display: none;
-    }
-
-    .brand-icon {
-        width: 36px;
-        height: 36px;
-    }
-
-    .form-actions {
-        grid-template-columns: 1fr;
-    }
-
-    .filter-bar {
-        grid-template-columns: 1fr;
-    }
-
-    .filter-bar .search-box {
-        grid-column: auto;
-    }
+    .container { padding: 16px 12px 30px; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .filter-bar { grid-template-columns: 1fr 1fr; }
+    .filter-bar .search-box { grid-column: 1 / -1; }
+    .time-row { grid-template-columns: 1fr 1fr; }
+    .btn-now { grid-column: 1 / -1; height: 38px; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- =====================================================
-     HEADER
-===================================================== -->
-
+<!-- TOPBAR HEADER -->
 <header class="topbar">
-
     <div class="brand">
-
-        <div class="brand-icon">
-            WR
-        </div>
-
+        <div class="brand-icon">WR</div>
         <div>
-            <div class="brand-title">
-                Work Request System
-            </div>
-
-            <div class="brand-subtitle">
-                Engineering • Maintenance Management
-            </div>
+            <div class="brand-title">Work Request System</div>
+            <div class="brand-subtitle">Engineering • Maintenance Management</div>
         </div>
-
     </div>
 
     <div class="header-right">
-
-        <div id="clock" class="clock">
-            00:00:00
-        </div>
-
+        <div id="clock" class="clock">00:00:00</div>
         <div class="user-box" id="userBox">
-
-            <div class="user-avatar">
-                U
+            <div class="user-avatar" id="userAvatar">U</div>
+            <div>
+                <span id="loginInfo" class="login-info">Guest</span>
+                <span id="roleBadge" class="user-role-badge hidden">REQ</span>
             </div>
-
-            <div id="loginInfo" class="login-info">
-                Guest
-            </div>
-
         </div>
-
-        <button
-            id="btnLogout"
-            class="btn btn-secondary btn-small"
-            style="display:none;"
-        >
-            Keluar
-        </button>
-
+        <button id="btnLogout" class="btn btn-secondary btn-small" style="display:none;">Keluar</button>
     </div>
-
 </header>
 
-
-<!-- =====================================================
-     LOGIN
-===================================================== -->
-
+<!-- LOGIN SECTION -->
 <section id="loginPage" class="login-wrapper">
-
     <div class="login-card">
-
-        <div class="login-logo">
-            WR
-        </div>
-
+        <div class="login-logo">WR</div>
         <h1>Work Request System</h1>
-
-        <p>
-            Silakan login untuk mengakses sistem.
-        </p>
+        <p>Silakan login untuk mengakses sistem.</p>
 
         <form id="loginForm">
-
-            <div class="form-group">
-
-                <label class="form-label">
-                    Username
-                </label>
-
-                <input
-                    id="username"
-                    class="form-control"
-                    type="text"
-                    placeholder="Masukkan username"
-                    autocomplete="username"
-                    required
-                >
-
+            <div class="form-group" id="urlGroup" style="display:none;">
+                <label class="form-label">Apps Script URL <span class="required">*</span></label>
+                <input id="scriptUrlInput" class="form-control" type="url" placeholder="https://script.google.com/macros/s/.../exec">
             </div>
 
             <div class="form-group">
-
-                <label class="form-label">
-                    Password
-                </label>
-
-                <input
-                    id="password"
-                    class="form-control"
-                    type="password"
-                    placeholder="Masukkan password"
-                    autocomplete="current-password"
-                    required
-                >
-
+                <label class="form-label">Username</label>
+                <input id="username" class="form-control" type="text" placeholder="Masukkan username" autocomplete="username" required>
             </div>
 
-            <button
-                class="btn btn-primary btn-block"
-                type="submit"
-            >
-                Masuk ke Sistem
-            </button>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input id="password" class="form-control" type="password" placeholder="Masukkan password" autocomplete="current-password" required>
+            </div>
 
+            <button class="btn btn-primary btn-block" type="submit" id="btnLoginSubmit">Masuk ke Sistem</button>
         </form>
-
     </div>
-
 </section>
 
-
-<!-- =====================================================
-     APP
-===================================================== -->
-
+<!-- MAIN APP SECTION -->
 <main id="appPage" class="container" style="display:none;">
 
     <div class="page-heading">
-
         <div class="page-title">
-
-            <h1>
-                Work Request
-            </h1>
-
-            <p>
-                Monitoring dan pengelolaan permintaan pekerjaan Engineering
-            </p>
-
+            <h1>Work Request</h1>
+            <p>Monitoring dan pengelolaan permintaan pekerjaan Engineering</p>
         </div>
-
         <div class="heading-actions">
-
-            <button
-                id="btnExport"
-                class="btn btn-outline"
-            >
-                Export
-            </button>
-
-            <button
-                id="btnRefresh"
-                class="btn btn-primary"
-            >
-                Refresh
-            </button>
-
+            <button id="btnExport" class="btn btn-outline">Export CSV</button>
+            <button id="btnRefresh" class="btn btn-primary">Refresh Data</button>
         </div>
-
     </div>
 
-
-    <!-- KPI -->
-
+    <!-- KPI CARDS -->
     <section class="kpi-grid">
-
         <div class="kpi-card kpi-total">
-
-            <div class="kpi-icon">
-                #
-            </div>
-
+            <div class="kpi-icon">#</div>
             <div>
-                <div class="kpi-label">
-                    TOTAL TIKET
-                </div>
-
-                <div
-                    id="totalCount"
-                    class="kpi-number"
-                >
-                    0
-                </div>
+                <div class="kpi-label">TOTAL TIKET</div>
+                <div id="totalCount" class="kpi-number">0</div>
             </div>
-
         </div>
-
-
         <div class="kpi-card kpi-open">
-
-            <div class="kpi-icon">
-                O
-            </div>
-
+            <div class="kpi-icon">O</div>
             <div>
-                <div class="kpi-label">
-                    OPEN
-                </div>
-
-                <div
-                    id="openCount"
-                    class="kpi-number"
-                >
-                    0
-                </div>
+                <div class="kpi-label">OPEN</div>
+                <div id="openCount" class="kpi-number">0</div>
             </div>
-
         </div>
-
-
         <div class="kpi-card kpi-progress">
-
-            <div class="kpi-icon">
-                P
-            </div>
-
+            <div class="kpi-icon">P</div>
             <div>
-                <div class="kpi-label">
-                    PROGRESS
-                </div>
-
-                <div
-                    id="progressCount"
-                    class="kpi-number"
-                >
-                    0
-                </div>
+                <div class="kpi-label">PROGRESS</div>
+                <div id="progressCount" class="kpi-number">0</div>
             </div>
-
         </div>
-
-
         <div class="kpi-card kpi-done">
-
-            <div class="kpi-icon">
-                ✓
-            </div>
-
+            <div class="kpi-icon">✓</div>
             <div>
-                <div class="kpi-label">
-                    SELESAI
-                </div>
-
-                <div
-                    id="doneCount"
-                    class="kpi-number"
-                >
-                    0
-                </div>
+                <div class="kpi-label">SELESAI</div>
+                <div id="doneCount" class="kpi-number">0</div>
             </div>
-
         </div>
-
     </section>
 
-
-    <!-- MAIN -->
-
+    <!-- MAIN GRID FORM & TABLE -->
     <section class="main-grid">
 
-
-        <!-- FORM -->
-
+        <!-- FORM CARD -->
         <div class="card">
-
             <div class="card-header">
-
                 <div>
-
-                    <div
-                        id="formTitle"
-                        class="card-title"
-                    >
-                        Buat Work Request
-                    </div>
-
-                    <div class="card-subtitle">
-                        Isi data pekerjaan yang diperlukan
-                    </div>
-
+                    <div id="formTitle" class="card-title">Buat Work Request</div>
+                    <div class="card-subtitle">Isi data pekerjaan yang diperlukan</div>
                 </div>
-
             </div>
-
 
             <div class="card-body">
-
                 <form id="jobForm">
-
-                    <!-- DATA REQUEST -->
-
                     <div class="form-section">
-
-                        <div class="form-section-title">
-                            Informasi Request
-                        </div>
-
+                        <div class="form-section-title">Informasi Request</div>
 
                         <div class="form-group">
-
-                            <label class="form-label">
-                                Tanggal <span class="required">*</span>
-                            </label>
-
-                            <input
-                                id="tanggal"
-                                class="form-control"
-                                type="date"
-                                required
-                            >
-
+                            <label class="form-label">Tanggal <span class="required">*</span></label>
+                            <input id="tanggal" class="form-control" type="date" required>
                         </div>
 
-
                         <div class="form-group">
-
-                            <label class="form-label">
-                                Jam <span class="required">*</span>
-                            </label>
-
+                            <label class="form-label">Jam <span class="required">*</span></label>
                             <div class="time-row">
-
-                                <select
-                                    id="jam"
-                                    required
-                                ></select>
-
-                                <select
-                                    id="menit"
-                                    required
-                                ></select>
-
-                                <button
-                                    id="btnNow"
-                                    type="button"
-                                    class="btn btn-secondary btn-now"
-                                >
-                                    Sekarang
-                                </button>
-
+                                <select id="jam" class="form-control" required></select>
+                                <select id="menit" class="form-control" required></select>
+                                <button id="btnNow" type="button" class="btn btn-secondary btn-now">Sekarang</button>
                             </div>
-
                         </div>
-
 
                         <div class="form-group">
-
-                            <label class="form-label">
-                                Requestor <span class="required">*</span>
-                            </label>
-
-                            <input
-                                id="requestor"
-                                class="form-control"
-                                type="text"
-                                placeholder="Nama requestor"
-                                required
-                            >
-
+                            <label class="form-label">Requestor <span class="required">*</span></label>
+                            <input id="requestor" class="form-control" type="text" placeholder="Nama requestor" required>
                         </div>
-
 
                         <div class="form-group">
-
-                            <label class="form-label">
-                                Area <span class="required">*</span>
-                            </label>
-
-                            <input
-                                id="area"
-                                class="form-control"
-                                type="text"
-                                placeholder="Contoh: Press 01"
-                                required
-                            >
-
+                            <label class="form-label">Area / Lokasi <span class="required">*</span></label>
+                            <input id="area" class="form-control" type="text" placeholder="Contoh: Press 01 / Lini Production 2" required>
                         </div>
-
                     </div>
 
-
-                    <!-- DETAIL -->
-
                     <div class="form-section">
-
-                        <div class="form-section-title">
-                            Detail Pekerjaan
-                        </div>
-
+                        <div class="form-section-title">Detail Pekerjaan</div>
 
                         <div class="form-group">
-
-                            <label class="form-label">
-                                Deskripsi Pekerjaan
-                                <span class="required">*</span>
-                            </label>
-
-                            <textarea
-                                id="deskripsi"
-                                placeholder="Jelaskan masalah atau pekerjaan yang diperlukan..."
-                                required
-                            ></textarea>
-
+                            <label class="form-label">Deskripsi Pekerjaan <span class="required">*</span></label>
+                            <textarea id="deskripsi" placeholder="Jelaskan kendala atau spesifikasi pekerjaan..." required></textarea>
                         </div>
-
 
                         <div class="form-row">
-
                             <div class="form-group">
-
-                                <label class="form-label">
-                                    Prioritas
-                                </label>
-
-                                <select id="priority">
-
-                                    <option value="LOW">
-                                        Low
-                                    </option>
-
-                                    <option
-                                        value="MEDIUM"
-                                        selected
-                                    >
-                                        Medium
-                                    </option>
-
-                                    <option value="HIGH">
-                                        High
-                                    </option>
-
+                                <label class="form-label">Prioritas</label>
+                                <select id="priority" class="form-control">
+                                    <option value="LOW">Low</option>
+                                    <option value="MEDIUM" selected>Medium</option>
+                                    <option value="HIGH">High</option>
                                 </select>
-
                             </div>
 
-
                             <div class="form-group">
-
-                                <label class="form-label">
-                                    Status
-                                </label>
-
-                                <select id="status">
-
-                                    <option value="OPEN">
-                                        Open
-                                    </option>
-
-                                    <option value="PROGRESS">
-                                        Progress
-                                    </option>
-
-                                    <option value="DONE">
-                                        Done
-                                    </option>
-
+                                <label class="form-label">Status</label>
+                                <select id="status" class="form-control">
+                                    <option value="OPEN">Open</option>
+                                    <option value="PROGRESS">Progress</option>
+                                    <option value="DONE">Done</option>
                                 </select>
-
                             </div>
-
                         </div>
 
-
-                        <div
-                            id="keteranganGroup"
-                            class="form-group"
-                        >
-
-                            <label class="form-label">
-                                Keterangan
-                            </label>
-
-                            <textarea
-                                id="keterangan"
-                                style="min-height:75px;"
-                                placeholder="Catatan tambahan..."
-                            ></textarea>
-
+                        <div id="keteranganGroup" class="form-group">
+                            <label class="form-label">Keterangan / Tindak Lanjut</label>
+                            <textarea id="keterangan" placeholder="Catatan perbaikan teknisi..."></textarea>
                         </div>
-
                     </div>
-
-
-                    <!-- BUTTON -->
 
                     <div class="form-actions">
-
-                        <button
-                            id="submitBtn"
-                            type="submit"
-                            class="btn btn-primary"
-                        >
-                            Simpan Request
-                        </button>
-
-                        <button
-                            id="updateBtn"
-                            type="submit"
-                            class="btn btn-success hidden"
-                        >
-                            Simpan Perubahan
-                        </button>
-
-                        <button
-                            id="resetBtn"
-                            type="button"
-                            class="btn btn-secondary"
-                        >
-                            Reset
-                        </button>
-
+                        <button id="submitBtn" type="submit" class="btn btn-primary">Simpan Request</button>
+                        <button id="updateBtn" type="submit" class="btn btn-success hidden">Simpan Perubahan</button>
+                        <button id="resetBtn" type="button" class="btn btn-secondary">Reset</button>
                     </div>
-
                 </form>
-
             </div>
-
         </div>
 
-
-        <!-- DATA -->
-
+        <!-- TABLE CARD -->
         <div class="card">
-
             <div class="card-header">
-
                 <div>
-
-                    <div class="card-title">
-                        Daftar Work Request
-                    </div>
-
-                    <div class="card-subtitle">
-                        Data permintaan pekerjaan terbaru
-                    </div>
-
+                    <div class="card-title">Daftar Work Request</div>
+                    <div class="card-subtitle">Data permintaan pekerjaan terbaru</div>
                 </div>
-
             </div>
-
-
-            <!-- FILTER -->
 
             <div class="filter-bar">
-
                 <div class="search-box">
-
-                    <span class="search-icon">
-                        🔎
-                    </span>
-
-                    <input
-                        id="searchInput"
-                        class="form-control"
-                        type="text"
-                        placeholder="Cari tiket, requestor, area..."
-                    >
-
+                    <span class="search-icon">🔎</span>
+                    <input id="searchInput" class="form-control" type="text" placeholder="Cari tiket, requestor, area...">
                 </div>
 
-
-                <select
-                    id="filterStatus"
-                    class="form-control"
-                >
-
-                    <option value="">
-                        Semua Status
-                    </option>
-
-                    <option value="OPEN">
-                        Open
-                    </option>
-
-                    <option value="PROGRESS">
-                        Progress
-                    </option>
-
-                    <option value="DONE">
-                        Done
-                    </option>
-
+                <select id="filterStatus" class="form-control">
+                    <option value="">Semua Status</option>
+                    <option value="OPEN">Open</option>
+                    <option value="PROGRESS">Progress</option>
+                    <option value="DONE">Done</option>
                 </select>
 
-
-                <select
-                    id="filterPriority"
-                    class="form-control"
-                >
-
-                    <option value="">
-                        Semua Prioritas
-                    </option>
-
-                    <option value="HIGH">
-                        High
-                    </option>
-
-                    <option value="MEDIUM">
-                        Medium
-                    </option>
-
-                    <option value="LOW">
-                        Low
-                    </option>
-
+                <select id="filterPriority" class="form-control">
+                    <option value="">Semua Prioritas</option>
+                    <option value="HIGH">High</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="LOW">Low</option>
                 </select>
 
-
-                <button
-                    id="clearFilter"
-                    class="btn btn-secondary"
-                    type="button"
-                >
-                    Reset
-                </button>
-
+                <button id="clearFilter" class="btn btn-secondary" type="button">Reset</button>
             </div>
 
-
-            <!-- TABLE -->
-
             <div class="table-wrapper">
-
                 <table class="data-table">
-
                     <thead>
-
                         <tr>
-
-                            <th>ID</th>
-                            <th>Tanggal</th>
+                            <th>ID Tiket</th>
+                            <th>Waktu Request</th>
                             <th>Requestor</th>
                             <th>Area</th>
                             <th>Deskripsi</th>
                             <th>Priority</th>
                             <th>Status</th>
-                            <th>Aksi</th>
-
+                            <th id="thAksi">Aksi</th>
                         </tr>
-
                     </thead>
-
-                    <tbody id="dataTableBody">
-
-                    </tbody>
-
+                    <tbody id="dataTableBody"></tbody>
                 </table>
 
-                <div
-                    id="emptyState"
-                    class="empty-state"
-                    style="display:none;"
-                >
-
-                    <div class="empty-icon">
-                        📋
-                    </div>
-
-                    <strong>
-                        Belum ada data
-                    </strong>
-
-                    <span>
-                        Work Request yang masuk akan tampil di sini.
-                    </span>
-
+                <div id="emptyState" class="empty-state" style="display:none;">
+                    <div class="empty-icon">📋</div>
+                    <strong>Belum ada data tiket</strong>
+                    <span>Work Request yang dikirimkan akan muncul di sini.</span>
                 </div>
-
             </div>
-
-
-            <!-- PAGINATION -->
 
             <div class="pagination">
-
-                <div
-                    id="paginationInfo"
-                    class="pagination-info"
-                >
-                    Halaman 1
-                </div>
-
+                <div id="paginationInfo" class="pagination-info">Halaman 1</div>
                 <div class="pagination-buttons">
-
-                    <button
-                        id="prevPage"
-                        class="btn btn-secondary btn-small"
-                        type="button"
-                    >
-                        ←
-                    </button>
-
-                    <button
-                        id="nextPage"
-                        class="btn btn-secondary btn-small"
-                        type="button"
-                    >
-                        →
-                    </button>
-
+                    <button id="prevPage" class="btn btn-secondary btn-small" type="button">← Prev</button>
+                    <button id="nextPage" class="btn btn-secondary btn-small" type="button">Next →</button>
                 </div>
-
             </div>
-
         </div>
 
     </section>
 
 </main>
 
+<!-- TOAST NOTIFICATION -->
+<div id="toastContainer" class="toast-container"></div>
 
-<!-- TOAST -->
-
-<div
-    id="toastContainer"
-    class="toast-container"
-></div>
-
-
-<!-- LOADING -->
-
-<div
-    id="loadingOverlay"
-    class="loading-overlay"
-    style="display:none;"
->
-
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay" class="loading-overlay" style="display:none;">
     <div class="loading-box">
-
         <div class="spinner"></div>
-
-        <div>
-            Memproses data...
-        </div>
-
+        <div id="loadingText">Memproses data...</div>
     </div>
-
 </div>
 
-
 <script>
+/* =========================================================
+   KONFIGURASI BACKEND SCRIPT URL
+========================================================= */
+// Tempelkan URL Deployment Apps Script Anda di bawah ini
+let SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaHItg2-ohw5UpcteZHQoK2kJw5ZznHIpvtx3TVnK3VMs4Y6-dSpOiatBu2GFezJRNiQ/exec";
 
 /* =========================================================
-   KONFIGURASI
+   STATE MANAGEMENT
 ========================================================= */
-
-const SCRIPT_URL =
-"https://script.google.com/macros/s/AKfycbzaHItg2-ohw5UpcteZHQoK2kJw5ZznHIpvtx3TVnK3VMs4Y6-dSpOiatBu2GFezJRNiQ/exec";
-
-
-/* =========================================================
-   STATE
-========================================================= */
-
 const AppState = {
-
     editId: null,
-
     isSubmitting: false,
-
     isLoading: false,
-
     allData: [],
-
     filteredData: [],
-
     currentPage: 1,
-
     pageSize: 8
-
 };
 
+function $(id) { return document.getElementById(id); }
+function getValue(id) { return $(id)?.value || ""; }
+function setValue(id, value) { if ($(id)) $(id).value = value ?? ""; }
 
-/* =========================================================
-   HELPER
-========================================================= */
-
-function $(id) {
-    return document.getElementById(id);
-}
-
-
-function getValue(id) {
-    return $(id)?.value || "";
-}
-
-
-function setValue(id, value) {
-
-    const el = $(id);
-
-    if (el) {
-        el.value = value ?? "";
-    }
-
-}
-
-
-function escapeHTML(value) {
-
-    return String(value ?? "")
+function escapeHTML(str) {
+    return String(str ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
-
 }
 
-
-function pad(n) {
-
-    return String(n).padStart(2, "0");
-
-}
-
+function pad(n) { return String(n).padStart(2, "0"); }
 
 /* =========================================================
-   DATE - FIX WIB
+   DATE & TIME HELPERS
 ========================================================= */
-
-function getLocalDateISO(date = new Date()) {
-
-    return [
-        date.getFullYear(),
-        pad(date.getMonth() + 1),
-        pad(date.getDate())
-    ].join("-");
-
+function getLocalDateISO(d = new Date()) {
+    return [d.getFullYear(), pad(d.getMonth() + 1), pad(d.getDate())].join("-");
 }
 
-
-function parseTanggalToISO(value) {
-
-    if (!value) return "";
-
-    const str = String(value).trim();
-
-    const match =
-        str.match(/^(\d{4})-(\d{2})-(\d{2})/);
-
-    if (match) {
-
-        return `${match[1]}-${match[2]}-${match[3]}`;
-
-    }
-
+function parseTanggalToISO(val) {
+    if (!val) return "";
+    const str = String(val).trim();
+    const match = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) return `${match[1]}-${match[2]}-${match[3]}`;
     const d = new Date(str);
-
-    if (isNaN(d.getTime())) {
-        return str;
-    }
-
-    return getLocalDateISO(d);
-
+    return isNaN(d.getTime()) ? str : getLocalDateISO(d);
 }
 
-
-function formatTanggalClean(value) {
-
-    if (!value) return "-";
-
-    const str = String(value).trim();
-
-    const match =
-        str.match(/^(\d{4})-(\d{2})-(\d{2})/);
-
-    if (match) {
-
-        return `${match[3]}/${match[2]}/${match[1]}`;
-
-    }
-
-    return str;
-
+function formatTanggalClean(val) {
+    if (!val) return "-";
+    const str = String(val).trim();
+    const match = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return match ? `${match[3]}/${match[2]}/${match[1]}` : str;
 }
 
-
-function formatJamClean(value) {
-
-    if (!value) return "-";
-
-    const str = String(value).trim();
-
-    const match =
-        str.match(/^(\d{1,2}):(\d{1,2})/);
-
-    if (match) {
-
-        return `${pad(match[1])}:${pad(match[2])}`;
-
-    }
-
-    return str;
-
+function formatJamClean(val) {
+    if (!val) return "-";
+    const str = String(val).trim();
+    const match = str.match(/^(\d{1,2}):(\d{1,2})/);
+    return match ? `${pad(match[1])}:${pad(match[2])}` : str;
 }
-
 
 /* =========================================================
-   AUTH
+   AUTH MANAGEMENT
 ========================================================= */
-
 const Auth = {
-
     login(userData) {
-
-        localStorage.setItem(
-            "isLoggedIn",
-            "true"
-        );
-
-        localStorage.setItem(
-            "userRole",
-            userData.role || "requestor"
-        );
-
-        localStorage.setItem(
-            "userName",
-            userData.name || userData.username || ""
-        );
-
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userRole", userData.role || "requestor");
+        localStorage.setItem("userName", userData.name || userData.username || "");
     },
-
     logout() {
-
         localStorage.removeItem("isLoggedIn");
         localStorage.removeItem("userRole");
         localStorage.removeItem("userName");
-
         location.reload();
-
     },
-
-    isLoggedIn() {
-
-        return localStorage.getItem("isLoggedIn") === "true";
-
-    },
-
-    getRole() {
-
-        return localStorage.getItem("userRole") || "";
-
-    },
-
-    getName() {
-
-        return localStorage.getItem("userName") || "";
-
-    }
-
+    isLoggedIn() { return localStorage.getItem("isLoggedIn") === "true"; },
+    getRole() { return localStorage.getItem("userRole") || "requestor"; },
+    getName() { return localStorage.getItem("userName") || ""; }
 };
-
-
-/* =========================================================
-   AUTH UI
-========================================================= */
 
 function updateAuthUI() {
-
     const logged = Auth.isLoggedIn();
+    $("loginPage").style.display = logged ? "none" : "flex";
+    $("appPage").style.display = logged ? "block" : "none";
+    $("btnLogout").style.display = logged ? "inline-flex" : "none";
 
-    $("loginPage").style.display =
-        logged ? "none" : "flex";
-
-    $("appPage").style.display =
-        logged ? "block" : "none";
-
-    $("btnLogout").style.display =
-        logged ? "inline-flex" : "none";
-
-
-    if (!logged) return;
-
+    if (!logged) {
+        if (!SCRIPT_URL || SCRIPT_URL.includes("PASTE_URL_WEB_APP")) {
+            $("urlGroup").style.display = "block";
+            const savedUrl = localStorage.getItem("customScriptUrl");
+            if (savedUrl) $("scriptUrlInput").value = savedUrl;
+        } else {
+            $("urlGroup").style.display = "none";
+        }
+        return;
+    }
 
     const name = Auth.getName() || "User";
-
+    const role = Auth.getRole();
+    
     $("loginInfo").textContent = name;
+    $("userAvatar").textContent = name.trim().charAt(0).toUpperCase();
+    
+    const roleBadge = $("roleBadge");
+    roleBadge.textContent = role;
+    roleBadge.classList.remove("hidden");
 
-    const avatar =
-        name.trim().charAt(0).toUpperCase();
-
-    document.querySelector(".user-avatar")
-        .textContent = avatar;
-
-
-    const isRequestor =
-        Auth.getRole() === "requestor";
-
-
-    $("keteranganGroup").style.display =
-        isRequestor ? "none" : "block";
-
-
-    $("status").disabled =
-        isRequestor;
-
+    const isRequestor = role === "requestor";
+    
+    $("keteranganGroup").style.display = isRequestor ? "none" : "block";
+    $("status").disabled = isRequestor;
 
     if (isRequestor) {
-
-        setValue(
-            "requestor",
-            Auth.getName()
-        );
-
-        setValue(
-            "status",
-            "OPEN"
-        );
-
+        setValue("requestor", name);
+        $("requestor").readOnly = true;
+        setValue("status", "OPEN");
+    } else {
+        $("requestor").readOnly = false;
     }
-
 }
 
-
 /* =========================================================
-   TOAST
+   UI FEEDBACK (TOAST & LOADING)
 ========================================================= */
-
 function showToast(message, type = "success") {
-
-    const container =
-        $("toastContainer");
-
-    const toast =
-        document.createElement("div");
-
-    toast.className =
-        `toast ${type}`;
-
-    toast.textContent =
-        message;
-
+    const container = $("toastContainer");
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
     container.appendChild(toast);
-
-    setTimeout(() => {
-
-        toast.remove();
-
-    }, 3500);
-
+    setTimeout(() => { toast.remove(); }, 3500);
 }
 
-
-/* =========================================================
-   LOADING
-========================================================= */
-
-function setLoading(show) {
-
-    $("loadingOverlay").style.display =
-        show ? "flex" : "none";
-
+function setLoading(show, text = "Memproses data...") {
+    $("loadingText").textContent = text;
+    $("loadingOverlay").style.display = show ? "flex" : "none";
 }
 
-
 /* =========================================================
-   SERVER RESPONSE
+   API REQUEST HANDLER (SOLVES CORS & REDIRECT)
 ========================================================= */
-
-async function readJSON(response) {
-
-    const text =
-        await response.text();
-
-    try {
-
-        return JSON.parse(text);
-
-    } catch (error) {
-
-        throw new Error(
-            "Server tidak mengembalikan JSON. " +
-            "Periksa deployment Apps Script."
-        );
-
+async function apiPost(payload) {
+    if ($("scriptUrlInput") && $("scriptUrlInput").value.trim()) {
+        SCRIPT_URL = $("scriptUrlInput").value.trim();
+        localStorage.setItem("customScriptUrl", SCRIPT_URL);
     }
 
+    if (!SCRIPT_URL || SCRIPT_URL.includes("PASTE_URL_WEB_APP")) {
+        throw new Error("URL Apps Script belum diisi!");
+    }
+
+    // Menggunakan Form URL Encoded agar kompatibel penuh dengan Google Apps Script doPost
+    const formData = new URLSearchParams();
+    formData.append("payload", JSON.stringify(payload));
+
+    const response = await fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formData.toString()
+    });
+
+    const text = await response.text();
+    try {
+        return JSON.parse(text);
+    } catch (e) {
+        throw new Error("Gagal memproses data dari Apps Script. Pastikan deployment berstatus 'Anyone'.");
+    }
 }
 
+async function apiGet() {
+    if (!SCRIPT_URL || SCRIPT_URL.includes("PASTE_URL_WEB_APP")) {
+        throw new Error("URL Apps Script belum dikonfigurasi.");
+    }
+
+    const response = await fetch(SCRIPT_URL + "?t=" + Date.now());
+    const text = await response.text();
+    try {
+        return JSON.parse(text);
+    } catch (e) {
+        throw new Error("Format data backend tidak valid.");
+    }
+}
 
 /* =========================================================
-   LOGIN
+   AUTH HANDLER
 ========================================================= */
-
 async function handleLogin(e) {
-
     e.preventDefault();
-
-    const username =
-        getValue("username").trim();
-
-    const password =
-        getValue("password");
+    const username = getValue("username").trim();
+    const password = getValue("password");
 
     if (!username || !password) {
-
-        showToast(
-            "Username dan password wajib diisi.",
-            "warning"
-        );
-
+        showToast("Username dan password wajib diisi.", "warning");
         return;
-
     }
 
-
-    setLoading(true);
-
+    setLoading(true, "Proses Login...");
     try {
-
-        const response =
-            await fetch(SCRIPT_URL, {
-
-                method: "POST",
-
-                headers: {
-                    "Content-Type":
-                        "text/plain;charset=utf-8"
-                },
-
-                body: JSON.stringify({
-
-                    action: "login",
-
-                    username,
-
-                    password
-
-                })
-
-            });
-
-
-        const result =
-            await readJSON(response);
-
-
-        if (!result.success) {
-
-            throw new Error(
-                result.message ||
-                "Login gagal."
-            );
-
-        }
-
+        const result = await apiPost({ action: "login", username, password });
+        if (!result.success) throw new Error(result.message || "Login gagal.");
 
         Auth.login(result.user);
-
         updateAuthUI();
-
-        showToast(
-            "Login berhasil.",
-            "success"
-        );
-
+        showToast("Login berhasil.", "success");
         await loadData();
-
     } catch (error) {
-
-        showToast(
-            error.message ||
-            "Gagal terhubung ke server.",
-            "error"
-        );
-
+        showToast(error.message, "error");
     } finally {
-
         setLoading(false);
-
     }
-
 }
 
-
 /* =========================================================
-   LOAD DATA
+   LOAD & NORMALIZE DATA
 ========================================================= */
-
 async function loadData() {
-
     if (AppState.isLoading) return;
-
     AppState.isLoading = true;
+    setLoading(true, "Memuat data tiket...");
 
     try {
+        const result = await apiGet();
+        if (!result.success) throw new Error(result.message || "Gagal mengambil data.");
 
-        const response =
-            await fetch(
-                SCRIPT_URL +
-                "?t=" +
-                Date.now()
-            );
-
-
-        const result =
-            await readJSON(response);
-
-
-        if (!result.success) {
-
-            throw new Error(
-                result.message ||
-                "Gagal mengambil data."
-            );
-
-        }
-
-
-        AppState.allData =
-            Array.isArray(result.data)
-                ? result.data.map(normalizeData)
-                : [];
-
-
+        AppState.allData = Array.isArray(result.data) ? result.data.map(normalizeData) : [];
         applyFilters();
-
         updateDashboard();
-
     } catch (error) {
-
-        showToast(
-            error.message ||
-            "Gagal memuat data.",
-            "error"
-        );
-
+        showToast(error.message, "error");
     } finally {
-
         AppState.isLoading = false;
-
+        setLoading(false);
     }
-
 }
-
-
-/* =========================================================
-   NORMALIZE
-========================================================= */
 
 function normalizeData(row) {
-
     return {
-
         id: String(row.id || ""),
-
-        tanggal:
-            parseTanggalToISO(row.tanggal),
-
-        jam:
-            formatJamClean(row.jam),
-
-        requestor:
-            String(row.requestor || ""),
-
-        area:
-            String(row.area || ""),
-
-        deskripsi:
-            String(row.deskripsi || ""),
-
-        createdAt:
-            String(row.createdAt || ""),
-
-        status:
-            String(row.status || "OPEN")
-                .toUpperCase(),
-
-        keterangan:
-            String(row.keterangan || ""),
-
-        priority:
-            String(row.priority || "MEDIUM")
-                .toUpperCase()
-
+        tanggal: parseTanggalToISO(row.tanggal),
+        jam: formatJamClean(row.jam),
+        requestor: String(row.requestor || ""),
+        area: String(row.area || ""),
+        deskripsi: String(row.deskripsi || ""),
+        createdAt: String(row.createdat || row.createdAt || ""),
+        status: String(row.status || "OPEN").toUpperCase(),
+        keterangan: String(row.keterangan || ""),
+        priority: String(row.priority || "MEDIUM").toUpperCase()
     };
-
 }
 
-
 /* =========================================================
-   FILTER
+   FILTER & DASHBOARD
 ========================================================= */
-
 function applyFilters() {
+    const search = getValue("searchInput").trim().toLowerCase();
+    const status = getValue("filterStatus").toUpperCase();
+    const priority = getValue("filterPriority").toUpperCase();
 
-    const search =
-        getValue("searchInput")
-            .trim()
-            .toLowerCase();
+    AppState.filteredData = AppState.allData.filter(item => {
+        const searchable = [
+            item.id, item.tanggal, item.jam, item.requestor,
+            item.area, item.deskripsi, item.status, item.priority, item.keterangan
+        ].join(" ").toLowerCase();
 
-    const status =
-        getValue("filterStatus")
-            .toUpperCase();
+        const matchSearch = !search || searchable.includes(search);
+        const matchStatus = !status || item.status === status;
+        const matchPriority = !priority || item.priority === priority;
 
-    const priority =
-        getValue("filterPriority")
-            .toUpperCase();
-
-
-    AppState.filteredData =
-        AppState.allData.filter(item => {
-
-            const searchable = [
-
-                item.id,
-                item.tanggal,
-                item.jam,
-                item.requestor,
-                item.area,
-                item.deskripsi,
-                item.status,
-                item.priority,
-                item.keterangan
-
-            ]
-                .join(" ")
-                .toLowerCase();
-
-
-            const matchSearch =
-                !search ||
-                searchable.includes(search);
-
-
-            const matchStatus =
-                !status ||
-                item.status === status;
-
-
-            const matchPriority =
-                !priority ||
-                item.priority === priority;
-
-
-            return (
-                matchSearch &&
-                matchStatus &&
-                matchPriority
-            );
-
-        });
-
+        return matchSearch && matchStatus && matchPriority;
+    });
 
     AppState.currentPage = 1;
-
     renderTable();
-
 }
-
-
-/* =========================================================
-   DASHBOARD
-========================================================= */
 
 function updateDashboard() {
-
-    const data =
-        AppState.allData;
-
-
-    $("totalCount").textContent =
-        data.length;
-
-
-    $("openCount").textContent =
-        data.filter(
-            x => x.status === "OPEN"
-        ).length;
-
-
-    $("progressCount").textContent =
-        data.filter(
-            x => x.status === "PROGRESS"
-        ).length;
-
-
-    $("doneCount").textContent =
-        data.filter(
-            x => x.status === "DONE"
-        ).length;
-
+    const data = AppState.allData;
+    $("totalCount").textContent = data.length;
+    $("openCount").textContent = data.filter(x => x.status === "OPEN").length;
+    $("progressCount").textContent = data.filter(x => x.status === "PROGRESS").length;
+    $("doneCount").textContent = data.filter(x => x.status === "DONE").length;
 }
-
 
 /* =========================================================
-   BADGE
+   RENDER TABLE & BADGES
 ========================================================= */
-
 function statusBadge(status) {
-
-    status =
-        String(status)
-            .toUpperCase();
-
-
-    if (status === "DONE") {
-
-        return `
-            <span class="badge badge-done">
-                SELESAI
-            </span>
-        `;
-
-    }
-
-
-    if (status === "PROGRESS") {
-
-        return `
-            <span class="badge badge-progress">
-                PROGRESS
-            </span>
-        `;
-
-    }
-
-
-    return `
-        <span class="badge badge-open">
-            OPEN
-        </span>
-    `;
-
+    status = String(status).toUpperCase();
+    if (status === "DONE") return `<span class="badge badge-done">SELESAI</span>`;
+    if (status === "PROGRESS") return `<span class="badge badge-progress">PROGRESS</span>`;
+    return `<span class="badge badge-open">OPEN</span>`;
 }
-
 
 function priorityBadge(priority) {
-
-    priority =
-        String(priority)
-            .toUpperCase();
-
-
-    const cls =
-        priority === "HIGH"
-            ? "badge-high"
-            : priority === "LOW"
-                ? "badge-low"
-                : "badge-medium";
-
-
-    return `
-        <span class="badge ${cls}">
-            ${escapeHTML(priority)}
-        </span>
-    `;
-
+    priority = String(priority).toUpperCase();
+    const cls = priority === "HIGH" ? "badge-high" : priority === "LOW" ? "badge-low" : "badge-medium";
+    return `<span class="badge ${cls}">${escapeHTML(priority)}</span>`;
 }
-
-
-/* =========================================================
-   TABLE
-========================================================= */
 
 function renderTable() {
-
-    const tbody =
-        $("dataTableBody");
-
+    const tbody = $("dataTableBody");
     tbody.innerHTML = "";
-
-
-    const data =
-        AppState.filteredData;
-
+    const data = AppState.filteredData;
+    const isRequestor = Auth.getRole() === "requestor";
 
     if (!data.length) {
-
-        $("emptyState").style.display =
-            "block";
-
-        $("paginationInfo").textContent =
-            "Tidak ada data";
-
+        $("emptyState").style.display = "block";
+        $("paginationInfo").textContent = "Tidak ada data";
         return;
-
     }
 
+    $("emptyState").style.display = "none";
+    const totalPages = Math.max(1, Math.ceil(data.length / AppState.pageSize));
+    
+    if (AppState.currentPage > totalPages) AppState.currentPage = totalPages;
 
-    $("emptyState").style.display =
-        "none";
-
-
-    const totalPages =
-        Math.max(
-            1,
-            Math.ceil(
-                data.length /
-                AppState.pageSize
-            )
-        );
-
-
-    if (
-        AppState.currentPage >
-        totalPages
-    ) {
-
-        AppState.currentPage =
-            totalPages;
-
-    }
-
-
-    const start =
-        (AppState.currentPage - 1) *
-        AppState.pageSize;
-
-
-    const pageData =
-        data.slice(
-            start,
-            start + AppState.pageSize
-        );
-
+    const start = (AppState.currentPage - 1) * AppState.pageSize;
+    const pageData = data.slice(start, start + AppState.pageSize);
 
     pageData.forEach(item => {
+        const tr = document.createElement("tr");
 
-        const tr =
-            document.createElement("tr");
-
+        let actionCell = `-`;
+        if (!isRequestor) {
+            actionCell = `
+                <div class="action-group">
+                    <button class="action-btn action-edit" title="Edit" onclick="prepareEdit('${escapeHTML(item.id)}')">✎</button>
+                    <button class="action-btn action-delete" title="Hapus" onclick="deleteData('${escapeHTML(item.id)}')">×</button>
+                </div>
+            `;
+        }
 
         tr.innerHTML = `
-
+            <td><div class="ticket-id">${escapeHTML(item.id)}</div></td>
             <td>
-                <div class="ticket-id">
-                    ${escapeHTML(item.id)}
-                </div>
+                <div>${formatTanggalClean(item.tanggal)}</div>
+                <div class="muted">${formatJamClean(item.jam)}</div>
             </td>
-
-            <td>
-                <div>
-                    ${formatTanggalClean(item.tanggal)}
-                </div>
-
-                <div class="muted">
-                    ${formatJamClean(item.jam)}
-                </div>
-            </td>
-
-            <td>
-                ${escapeHTML(item.requestor)}
-            </td>
-
-            <td>
-                ${escapeHTML(item.area)}
-            </td>
-
-            <td>
-                <div class="description">
-                    ${escapeHTML(item.deskripsi)}
-                </div>
-            </td>
-
-            <td>
-                ${priorityBadge(item.priority)}
-            </td>
-
-            <td>
-                ${statusBadge(item.status)}
-            </td>
-
-            <td>
-
-                <div class="action-group">
-
-                    <button
-                        class="action-btn action-edit"
-                        title="Edit"
-                        onclick="prepareEdit('${escapeHTML(item.id)}')"
-                    >
-                        ✎
-                    </button>
-
-                    <button
-                        class="action-btn action-delete"
-                        title="Hapus"
-                        onclick="deleteData('${escapeHTML(item.id)}')"
-                    >
-                        ×
-                    </button>
-
-                </div>
-
-            </td>
-
+            <td>${escapeHTML(item.requestor)}</td>
+            <td>${escapeHTML(item.area)}</td>
+            <td><div class="description">${escapeHTML(item.deskripsi)}</div></td>
+            <td>${priorityBadge(item.priority)}</td>
+            <td>${statusBadge(item.status)}</td>
+            <td>${actionCell}</td>
         `;
-
-
         tbody.appendChild(tr);
-
     });
 
-
-    $("paginationInfo").textContent =
-        `Halaman ${AppState.currentPage} dari ${totalPages} • ${data.length} tiket`;
-
-
-    $("prevPage").disabled =
-        AppState.currentPage <= 1;
-
-
-    $("nextPage").disabled =
-        AppState.currentPage >= totalPages;
-
+    $("paginationInfo").textContent = `Halaman ${AppState.currentPage} dari ${totalPages} • ${data.length} tiket`;
+    $("prevPage").disabled = AppState.currentPage <= 1;
+    $("nextPage").disabled = AppState.currentPage >= totalPages;
 }
 
-
 /* =========================================================
-   SUBMIT
+   FORM SUBMIT (CREATE / UPDATE)
 ========================================================= */
-
 async function submitForm(e) {
-
     e.preventDefault();
-
     if (AppState.isSubmitting) return;
 
-
-    const isEdit =
-        Boolean(AppState.editId);
-
-
+    const isEdit = Boolean(AppState.editId);
     const payload = {
-
-        action:
-            isEdit
-                ? "update"
-                : "add",
-
-        id:
-            AppState.editId,
-
-        tanggal:
-            getValue("tanggal"),
-
-        jam:
-            `${getValue("jam")}:${getValue("menit")}`,
-
-        priority:
-            getValue("priority")
-                .toUpperCase(),
-
-        requestor:
-            getValue("requestor")
-                .trim(),
-
-        area:
-            getValue("area")
-                .trim(),
-
-        deskripsi:
-            getValue("deskripsi")
-                .trim(),
-
-        status:
-            (
-                getValue("status") ||
-                "OPEN"
-            ).toUpperCase(),
-
-        keterangan:
-            getValue("keterangan")
-                .trim()
-
+        action: isEdit ? "update" : "add",
+        id: AppState.editId,
+        tanggal: getValue("tanggal"),
+        jam: `${getValue("jam")}:${getValue("menit")}`,
+        priority: getValue("priority").toUpperCase(),
+        requestor: getValue("requestor").trim(),
+        area: getValue("area").trim(),
+        deskripsi: getValue("deskripsi").trim(),
+        status: (getValue("status") || "OPEN").toUpperCase(),
+        keterangan: getValue("keterangan").trim()
     };
 
-
-    if (
-        !payload.tanggal ||
-        !payload.jam ||
-        !payload.requestor ||
-        !payload.area ||
-        !payload.deskripsi
-    ) {
-
-        showToast(
-            "Lengkapi data yang wajib diisi.",
-            "warning"
-        );
-
+    if (!payload.tanggal || !payload.jam || !payload.requestor || !payload.area || !payload.deskripsi) {
+        showToast("Lengkapi data yang wajib diisi.", "warning");
         return;
-
     }
-
 
     AppState.isSubmitting = true;
-
-    setLoading(true);
-
+    setLoading(true, "Menyimpan data...");
 
     try {
+        const result = await apiPost(payload);
+        if (!result.success) throw new Error(result.message || "Gagal menyimpan data.");
 
-        const response =
-            await fetch(SCRIPT_URL, {
-
-                method: "POST",
-
-                headers: {
-                    "Content-Type":
-                        "text/plain;charset=utf-8"
-                },
-
-                body:
-                    JSON.stringify(payload)
-
-            });
-
-
-        const result =
-            await readJSON(response);
-
-
-        if (!result.success) {
-
-            throw new Error(
-                result.message ||
-                "Gagal menyimpan data."
-            );
-
-        }
-
-
-        showToast(
-
-            isEdit
-                ? "Tiket berhasil diperbarui."
-                : `Tiket berhasil dibuat: ${result.id || ""}`,
-
-            "success"
-
-        );
-
-
+        showToast(isEdit ? "Tiket diperbarui." : `Tiket dibuat: ${result.id || ""}`, "success");
         resetForm();
-
         await loadData();
-
-
     } catch (error) {
-
-        showToast(
-            error.message ||
-            "Gagal menyimpan data.",
-            "error"
-        );
-
+        showToast(error.message, "error");
     } finally {
-
         AppState.isSubmitting = false;
-
         setLoading(false);
-
     }
-
 }
 
-
 /* =========================================================
-   EDIT
+   PREPARE EDIT & DELETE
 ========================================================= */
-
 function prepareEdit(id) {
-
-    const item =
-        AppState.allData.find(
-            x => String(x.id) === String(id)
-        );
-
-
+    const item = AppState.allData.find(x => String(x.id) === String(id));
     if (!item) {
-
-        showToast(
-            "Data tiket tidak ditemukan.",
-            "error"
-        );
-
+        showToast("Data tiket tidak ditemukan.", "error");
         return;
-
     }
 
+    AppState.editId = item.id;
+    setValue("tanggal", parseTanggalToISO(item.tanggal));
 
-    AppState.editId =
-        item.id;
+    const time = formatJamClean(item.jam);
+    const parts = time.split(":");
+    setValue("jam", parts[0] || "00");
+    setValue("menit", parts[1] || "00");
 
+    setValue("requestor", item.requestor);
+    setValue("area", item.area);
+    setValue("deskripsi", item.deskripsi);
+    setValue("priority", item.priority);
+    setValue("status", item.status);
+    setValue("keterangan", item.keterangan);
 
-    setValue(
-        "tanggal",
-        parseTanggalToISO(item.tanggal)
-    );
+    $("submitBtn").classList.add("hidden");
+    $("updateBtn").classList.remove("hidden");
+    $("formTitle").textContent = "Edit Work Request";
 
-
-    const time =
-        formatJamClean(item.jam);
-
-
-    const parts =
-        time.split(":");
-
-
-    setValue(
-        "jam",
-        parts[0] || "00"
-    );
-
-
-    setValue(
-        "menit",
-        parts[1] || "00"
-    );
-
-
-    setValue(
-        "requestor",
-        item.requestor
-    );
-
-
-    setValue(
-        "area",
-        item.area
-    );
-
-
-    setValue(
-        "deskripsi",
-        item.deskripsi
-    );
-
-
-    setValue(
-        "priority",
-        item.priority
-    );
-
-
-    setValue(
-        "status",
-        item.status
-    );
-
-
-    setValue(
-        "keterangan",
-        item.keterangan
-    );
-
-
-    $("submitBtn")
-        .classList.add("hidden");
-
-
-    $("updateBtn")
-        .classList.remove("hidden");
-
-
-    $("formTitle")
-        .textContent =
-        "Edit Work Request";
-
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
-
-
-/* =========================================================
-   DELETE
-========================================================= */
 
 async function deleteData(id) {
-
-    const item =
-        AppState.allData.find(
-            x => String(x.id) === String(id)
-        );
-
-
+    const item = AppState.allData.find(x => String(x.id) === String(id));
     if (!item) return;
 
+    if (!confirm(`Hapus tiket ${item.id}?\n\n"${item.deskripsi}"`)) return;
 
-    const confirmed =
-        confirm(
-            `Hapus tiket ${item.id}?\n\n` +
-            `${item.deskripsi}`
-        );
-
-
-    if (!confirmed) return;
-
-
-    setLoading(true);
-
-
+    setLoading(true, "Mengeksekusi penghapusan...");
     try {
+        const result = await apiPost({ action: "delete", id: item.id });
+        if (!result.success) throw new Error(result.message || "Gagal menghapus tiket.");
 
-        const response =
-            await fetch(SCRIPT_URL, {
-
-                method: "POST",
-
-                headers: {
-                    "Content-Type":
-                        "text/plain;charset=utf-8"
-                },
-
-                body:
-                    JSON.stringify({
-
-                        action: "delete",
-
-                        id: item.id
-
-                    })
-
-            });
-
-
-        const result =
-            await readJSON(response);
-
-
-        if (!result.success) {
-
-            throw new Error(
-                result.message ||
-                "Gagal menghapus tiket."
-            );
-
-        }
-
-
-        showToast(
-            "Tiket berhasil dihapus.",
-            "success"
-        );
-
-
+        showToast("Tiket berhasil dihapus.", "success");
         await loadData();
-
-
     } catch (error) {
-
-        showToast(
-            error.message ||
-            "Gagal menghapus data.",
-            "error"
-        );
-
+        showToast(error.message, "error");
     } finally {
-
         setLoading(false);
-
     }
-
 }
 
-
 /* =========================================================
-   RESET FORM
+   FORM UTILITIES & TIME
 ========================================================= */
-
 function resetForm() {
-
     AppState.editId = null;
-
-
     $("jobForm").reset();
 
-
-    $("submitBtn")
-        .classList.remove("hidden");
-
-
-    $("updateBtn")
-        .classList.add("hidden");
-
-
-    $("formTitle")
-        .textContent =
-        "Buat Work Request";
-
+    $("submitBtn").classList.remove("hidden");
+    $("updateBtn").classList.add("hidden");
+    $("formTitle").textContent = "Buat Work Request";
 
     setDefaultTime();
+    setValue("priority", "MEDIUM");
+    setValue("status", "OPEN");
 
-
-    setValue(
-        "priority",
-        "MEDIUM"
-    );
-
-
-    setValue(
-        "status",
-        "OPEN"
-    );
-
-
-    if (
-        Auth.isLoggedIn() &&
-        Auth.getRole() === "requestor"
-    ) {
-
-        setValue(
-            "requestor",
-            Auth.getName()
-        );
-
-        setValue(
-            "status",
-            "OPEN"
-        );
-
+    if (Auth.isLoggedIn() && Auth.getRole() === "requestor") {
+        setValue("requestor", Auth.getName());
+        setValue("status", "OPEN");
     }
-
 }
-
-
-/* =========================================================
-   DEFAULT TIME
-========================================================= */
 
 function setDefaultTime() {
-
-    const now =
-        new Date();
-
-
-    setValue(
-        "tanggal",
-        getLocalDateISO(now)
-    );
-
-
-    setValue(
-        "jam",
-        pad(now.getHours())
-    );
-
-
-    setValue(
-        "menit",
-        pad(now.getMinutes())
-    );
-
+    const now = new Date();
+    setValue("tanggal", getLocalDateISO(now));
+    setValue("jam", pad(now.getHours()));
+    setValue("menit", pad(now.getMinutes()));
 }
-
-
-/* =========================================================
-   SELECT TIME
-========================================================= */
 
 function populateTimeSelects() {
-
-    const jam =
-        $("jam");
-
-    const menit =
-        $("menit");
-
-
+    const jam = $("jam");
+    const menit = $("menit");
     jam.innerHTML = "";
-
     menit.innerHTML = "";
 
-
-    for (let i = 0; i < 24; i++) {
-
-        const option =
-            new Option(
-                pad(i),
-                pad(i)
-            );
-
-        jam.appendChild(option);
-
-    }
-
-
-    for (let i = 0; i < 60; i++) {
-
-        const option =
-            new Option(
-                pad(i),
-                pad(i)
-            );
-
-        menit.appendChild(option);
-
-    }
-
+    for (let i = 0; i < 24; i++) jam.appendChild(new Option(pad(i), pad(i)));
+    for (let i = 0; i < 60; i++) menit.appendChild(new Option(pad(i), pad(i)));
 }
 
-
 /* =========================================================
-   PAGINATION
+   PAGINATION & EXPORT CSV
 ========================================================= */
-
-$("prevPage").onclick = function() {
-
-    if (AppState.currentPage > 1) {
-
-        AppState.currentPage--;
-
-        renderTable();
-
-    }
-
+$("prevPage").onclick = () => { if (AppState.currentPage > 1) { AppState.currentPage--; renderTable(); } };
+$("nextPage").onclick = () => {
+    const totalPages = Math.ceil(AppState.filteredData.length / AppState.pageSize);
+    if (AppState.currentPage < totalPages) { AppState.currentPage++; renderTable(); }
 };
-
-
-$("nextPage").onclick = function() {
-
-    const totalPages =
-        Math.ceil(
-            AppState.filteredData.length /
-            AppState.pageSize
-        );
-
-
-    if (
-        AppState.currentPage <
-        totalPages
-    ) {
-
-        AppState.currentPage++;
-
-        renderTable();
-
-    }
-
-};
-
-
-/* =========================================================
-   EXPORT CSV
-========================================================= */
 
 function exportToExcel() {
-
-    const data =
-        AppState.filteredData;
-
-
+    const data = AppState.filteredData;
     if (!data.length) {
-
-        showToast(
-            "Tidak ada data untuk diexport.",
-            "warning"
-        );
-
+        showToast("Tidak ada data untuk diexport.", "warning");
         return;
-
     }
 
+    const headers = ["ID Tiket", "Tanggal", "Jam", "Requestor", "Area", "Deskripsi Pekerjaan", "Status", "Priority", "Keterangan"];
+    const rows = data.map(item => [
+        item.id, item.tanggal, item.jam, item.requestor, item.area, item.deskripsi, item.status, item.priority, item.keterangan
+    ]);
 
-    const headers = [
-
-        "ID",
-        "Tanggal",
-        "Jam",
-        "Requestor",
-        "Area",
-        "Deskripsi",
-        "Status",
-        "Priority",
-        "Keterangan"
-
-    ];
-
-
-    const rows =
-        data.map(item => [
-
-            item.id,
-            item.tanggal,
-            item.jam,
-            item.requestor,
-            item.area,
-            item.deskripsi,
-            item.status,
-            item.priority,
-            item.keterangan
-
-        ]);
-
-
-    const csv = [
-
-        headers,
-
-        ...rows
-
-    ].map(row =>
-
-        row.map(value => {
-
-            const str =
-                String(value ?? "");
-
-            return `"${str.replace(
-                /"/g,
-                '""'
-            )}"`;
-
-        }).join(",")
-
+    const csv = [headers, ...rows].map(row =>
+        row.map(val => `"${String(val ?? "").replace(/"/g, '""')}"`).join(",")
     ).join("\n");
 
-
-    const blob =
-        new Blob(
-            ["\ufeff" + csv],
-            {
-                type:
-                    "text/csv;charset=utf-8;"
-            }
-        );
-
-
-    const url =
-        URL.createObjectURL(blob);
-
-
-    const a =
-        document.createElement("a");
-
-
+    const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
     a.href = url;
-
-    a.download =
-        `Work_Request_${getLocalDateISO()}.csv`;
-
-
+    a.download = `Work_Request_${getLocalDateISO()}.csv`;
     a.click();
-
-
     URL.revokeObjectURL(url);
-
 }
-
-
-/* =========================================================
-   CLOCK
-========================================================= */
 
 function updateClock() {
-
-    const now =
-        new Date();
-
-
-    $("clock").textContent =
-        now.toLocaleTimeString(
-            "id-ID",
-            {
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit"
-            }
-        );
-
+    $("clock").textContent = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
 
-
 /* =========================================================
-   EVENTS
+   EVENT LISTENERS & INIT
 ========================================================= */
+$("loginForm").addEventListener("submit", handleLogin);
+$("jobForm").addEventListener("submit", submitForm);
+$("btnLogout").addEventListener("click", () => Auth.logout());
+$("resetBtn").addEventListener("click", resetForm);
+$("btnNow").addEventListener("click", setDefaultTime);
+$("btnRefresh").addEventListener("click", loadData);
+$("btnExport").addEventListener("click", exportToExcel);
 
-$("loginForm")
-    .addEventListener(
-        "submit",
-        handleLogin
-    );
+$("searchInput").addEventListener("input", applyFilters);
+$("filterStatus").addEventListener("change", applyFilters);
+$("filterPriority").addEventListener("change", applyFilters);
+$("clearFilter").addEventListener("click", () => {
+    $("searchInput").value = "";
+    $("filterStatus").value = "";
+    $("filterPriority").value = "";
+    applyFilters();
+});
 
+document.addEventListener("DOMContentLoaded", async () => {
+    populateTimeSelects();
+    setDefaultTime();
+    updateClock();
+    setInterval(updateClock, 1000);
 
-$("jobForm")
-    .addEventListener(
-        "submit",
-        submitForm
-    );
-
-
-$("btnLogout")
-    .addEventListener(
-        "click",
-        () => Auth.logout()
-    );
-
-
-$("resetBtn")
-    .addEventListener(
-        "click",
-        resetForm
-    );
-
-
-$("btnNow")
-    .addEventListener(
-        "click",
-        setDefaultTime
-    );
-
-
-$("btnRefresh")
-    .addEventListener(
-        "click",
-        loadData
-    );
-
-
-$("btnExport")
-    .addEventListener(
-        "click",
-        exportToExcel
-    );
-
-
-$("searchInput")
-    .addEventListener(
-        "input",
-        applyFilters
-    );
-
-
-$("filterStatus")
-    .addEventListener(
-        "change",
-        applyFilters
-    );
-
-
-$("filterPriority")
-    .addEventListener(
-        "change",
-        applyFilters
-    );
-
-
-$("clearFilter")
-    .addEventListener(
-        "click",
-        () => {
-
-            $("searchInput").value = "";
-
-            $("filterStatus").value = "";
-
-            $("filterPriority").value = "";
-
-            applyFilters();
-
-        }
-    );
-
-
-/* =========================================================
-   INIT
-========================================================= */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    async function() {
-
-        populateTimeSelects();
-
-        setDefaultTime();
-
-        updateClock();
-
-        setInterval(
-            updateClock,
-            1000
-        );
-
-
-        updateAuthUI();
-
-
-        if (Auth.isLoggedIn()) {
-
-            await loadData();
-
-        }
-
+    updateAuthUI();
+    if (Auth.isLoggedIn()) {
+        await loadData();
     }
-);
-
+});
 </script>
 
 </body>
