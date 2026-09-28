@@ -418,7 +418,6 @@ textarea {
 
 .btn-primary { background: var(--primary); color: white; }
 .btn-primary:hover { background: var(--primary-dark); }
-
 .btn-success { background: var(--success); color: white; }
 .btn-danger { background: var(--danger); color: white; }
 .btn-secondary { background: #f2f4f7; color: #344054; }
@@ -630,7 +629,6 @@ textarea {
 .empty-icon { font-size: 35px; margin-bottom: 10px; }
 .empty-state strong { display: block; color: #344054; font-size: 13px; margin-bottom: 3px; }
 
-/* Responsive adjustments */
 @media (max-width: 1100px) {
     .main-grid { grid-template-columns: 1fr; }
     .kpi-grid { grid-template-columns: repeat(2, 1fr); }
@@ -648,7 +646,7 @@ textarea {
 
 <body>
 
-<!-- TOPBAR HEADER -->
+<!-- HEADER -->
 <header class="topbar">
     <div class="brand">
         <div class="brand-icon">WR</div>
@@ -671,7 +669,7 @@ textarea {
     </div>
 </header>
 
-<!-- LOGIN SECTION -->
+<!-- LOGIN PAGE -->
 <section id="loginPage" class="login-wrapper">
     <div class="login-card">
         <div class="login-logo">WR</div>
@@ -699,7 +697,7 @@ textarea {
     </div>
 </section>
 
-<!-- MAIN APP SECTION -->
+<!-- MAIN APP -->
 <main id="appPage" class="container" style="display:none;">
 
     <div class="page-heading">
@@ -713,7 +711,7 @@ textarea {
         </div>
     </div>
 
-    <!-- KPI CARDS -->
+    <!-- KPI DASHBOARD -->
     <section class="kpi-grid">
         <div class="kpi-card kpi-total">
             <div class="kpi-icon">#</div>
@@ -745,7 +743,7 @@ textarea {
         </div>
     </section>
 
-    <!-- MAIN GRID FORM & TABLE -->
+    <!-- MAIN GRID -->
     <section class="main-grid">
 
         <!-- FORM CARD -->
@@ -899,10 +897,8 @@ textarea {
 
 </main>
 
-<!-- TOAST NOTIFICATION -->
 <div id="toastContainer" class="toast-container"></div>
 
-<!-- LOADING OVERLAY -->
 <div id="loadingOverlay" class="loading-overlay" style="display:none;">
     <div class="loading-box">
         <div class="spinner"></div>
@@ -911,15 +907,9 @@ textarea {
 </div>
 
 <script>
-/* =========================================================
-   KONFIGURASI BACKEND SCRIPT URL
-========================================================= */
-// Tempelkan URL Deployment Apps Script Anda di bawah ini
-let SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaHItg2-ohw5UpcteZHQoK2kJw5ZznHIpvtx3TVnK3VMs4Y6-dSpOiatBu2GFezJRNiQ/exec";
+/* KONFIGURASI BACKEND */
+let SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnpj8BPh30Dkpyrmq2wt9S0fFOCEBF6EBq2hqWSvRQybIz5QKZe2EcrHPW3ahlXgGX/exec";
 
-/* =========================================================
-   STATE MANAGEMENT
-========================================================= */
 const AppState = {
     editId: null,
     isSubmitting: false,
@@ -945,9 +935,6 @@ function escapeHTML(str) {
 
 function pad(n) { return String(n).padStart(2, "0"); }
 
-/* =========================================================
-   DATE & TIME HELPERS
-========================================================= */
 function getLocalDateISO(d = new Date()) {
     return [d.getFullYear(), pad(d.getMonth() + 1), pad(d.getDate())].join("-");
 }
@@ -975,9 +962,6 @@ function formatJamClean(val) {
     return match ? `${pad(match[1])}:${pad(match[2])}` : str;
 }
 
-/* =========================================================
-   AUTH MANAGEMENT
-========================================================= */
 const Auth = {
     login(userData) {
         localStorage.setItem("isLoggedIn", "true");
@@ -1036,9 +1020,6 @@ function updateAuthUI() {
     }
 }
 
-/* =========================================================
-   UI FEEDBACK (TOAST & LOADING)
-========================================================= */
 function showToast(message, type = "success") {
     const container = $("toastContainer");
     const toast = document.createElement("div");
@@ -1053,9 +1034,7 @@ function setLoading(show, text = "Memproses data...") {
     $("loadingOverlay").style.display = show ? "flex" : "none";
 }
 
-/* =========================================================
-   API REQUEST HANDLER (SOLVES CORS & REDIRECT)
-========================================================= */
+/* HARMONIZED API POST FUNCTION (TEXT/PLAIN RAW STRING JSON) */
 async function apiPost(payload) {
     if ($("scriptUrlInput") && $("scriptUrlInput").value.trim()) {
         SCRIPT_URL = $("scriptUrlInput").value.trim();
@@ -1066,21 +1045,17 @@ async function apiPost(payload) {
         throw new Error("URL Apps Script belum diisi!");
     }
 
-    // Menggunakan Form URL Encoded agar kompatibel penuh dengan Google Apps Script doPost
-    const formData = new URLSearchParams();
-    formData.append("payload", JSON.stringify(payload));
-
     const response = await fetch(SCRIPT_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: formData.toString()
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
     });
 
     const text = await response.text();
     try {
         return JSON.parse(text);
     } catch (e) {
-        throw new Error("Gagal memproses data dari Apps Script. Pastikan deployment berstatus 'Anyone'.");
+        throw new Error("Gagal mengurai respons server. Lakukan 'New Deployment' di Apps Script.");
     }
 }
 
@@ -1098,9 +1073,6 @@ async function apiGet() {
     }
 }
 
-/* =========================================================
-   AUTH HANDLER
-========================================================= */
 async function handleLogin(e) {
     e.preventDefault();
     const username = getValue("username").trim();
@@ -1127,9 +1099,6 @@ async function handleLogin(e) {
     }
 }
 
-/* =========================================================
-   LOAD & NORMALIZE DATA
-========================================================= */
 async function loadData() {
     if (AppState.isLoading) return;
     AppState.isLoading = true;
@@ -1165,9 +1134,6 @@ function normalizeData(row) {
     };
 }
 
-/* =========================================================
-   FILTER & DASHBOARD
-========================================================= */
 function applyFilters() {
     const search = getValue("searchInput").trim().toLowerCase();
     const status = getValue("filterStatus").toUpperCase();
@@ -1198,9 +1164,6 @@ function updateDashboard() {
     $("doneCount").textContent = data.filter(x => x.status === "DONE").length;
 }
 
-/* =========================================================
-   RENDER TABLE & BADGES
-========================================================= */
 function statusBadge(status) {
     status = String(status).toUpperCase();
     if (status === "DONE") return `<span class="badge badge-done">SELESAI</span>`;
@@ -1268,9 +1231,6 @@ function renderTable() {
     $("nextPage").disabled = AppState.currentPage >= totalPages;
 }
 
-/* =========================================================
-   FORM SUBMIT (CREATE / UPDATE)
-========================================================= */
 async function submitForm(e) {
     e.preventDefault();
     if (AppState.isSubmitting) return;
@@ -1312,9 +1272,6 @@ async function submitForm(e) {
     }
 }
 
-/* =========================================================
-   PREPARE EDIT & DELETE
-========================================================= */
 function prepareEdit(id) {
     const item = AppState.allData.find(x => String(x.id) === String(id));
     if (!item) {
@@ -1364,9 +1321,6 @@ async function deleteData(id) {
     }
 }
 
-/* =========================================================
-   FORM UTILITIES & TIME
-========================================================= */
 function resetForm() {
     AppState.editId = null;
     $("jobForm").reset();
@@ -1402,9 +1356,6 @@ function populateTimeSelects() {
     for (let i = 0; i < 60; i++) menit.appendChild(new Option(pad(i), pad(i)));
 }
 
-/* =========================================================
-   PAGINATION & EXPORT CSV
-========================================================= */
 $("prevPage").onclick = () => { if (AppState.currentPage > 1) { AppState.currentPage--; renderTable(); } };
 $("nextPage").onclick = () => {
     const totalPages = Math.ceil(AppState.filteredData.length / AppState.pageSize);
@@ -1440,9 +1391,6 @@ function updateClock() {
     $("clock").textContent = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
 
-/* =========================================================
-   EVENT LISTENERS & INIT
-========================================================= */
 $("loginForm").addEventListener("submit", handleLogin);
 $("jobForm").addEventListener("submit", submitForm);
 $("btnLogout").addEventListener("click", () => Auth.logout());
