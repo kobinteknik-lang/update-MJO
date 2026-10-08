@@ -582,6 +582,90 @@ textarea {
 .pagination-buttons { display: flex; gap: 4px; }
 
 /* =========================================================
+   CUSTOM MODAL DIALOG (MARS KOSMIK)
+========================================================= */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 7, 14, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+    padding: 20px;
+    animation: scaleUp 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.modal-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--danger-light);
+    color: #f87171;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.modal-header h3 {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.modal-body {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px dashed var(--border);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.modal-actions .btn {
+    flex: 1;
+    padding: 10px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* =========================================================
    TOAST & LOADING
 ========================================================= */
 .toast-container {
@@ -999,6 +1083,23 @@ textarea {
 
 </main>
 
+<!-- CUSTOM CONFIRM MODAL -->
+<div id="confirmModal" class="modal-overlay" style="display:none;">
+    <div class="modal-card">
+        <div class="modal-header">
+            <div class="modal-icon">⚠️</div>
+            <h3 id="modalTitle">Konfirmasi Hapus</h3>
+        </div>
+        <div class="modal-body" id="modalMessage">
+            Apakah Anda yakin ingin menghapus data ini?
+        </div>
+        <div class="modal-actions">
+            <button id="btnModalCancel" class="btn btn-secondary">Batal</button>
+            <button id="btnModalConfirm" class="btn btn-danger">Hapus Tiket</button>
+        </div>
+    </div>
+</div>
+
 <div id="toastContainer" class="toast-container"></div>
 
 <div id="loadingOverlay" class="loading-overlay" style="display:none;">
@@ -1058,22 +1159,25 @@ function formatTanggalClean(val) {
 
 function formatJamClean(val) {
     if (!val) return "-";
-    const str = String(val).trim();
+    let str = String(val).trim();
+    
+    // Sanitasi sisa teks Date era 1899 jika ada
+    if (str.includes("1899") || str.includes("GMT")) {
+        const timeMatch = str.match(/\d{2}:\d{2}/);
+        str = timeMatch ? timeMatch[0] : str;
+    }
+
     const match = str.match(/^(\d{1,2}):(\d{1,2})/);
     return match ? `${pad(match[1])}:${pad(match[2])}` : str;
 }
 
-/* =========================================================
-   LOGIKA GENERATE NOMOR TIKET BERDASARKAN TANGGAL DIPILIH
-========================================================= */
+/* LOGIKA GENERATE NOMOR TIKET */
 function generateNextTicketId(selectedDateISO) {
     if (!selectedDateISO) return "WR-YYYYMMDD-001";
 
-    // Konversi YYYY-MM-DD menjadi YYYYMMDD
     const cleanDate = selectedDateISO.replace(/-/g, ""); 
     const prefix = `WR-${cleanDate}-`;
 
-    // Filter hanya tiket yang tanggalnya SAMA persis dengan tanggal yang dipilih
     const matchingTickets = AppState.allData.filter(item => {
         const itemId = String(item.id || "").trim();
         return itemId.startsWith(prefix);
@@ -1092,7 +1196,6 @@ function generateNextTicketId(selectedDateISO) {
         }
     });
 
-    // Nomor urut baru (Reset ke 001 jika maxSeq = 0)
     const nextSeq = String(maxSeq + 1).padStart(3, "0");
     return `${prefix}${nextSeq}`;
 }
@@ -1100,7 +1203,6 @@ function generateNextTicketId(selectedDateISO) {
 function updateTicketPreview() {
     const editId = getValue("editTicketId").trim();
     if (editId) {
-        // Jika sedang mode EDIT, tetap gunakan No Tiket asli
         setValue("ticketPreview", editId);
         return;
     }
@@ -1182,7 +1284,41 @@ function setLoading(show, text = "Memproses data...") {
     $("loadingOverlay").style.display = show ? "flex" : "none";
 }
 
-/* HARMONIZED API POST FUNCTION */
+/* HELPER CUSTOM CONFIRM MODAL */
+function showConfirm({ title, message, confirmText = "Konfirmasi", confirmClass = "btn-danger" }) {
+    return new Promise((resolve) => {
+        const modal = $("confirmModal");
+        const titleEl = $("modalTitle");
+        const msgEl = $("modalMessage");
+        const btnConfirm = $("btnModalConfirm");
+        const btnCancel = $("btnModalCancel");
+
+        titleEl.textContent = title;
+        msgEl.innerHTML = message;
+        btnConfirm.textContent = confirmText;
+        btnConfirm.className = `btn ${confirmClass}`;
+
+        modal.style.display = "flex";
+
+        const cleanup = () => {
+            modal.style.display = "none";
+            btnConfirm.onclick = null;
+            btnCancel.onclick = null;
+        };
+
+        btnConfirm.onclick = () => {
+            cleanup();
+            resolve(true);
+        };
+
+        btnCancel.onclick = () => {
+            cleanup();
+            resolve(false);
+        };
+    });
+}
+
+/* API CALLS */
 async function apiPost(payload) {
     if ($("scriptUrlInput") && $("scriptUrlInput").value.trim()) {
         SCRIPT_URL = $("scriptUrlInput").value.trim();
@@ -1259,7 +1395,7 @@ async function loadData() {
         AppState.allData = Array.isArray(result.data) ? result.data.map(normalizeData) : [];
         applyFilters();
         updateDashboard();
-        updateTicketPreview(); // Update preview nomor tiket saat data selesai dimuat
+        updateTicketPreview();
     } catch (error) {
         showToast(error.message, "error");
     } finally {
@@ -1389,7 +1525,6 @@ async function submitForm(e) {
     const isEdit = Boolean(editId);
     const selectedDate = getValue("tanggal");
 
-    // Tentukan ID tiket baru jika membuat tiket baru
     const finalTicketId = isEdit ? editId : generateNextTicketId(selectedDate);
 
     const payload = {
@@ -1435,7 +1570,6 @@ function prepareEdit(id) {
         return;
     }
 
-    // Set nilai ID di hidden field & preview field
     setValue("editTicketId", item.id);
     setValue("ticketPreview", item.id);
 
@@ -1453,20 +1587,26 @@ function prepareEdit(id) {
     setValue("status", item.status);
     setValue("keterangan", item.keterangan);
 
-    // Toggle tampilan tombol
     $("submitBtn").classList.add("hidden");
     $("updateBtn").classList.remove("hidden");
     $("formTitle").textContent = "Edit Work Request";
 
-    // Smooth Scroll ke Form
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+/* FUNGSI HAPUS DENGAN CUSTOM MODAL */
 async function deleteData(id) {
     const item = AppState.allData.find(x => String(x.id) === String(id));
     if (!item) return;
 
-    if (!confirm(`Hapus tiket ${item.id}?\n\n"${item.deskripsi}"`)) return;
+    const confirmed = await showConfirm({
+        title: "Hapus Work Request",
+        message: `Apakah Anda yakin ingin menghapus tiket <b style="color:var(--accent);">${escapeHTML(item.id)}</b>?<br><br><i>"${escapeHTML(item.deskripsi)}"</i>`,
+        confirmText: "Hapus Tiket",
+        confirmClass: "btn-danger"
+    });
+
+    if (!confirmed) return;
 
     setLoading(true, "Mengeksekusi penghapusan...");
     try {
@@ -1564,7 +1704,6 @@ $("btnNow").addEventListener("click", setDefaultTime);
 $("btnRefresh").addEventListener("click", loadData);
 $("btnExport").addEventListener("click", exportToExcel);
 
-/* EVENT LISTENER UPDATE TICKET ID PREVIEW SAAT TANGGAL DIUBAH */
 $("tanggal").addEventListener("change", updateTicketPreview);
 
 $("searchInput").addEventListener("input", applyFilters);
