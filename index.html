@@ -391,7 +391,7 @@ textarea {
     min-height: 80px;
 }
 
-.form-control:disabled, select:disabled, textarea:disabled {
+.form-control:disabled, select:disabled, textarea:disabled, .form-control[readonly] {
     background: rgba(255, 255, 255, 0.05);
     color: var(--muted);
     cursor: not-allowed;
@@ -850,11 +850,17 @@ textarea {
 
             <div class="card-body">
                 <form id="jobForm">
-                    <!-- HIDDEN FIELD EDIT ID (KUNCI UTAMA FIX EDIT) -->
+                    <!-- HIDDEN FIELD EDIT ID -->
                     <input type="hidden" id="editTicketId" value="">
 
                     <div class="form-section">
                         <div class="form-section-title">Informasi Request</div>
+
+                        <!-- DISPLAY TICKET PREVIEW -->
+                        <div class="form-group">
+                            <label class="form-label">No. Tiket (Auto Generated)</label>
+                            <input id="ticketPreview" class="form-control" type="text" readonly placeholder="Pilih tanggal untuk melihat No. Tiket">
+                        </div>
 
                         <div class="form-group">
                             <label class="form-label">Tanggal <span class="required">*</span></label>
@@ -917,7 +923,7 @@ textarea {
 
                     <div class="form-actions">
                         <button id="submitBtn" type="submit" class="btn btn-primary">Simpan Request</button>
-                        <button id="updateBtn" type="submit" class="btn btn-success hidden">Simpan Perubahan</button>
+                        <button id="updateBtn" type="button" class="btn btn-success hidden">Simpan Perubahan</button>
                         <button id="resetBtn" type="button" class="btn btn-secondary">Reset</button>
                     </div>
                 </form>
@@ -1055,6 +1061,53 @@ function formatJamClean(val) {
     const str = String(val).trim();
     const match = str.match(/^(\d{1,2}):(\d{1,2})/);
     return match ? `${pad(match[1])}:${pad(match[2])}` : str;
+}
+
+/* =========================================================
+   LOGIKA GENERATE NOMOR TIKET BERDASARKAN TANGGAL DIPILIH
+========================================================= */
+function generateNextTicketId(selectedDateISO) {
+    if (!selectedDateISO) return "WR-YYYYMMDD-001";
+
+    // Konversi YYYY-MM-DD menjadi YYYYMMDD
+    const cleanDate = selectedDateISO.replace(/-/g, ""); 
+    const prefix = `WR-${cleanDate}-`;
+
+    // Filter hanya tiket yang tanggalnya SAMA persis dengan tanggal yang dipilih
+    const matchingTickets = AppState.allData.filter(item => {
+        const itemId = String(item.id || "").trim();
+        return itemId.startsWith(prefix);
+    });
+
+    let maxSeq = 0;
+
+    matchingTickets.forEach(item => {
+        const idStr = String(item.id).trim();
+        const parts = idStr.split("-");
+        if (parts.length >= 3) {
+            const seq = parseInt(parts[parts.length - 1], 10);
+            if (!isNaN(seq) && seq > maxSeq) {
+                maxSeq = seq;
+            }
+        }
+    });
+
+    // Nomor urut baru (Reset ke 001 jika maxSeq = 0)
+    const nextSeq = String(maxSeq + 1).padStart(3, "0");
+    return `${prefix}${nextSeq}`;
+}
+
+function updateTicketPreview() {
+    const editId = getValue("editTicketId").trim();
+    if (editId) {
+        // Jika sedang mode EDIT, tetap gunakan No Tiket asli
+        setValue("ticketPreview", editId);
+        return;
+    }
+
+    const tglISO = getValue("tanggal");
+    const nextTicketId = generateNextTicketId(tglISO);
+    setValue("ticketPreview", nextTicketId);
 }
 
 const Auth = {
@@ -1206,6 +1259,7 @@ async function loadData() {
         AppState.allData = Array.isArray(result.data) ? result.data.map(normalizeData) : [];
         applyFilters();
         updateDashboard();
+        updateTicketPreview(); // Update preview nomor tiket saat data selesai dimuat
     } catch (error) {
         showToast(error.message, "error");
     } finally {
@@ -1326,18 +1380,22 @@ function renderTable() {
     $("nextPage").disabled = AppState.currentPage >= totalPages;
 }
 
-/* FORM SUBMIT & EDIT HANDLER (FIX BISA DISIMPAN SETELAH EDIT) */
+/* FORM SUBMIT & EDIT HANDLER */
 async function submitForm(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (AppState.isSubmitting) return;
 
     const editId = getValue("editTicketId").trim();
     const isEdit = Boolean(editId);
+    const selectedDate = getValue("tanggal");
+
+    // Tentukan ID tiket baru jika membuat tiket baru
+    const finalTicketId = isEdit ? editId : generateNextTicketId(selectedDate);
 
     const payload = {
         action: isEdit ? "update" : "add",
-        id: editId,
-        tanggal: getValue("tanggal"),
+        id: finalTicketId,
+        tanggal: selectedDate,
         jam: `${getValue("jam")}:${getValue("menit")}`,
         priority: getValue("priority").toUpperCase(),
         requestor: getValue("requestor").trim(),
@@ -1359,7 +1417,7 @@ async function submitForm(e) {
         const result = await apiPost(payload);
         if (!result.success) throw new Error(result.message || "Gagal menyimpan data.");
 
-        showToast(isEdit ? "Tiket berhasil diperbarui!" : `Tiket berhasil dibuat: ${result.id || ""}`, "success");
+        showToast(isEdit ? "Tiket berhasil diperbarui!" : `Tiket berhasil dibuat: ${result.id || finalTicketId}`, "success");
         resetForm();
         await loadData();
     } catch (error) {
@@ -1377,8 +1435,9 @@ function prepareEdit(id) {
         return;
     }
 
-    // Set nilai ID di hidden field
+    // Set nilai ID di hidden field & preview field
     setValue("editTicketId", item.id);
+    setValue("ticketPreview", item.id);
 
     setValue("tanggal", parseTanggalToISO(item.tanggal));
 
@@ -1399,7 +1458,7 @@ function prepareEdit(id) {
     $("updateBtn").classList.remove("hidden");
     $("formTitle").textContent = "Edit Work Request";
 
-    // Smooth Scroll ke Form di Mobile & PC
+    // Smooth Scroll ke Form
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -1439,6 +1498,8 @@ function resetForm() {
         setValue("requestor", Auth.getName());
         setValue("status", "OPEN");
     }
+
+    updateTicketPreview();
 }
 
 function setDefaultTime() {
@@ -1446,6 +1507,7 @@ function setDefaultTime() {
     setValue("tanggal", getLocalDateISO(now));
     setValue("jam", pad(now.getHours()));
     setValue("menit", pad(now.getMinutes()));
+    updateTicketPreview();
 }
 
 function populateTimeSelects() {
@@ -1495,11 +1557,15 @@ function updateClock() {
 
 $("loginForm").addEventListener("submit", handleLogin);
 $("jobForm").addEventListener("submit", submitForm);
+$("updateBtn").addEventListener("click", submitForm);
 $("btnLogout").addEventListener("click", () => Auth.logout());
 $("resetBtn").addEventListener("click", resetForm);
 $("btnNow").addEventListener("click", setDefaultTime);
 $("btnRefresh").addEventListener("click", loadData);
 $("btnExport").addEventListener("click", exportToExcel);
+
+/* EVENT LISTENER UPDATE TICKET ID PREVIEW SAAT TANGGAL DIUBAH */
+$("tanggal").addEventListener("change", updateTicketPreview);
 
 $("searchInput").addEventListener("input", applyFilters);
 $("filterStatus").addEventListener("change", applyFilters);
