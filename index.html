@@ -33,6 +33,9 @@
     --danger: #d62828;
     --danger-light: rgba(214, 40, 40, 0.18);
 
+    --info: #3a86ef;
+    --info-light: rgba(58, 134, 239, 0.18);
+
     --text: #f1faee;
     --muted: #a8b2c1;
 
@@ -237,11 +240,11 @@ body {
 }
 
 /* =========================================================
-   KPI DASHBOARD
+   KPI DASHBOARD (5 COLUMNS)
 ========================================================= */
 .kpi-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 12px;
     margin-bottom: 18px;
 }
@@ -267,12 +270,14 @@ body {
     justify-content: center;
     font-weight: 800;
     font-size: 14px;
+    flex-shrink: 0;
 }
 
 .kpi-total .kpi-icon { background: var(--primary-light); color: var(--primary); }
 .kpi-open .kpi-icon { background: var(--accent-light); color: var(--accent); }
 .kpi-progress .kpi-icon { background: var(--warning-light); color: var(--warning); }
 .kpi-done .kpi-icon { background: var(--success-light); color: var(--success); }
+.kpi-area .kpi-icon { background: var(--info-light); color: var(--info); }
 
 .kpi-label {
     color: var(--muted);
@@ -464,7 +469,7 @@ textarea {
     background: rgba(0, 0, 0, 0.2);
     border-bottom: 1px solid var(--border);
     display: grid;
-    grid-template-columns: 1fr 120px 120px auto;
+    grid-template-columns: 1fr 120px 120px 130px auto;
     gap: 8px;
 }
 
@@ -747,12 +752,24 @@ textarea {
 /* =========================================================
    RESPONSIVE (HP & MOBILE DISPLAY REFINEMENT)
 ========================================================= */
+@media (max-width: 1100px) {
+    .kpi-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
 @media (max-width: 900px) {
     .main-grid {
         grid-template-columns: 1fr;
     }
     .kpi-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .filter-bar {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    .filter-bar .search-box {
+        grid-column: 1 / -1;
     }
 }
 
@@ -918,6 +935,13 @@ textarea {
                 <div id="doneCount" class="kpi-number">0</div>
             </div>
         </div>
+        <div class="kpi-card kpi-area">
+            <div class="kpi-icon">📍</div>
+            <div>
+                <div class="kpi-label">TOTAL AREA</div>
+                <div id="areaCount" class="kpi-number">0</div>
+            </div>
+        </div>
     </section>
 
     <!-- MAIN GRID -->
@@ -1042,6 +1066,8 @@ textarea {
                     <option value="MEDIUM">Medium</option>
                     <option value="LOW">Low</option>
                 </select>
+
+                <input id="filterDate" class="form-control" type="date" title="Filter per Tanggal">
 
                 <button id="clearFilter" class="btn btn-secondary" type="button">Reset</button>
             </div>
@@ -1423,6 +1449,7 @@ function applyFilters() {
     const search = getValue("searchInput").trim().toLowerCase();
     const status = getValue("filterStatus").toUpperCase();
     const priority = getValue("filterPriority").toUpperCase();
+    const date = getValue("filterDate");
 
     AppState.filteredData = AppState.allData.filter(item => {
         const searchable = [
@@ -1433,8 +1460,9 @@ function applyFilters() {
         const matchSearch = !search || searchable.includes(search);
         const matchStatus = !status || item.status === status;
         const matchPriority = !priority || item.priority === priority;
+        const matchDate = !date || item.tanggal === date;
 
-        return matchSearch && matchStatus && matchPriority;
+        return matchSearch && matchStatus && matchPriority && matchDate;
     });
 
     AppState.currentPage = 1;
@@ -1447,6 +1475,12 @@ function updateDashboard() {
     $("openCount").textContent = data.filter(x => x.status === "OPEN").length;
     $("progressCount").textContent = data.filter(x => x.status === "PROGRESS").length;
     $("doneCount").textContent = data.filter(x => x.status === "DONE").length;
+
+    // Menghitung Jumlah Area Unik
+    const uniqueAreas = new Set(
+        data.map(x => String(x.area || "").trim().toLowerCase()).filter(Boolean)
+    );
+    $("areaCount").textContent = uniqueAreas.size;
 }
 
 function statusBadge(status) {
@@ -1709,10 +1743,13 @@ $("tanggal").addEventListener("change", updateTicketPreview);
 $("searchInput").addEventListener("input", applyFilters);
 $("filterStatus").addEventListener("change", applyFilters);
 $("filterPriority").addEventListener("change", applyFilters);
+$("filterDate").addEventListener("change", applyFilters);
+
 $("clearFilter").addEventListener("click", () => {
     $("searchInput").value = "";
     $("filterStatus").value = "";
     $("filterPriority").value = "";
+    $("filterDate").value = "";
     applyFilters();
 });
 
