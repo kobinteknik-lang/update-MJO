@@ -862,7 +862,7 @@ textarea {
         <div class="brand-icon">WR</div>
         <div>
             <div class="brand-title">Work Request System</div>
-            <div class="brand-subtitle">Engineering • Maintenance Command</div>
+            <div class="brand-subtitle">ENG • Maintenance Command</div>
         </div>
     </div>
 
@@ -912,8 +912,8 @@ textarea {
 
     <div class="page-heading">
         <div class="page-title">
-            <h1>Work Request</h1>
-            <p>Monitoring dan pengelolaan pekerjaan Maintenance Engineering</p>
+          <h1>Work Request</h1>
+          <p>Monitoring dan pengelolaan pekerjaan Maintenance Engineering</p>
         </div>
         <div class="heading-actions">
             <button id="btnExport" class="btn btn-outline">Export CSV</button>
@@ -1215,10 +1215,10 @@ function formatJamClean(val) {
 
 /* LOGIKA GENERATE NOMOR TIKET */
 function generateNextTicketId(selectedDateISO) {
-    if (!selectedDateISO) return "WR-YYYYMMDD-001";
+    if (!selectedDateISO) return "ENG-YYYYMMDD-001";
 
     const cleanDate = selectedDateISO.replace(/-/g, ""); 
-    const prefix = `WR-${cleanDate}-`;
+    const prefix = `ENG-${cleanDate}-`;
 
     const matchingTickets = AppState.allData.filter(item => {
         const itemId = String(item.id || "").trim();
