@@ -183,15 +183,30 @@ button, input, select, textarea, .card, .kpi-card, .action-btn {
 .kpi-label { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: 0.6px; margin-bottom: 2px; }
 .kpi-number { font-size: 22px; font-weight: 800; color: var(--text); }
 
-/* Analytics Chart Container */
+/* Analytics & Area Ranking Grid */
 .analytics-grid {
-    display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 24px;
 }
 .chart-card {
     background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius);
     padding: 16px 20px; box-shadow: var(--shadow); position: relative; height: 260px;
 }
 .chart-card h3 { font-size: 12px; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; }
+
+/* Top Areas Ranking List Card */
+.top-area-card {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px 20px; box-shadow: var(--shadow); height: 260px; display: flex; flex-direction: column;
+}
+.top-area-card h3 { font-size: 12px; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; }
+.area-list { overflow-y: auto; flex-grow: 1; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; }
+.area-item {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255, 255, 255, 0.03); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255, 122, 0, 0.1);
+    font-size: 12px;
+}
+.area-name { font-weight: 700; color: var(--text); }
+.area-count { background: var(--accent-light); color: var(--accent); padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 11px; }
 
 /* =========================================================
    MAIN GRID & FORMS
@@ -210,10 +225,6 @@ button, input, select, textarea, .card, .kpi-card, .action-btn {
 .card-body { padding: 20px; }
 
 .form-section { margin-bottom: 18px; }
-.form-section-title {
-    font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--accent);
-    font-weight: 800; padding-bottom: 8px; margin-bottom: 12px; border-bottom: 1px dashed var(--border);
-}
 .form-group { margin-bottom: 14px; }
 .form-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
 .form-label .required { color: var(--primary); }
@@ -225,18 +236,9 @@ button, input, select, textarea, .card, .kpi-card, .action-btn {
 .form-control:focus, select:focus, textarea:focus {
     border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.25); background: rgba(10, 8, 16, 0.98);
 }
-textarea { resize: vertical; min-height: 80px; }
+textarea { resize: vertical; min-height: 90px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .time-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; }
-
-/* File Upload Box */
-.file-upload-box {
-    border: 2px dashed var(--border); border-radius: 10px; padding: 12px; text-align: center;
-    background: rgba(0,0,0,0.2); cursor: pointer; position: relative;
-}
-.file-upload-box:hover { border-color: var(--accent); background: rgba(255,122,0,0.05); }
-.file-upload-box input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-.file-preview-thumb { width: 45px; height: 45px; border-radius: 6px; object-fit: cover; display: none; margin: 4px auto 0; border: 1px solid var(--accent); }
 
 /* =========================================================
    BUTTONS & TABLES
@@ -293,7 +295,8 @@ textarea { resize: vertical; min-height: 80px; }
 .spinner { width: 26px; height: 26px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 10px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-@media(max-width: 1200px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } .analytics-grid { grid-template-columns: 1fr; } }
+@media(max-width: 1400px) { .analytics-grid { grid-template-columns: 1fr 1fr; } }
+@media(max-width: 1000px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } .analytics-grid { grid-template-columns: 1fr; } }
 @media(max-width: 900px) { .main-grid { grid-template-columns: 1fr; } .filter-bar { grid-template-columns: 1fr 1fr; } }
 </style>
 </head>
@@ -366,7 +369,7 @@ textarea { resize: vertical; min-height: 80px; }
         <div class="kpi-card kpi-area"><div class="kpi-icon">📍</div><div><div class="kpi-label">TOTAL AREA</div><div id="areaCount" class="kpi-number">0</div></div></div>
     </section>
 
-    <!-- ANALYTICS CHARTS -->
+    <!-- ANALYTICS CHARTS & TOP AREA LIST -->
     <section class="analytics-grid">
         <div class="chart-card">
             <h3>Statistik Status Tiket</h3>
@@ -375,6 +378,12 @@ textarea { resize: vertical; min-height: 80px; }
         <div class="chart-card">
             <h3>Distribusi Prioritas</h3>
             <canvas id="priorityChart"></canvas>
+        </div>
+        <div class="top-area-card">
+            <h3>Top Area / Mesin Bermasalah</h3>
+            <div id="topAreaList" class="area-list">
+                <!-- Diisi otomatis via Javascript -->
+            </div>
         </div>
     </section>
 
@@ -417,17 +426,6 @@ textarea { resize: vertical; min-height: 80px; }
                         </div>
                     </div>
 
-                    <!-- FOTO DOKUMENTASI UPLOAD -->
-                    <div class="form-group">
-                        <label class="form-label">Lampiran Foto (Opsional)</label>
-                        <div class="file-upload-box">
-                            <span>📁 Klik / Pilih Foto Kerusakan</span>
-                            <input type="file" id="fotoFile" accept="image/*">
-                            <img id="previewThumb" class="file-preview-thumb">
-                        </div>
-                        <input type="hidden" id="fotoBase64" value="">
-                    </div>
-
                     <div id="keteranganGroup" class="form-group">
                         <label class="form-label">Tindak Lanjut Teknisi</label>
                         <textarea id="keterangan"></textarea>
@@ -462,7 +460,7 @@ textarea { resize: vertical; min-height: 80px; }
                             <th>Waktu</th>
                             <th>Requestor</th>
                             <th>Area</th>
-                            <th>Deskripsi & Foto</th>
+                            <th>Deskripsi Kendala</th>
                             <th>Prioritas</th>
                             <th>Status</th>
                             <th>Aksi</th>
@@ -521,22 +519,42 @@ function updateChartsData(data) {
     const low = data.filter(x => x.priority === 'LOW').length;
     priorityChartInstance.data.datasets[0].data = [high, med, low];
     priorityChartInstance.update();
+
+    // Render Top Area Ranking List
+    renderTopAreas(data);
 }
 
-// Konversi Upload Foto ke Base64
-$('fotoFile').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(uploadEvent) {
-        const base64String = uploadEvent.target.result;
-        $('fotoBase64').value = base64String;
-        const thumb = $('previewThumb');
-        thumb.src = base64String;
-        thumb.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-});
+function renderTopAreas(data) {
+    const container = $('topAreaList');
+    container.innerHTML = '';
+
+    // Hitung frekuensi kemunculan tiap area
+    const areaCounts = {};
+    data.forEach(item => {
+        const areaName = (item.area || 'Lainnya').trim();
+        if (areaName) {
+            areaCounts[areaName] = (areaCounts[areaName] || 0) + 1;
+        }
+    });
+
+    // Urutkan dari jumlah terbanyak
+    const sortedAreas = Object.entries(areaCounts).sort((a, b) => b[1] - a[1]);
+
+    if (sortedAreas.length === 0) {
+        container.innerHTML = '<div style="color:var(--muted); font-size:12px; text-align:center; margin-top:30px;">Belum ada data area.</div>';
+        return;
+    }
+
+    sortedAreas.forEach(([area, count], index) => {
+        const div = document.createElement('div');
+        div.className = 'area-item';
+        div.innerHTML = `
+            <span class="area-name">${index + 1}. ${area}</span>
+            <span class="area-count">${count} Tiket</span>
+        `;
+        container.appendChild(div);
+    });
+}
 
 // Load & Auth Logic
 const Auth = {
@@ -626,14 +644,12 @@ function renderTable() {
 
     AppState.filteredData.forEach(item => {
         const tr = document.createElement('tr');
-        const fotoHtml = item.foto ? `<br><a href="${item.foto}" target="_blank" style="color:var(--accent); font-size:11px;">[ Lihat Foto Bukti ]</a>` : '';
-        
         tr.innerHTML = `
             <td><span class="ticket-id">${item.id}</span></td>
             <td>${item.tanggal || '-'}<br><span style="color:var(--muted);">${item.jam || ''}</span></td>
             <td>${item.requestor}</td>
             <td>${item.area}</td>
-            <td>${item.deskripsi}${fotoHtml}</td>
+            <td>${item.deskripsi}</td>
             <td><span class="badge badge-${item.priority.toLowerCase()}">${item.priority}</span></td>
             <td><span class="badge badge-${item.status.toLowerCase()}">${item.status}</span></td>
             <td>
@@ -651,7 +667,7 @@ async function submitJob(e) {
     const editId = $('editTicketId').value;
     const payload = {
         action: editId ? 'update' : 'add',
-        id: editId || undefined, // Jika add, ID di-generate aman di backend Apps Script
+        id: editId || undefined,
         tanggal: $('tanggal').value,
         jam: $('jam').value + ':' + $('menit').value,
         requestor: $('requestor').value,
@@ -659,8 +675,7 @@ async function submitJob(e) {
         deskripsi: $('deskripsi').value,
         priority: $('priority').value,
         status: $('status').value,
-        keterangan: $('keterangan').value,
-        foto: $('fotoBase64').value
+        keterangan: $('keterangan').value
     };
 
     AppState.isSubmitting = true;
@@ -723,8 +738,6 @@ function resetForm() {
     $('ticketPreview').value = 'Auto Generated by Server';
     $('submitBtn').classList.remove('hidden');
     $('updateBtn').classList.add('hidden');
-    $('previewThumb').style.display = 'none';
-    $('fotoBase64').value = '';
     if (Auth.getRole() === 'requestor') {
         $('requestor').value = Auth.getName();
     }
