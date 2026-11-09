@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Work Request System PRO - Engineering Command</title>
+<!-- Chart.js untuk Dashboard Analitik -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 /* =========================================================
@@ -59,782 +61,246 @@ body {
     overflow-x: hidden;
 }
 
-/* =========================================================
-   ANIMASI GETAR (SHAKE) & TRANSISI HALUS
-========================================================= */
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     20%, 60% { transform: translateX(-5px); }
     40%, 80% { transform: translateX(5px); }
 }
 
-.shake-effect {
-    animation: shake 0.4s ease-in-out;
-}
+.shake-effect { animation: shake 0.4s ease-in-out; }
 
 button, input, select, textarea, .card, .kpi-card, .action-btn {
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* =========================================================
-   ANIMATED SKYLINE & CLOUDS BACKGROUND
+   BACKGROUND ANIMATION
 ========================================================= */
 .sky-background {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -1;
-    pointer-events: none;
-    overflow: hidden;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1; pointer-events: none; overflow: hidden;
 }
 
 .clouds-layer-1 {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 200%;
-    height: 60%;
+    position: absolute; top: 0; left: 0; width: 200%; height: 60%;
     background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" opacity="0.10"><path fill="%23ff7a00" d="M150,150 Q170,120 200,140 Q230,100 280,130 Q330,110 370,150 Z M600,100 Q630,70 670,90 Q720,60 770,100 Q820,80 850,130 Z"/></svg>') repeat-x;
     background-size: 1000px 300px;
     animation: driftClouds 60s linear infinite;
 }
 
-.clouds-layer-2 {
-    position: absolute;
-    top: 5%;
-    left: 0;
-    width: 200%;
-    height: 50%;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" opacity="0.06"><path fill="%23ff7a00" d="M100,200 Q130,160 180,180 Q220,130 290,170 Q350,140 400,200 Z M700,120 Q750,80 800,110 Q870,70 930,130 Z"/></svg>') repeat-x;
-    background-size: 1200px 400px;
-    animation: driftClouds 35s linear infinite;
-}
-
 .city-skyline {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 200%;
-    height: 160px;
+    position: absolute; bottom: 0; left: 0; width: 200%; height: 160px;
     background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 200" preserveAspectRatio="none"><path fill="%230b0813" d="M0,200 L0,120 L30,120 L30,80 L50,80 L50,200 L80,200 L80,50 L120,50 L120,200 L160,200 L160,100 L200,100 L200,200 L250,200 L250,30 L300,30 L300,200 L350,200 L350,90 L400,90 L400,200 L460,200 L460,60 L500,60 L500,200 L550,200 L550,110 L600,110 L600,200 L680,200 L680,40 L730,40 L730,200 L800,200 L800,70 L850,70 L850,200 L920,200 L920,20 L980,20 L980,200 L1050,200 L1050,90 L1100,90 L1100,200 L1180,200 L1180,50 L1240,50 L1240,200 L1400,200 Z"/></svg>') repeat-x;
     background-size: 1400px 160px;
     animation: driftSkyline 120s linear infinite;
     opacity: 0.6;
 }
 
-@keyframes driftClouds {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-}
-
-@keyframes driftSkyline {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-}
+@keyframes driftClouds { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes driftSkyline { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
 /* =========================================================
-   TOP HEADER
+   TOPBAR & COMPONENTS
 ========================================================= */
 .topbar {
-    height: 72px;
-    background: var(--topbar-bg);
-    backdrop-filter: blur(18px);
-    border-bottom: 2px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 28px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    height: 72px; background: var(--topbar-bg); backdrop-filter: blur(18px);
+    border-bottom: 2px solid var(--border); display: flex; align-items: center;
+    justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 100;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
+.brand { display: flex; align-items: center; gap: 14px; }
 .brand-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    width: 44px; height: 44px; border-radius: 12px;
     background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    font-weight: 900;
-    box-shadow: 0 0 20px rgba(255, 122, 0, 0.4);
+    color: white; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 900; box-shadow: 0 0 20px rgba(255, 122, 0, 0.4);
 }
+.brand-title { font-size: 16px; font-weight: 800; color: var(--text); }
+.brand-subtitle { font-size: 12px; color: var(--accent); font-weight: 600; }
 
-.brand-title {
-    font-size: 16px;
-    font-weight: 800;
-    color: var(--text);
-    letter-spacing: 0.4px;
-}
-
-.brand-subtitle {
-    font-size: 12px;
-    color: var(--accent);
-    font-weight: 600;
-}
-
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
+.header-right { display: flex; align-items: center; gap: 16px; }
 .clock {
-    font-size: 13px;
-    color: var(--accent);
-    font-weight: 700;
-    font-family: monospace;
-    background: rgba(255, 122, 0, 0.08);
-    padding: 6px 14px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
+    font-size: 13px; color: var(--accent); font-weight: 700; font-family: monospace;
+    background: rgba(255, 122, 0, 0.08); padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border);
 }
 
 .user-box {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 6px 14px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: rgba(255, 122, 0, 0.05);
+    display: flex; align-items: center; gap: 10px; padding: 6px 14px;
+    border: 1px solid var(--border); border-radius: 10px; background: rgba(255, 122, 0, 0.05);
 }
-
 .user-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 800;
+    width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;
 }
-
-.login-info {
-    font-size: 13px;
-    font-weight: 700;
-}
-
+.login-info { font-size: 13px; font-weight: 700; }
 .user-role-badge {
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 4px;
-    background: var(--accent-light);
-    color: var(--accent);
-    font-weight: 800;
-    text-transform: uppercase;
+    font-size: 10px; padding: 2px 8px; border-radius: 4px;
+    background: var(--accent-light); color: var(--accent); font-weight: 800; text-transform: uppercase;
 }
 
-/* =========================================================
-   CONTAINER & LAYOUT
-========================================================= */
-.container {
-    max-width: 1500px;
-    margin: auto;
-    padding: 24px 20px 40px;
-}
-
-.login-wrapper {
-    min-height: calc(100vh - 72px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
+.container { max-width: 1500px; margin: auto; padding: 24px 20px 40px; }
+.login-wrapper { min-height: calc(100vh - 72px); display: flex; align-items: center; justify-content: center; padding: 20px; }
 .login-card {
-    width: 100%;
-    max-width: 420px;
-    background: var(--card-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    box-shadow: var(--shadow);
-    padding: 32px;
+    width: 100%; max-width: 420px; background: var(--card-bg); backdrop-filter: blur(20px);
+    border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow); padding: 32px;
 }
-
 .login-logo {
-    width: 60px;
-    height: 60px;
-    margin: 0 auto 20px;
-    border-radius: 14px;
+    width: 60px; height: 60px; margin: 0 auto 20px; border-radius: 14px;
     background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    font-weight: 900;
-    box-shadow: 0 0 25px rgba(255, 122, 0, 0.5);
+    color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900;
 }
+.login-card h1 { text-align: center; font-size: 20px; font-weight: 800; color: var(--text); }
+.login-card p { text-align: center; font-size: 13px; color: var(--muted); margin: 6px 0 24px; }
 
-.login-card h1 {
-    text-align: center;
-    font-size: 20px;
-    font-weight: 800;
-    color: var(--text);
-}
-
-.login-card p {
-    text-align: center;
-    font-size: 13px;
-    color: var(--muted);
-    margin: 6px 0 24px;
-}
-
-.page-heading {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 24px;
-}
-
-.page-title h1 {
-    font-size: 24px;
-    font-weight: 800;
-    color: var(--text);
-    letter-spacing: -0.3px;
-}
-
-.page-title p {
-    font-size: 13px;
-    color: var(--muted);
-    margin-top: 2px;
-}
-
-.heading-actions {
-    display: flex;
-    gap: 10px;
-}
+.page-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.page-title h1 { font-size: 24px; font-weight: 800; color: var(--text); }
+.page-title p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.heading-actions { display: flex; gap: 10px; }
 
 /* =========================================================
-   KPI DASHBOARD
+   KPI & CHARTS DASHBOARD GRID
 ========================================================= */
 .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 16px;
-    margin-bottom: 24px;
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 20px;
 }
-
 .kpi-card {
-    background: var(--card-bg);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 18px;
-    box-shadow: var(--shadow);
-    display: flex;
-    align-items: center;
-    gap: 16px;
+    background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 16px;
 }
-
-.kpi-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--accent);
-    box-shadow: 0 10px 25px rgba(255, 122, 0, 0.2);
-}
-
+.kpi-card:hover { transform: translateY(-3px); border-color: var(--accent); }
 .kpi-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 16px;
-    flex-shrink: 0;
+    width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center;
+    justify-content: center; font-weight: 800; font-size: 16px; flex-shrink: 0;
 }
-
 .kpi-total .kpi-icon { background: var(--primary-light); color: var(--primary); }
 .kpi-open .kpi-icon { background: var(--accent-light); color: var(--accent); }
 .kpi-progress .kpi-icon { background: var(--warning-light); color: var(--warning); }
 .kpi-done .kpi-icon { background: var(--success-light); color: var(--success); }
 .kpi-area .kpi-icon { background: var(--info-light); color: var(--info); }
 
-.kpi-label {
-    color: var(--muted);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.6px;
-    margin-bottom: 2px;
-}
+.kpi-label { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: 0.6px; margin-bottom: 2px; }
+.kpi-number { font-size: 22px; font-weight: 800; color: var(--text); }
 
-.kpi-number {
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--text);
+/* Analytics Chart Container */
+.analytics-grid {
+    display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px;
 }
+.chart-card {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px 20px; box-shadow: var(--shadow); position: relative; height: 260px;
+}
+.chart-card h3 { font-size: 12px; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; }
 
 /* =========================================================
    MAIN GRID & FORMS
 ========================================================= */
-.main-grid {
-    display: grid;
-    grid-template-columns: 380px 1fr;
-    gap: 20px;
-    align-items: start;
-}
-
+.main-grid { display: grid; grid-template-columns: 380px 1fr; gap: 20px; align-items: start; }
 .card {
-    background: var(--card-bg);
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    overflow: hidden;
+    background: var(--card-bg); backdrop-filter: blur(16px); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
 }
-
 .card-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
     background: linear-gradient(135deg, rgba(255, 122, 0, 0.08), rgba(244, 63, 94, 0.04));
 }
+.card-title { font-size: 13px; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: 0.8px; }
+.card-subtitle { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.card-body { padding: 20px; }
 
-.card-title {
-    font-size: 13px;
-    font-weight: 800;
-    color: var(--accent);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-}
-
-.card-subtitle {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 2px;
-}
-
-.card-body {
-    padding: 20px;
-}
-
-.form-section {
-    margin-bottom: 18px;
-}
-
-.form-section:last-child {
-    margin-bottom: 0;
-}
-
+.form-section { margin-bottom: 18px; }
 .form-section-title {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    color: var(--accent);
-    font-weight: 800;
-    padding-bottom: 8px;
-    margin-bottom: 12px;
-    border-bottom: 1px dashed var(--border);
+    font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--accent);
+    font-weight: 800; padding-bottom: 8px; margin-bottom: 12px; border-bottom: 1px dashed var(--border);
 }
-
-.form-group {
-    margin-bottom: 14px;
-}
-
-.form-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 700;
-    margin-bottom: 6px;
-    color: var(--text);
-}
-
-.form-label .required {
-    color: var(--primary);
-}
+.form-group { margin-bottom: 14px; }
+.form-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+.form-label .required { color: var(--primary); }
 
 .form-control, select, textarea {
-    width: 100%;
-    border: 1px solid var(--border);
-    background: rgba(10, 8, 16, 0.85);
-    color: var(--text);
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-family: inherit;
-    font-size: 13px;
-    outline: none;
+    width: 100%; border: 1px solid var(--border); background: rgba(10, 8, 16, 0.85);
+    color: var(--text); border-radius: 10px; padding: 10px 14px; font-family: inherit; font-size: 13px; outline: none;
 }
-
 .form-control:focus, select:focus, textarea:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.25);
-    background: rgba(10, 8, 16, 0.98);
+    border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.25); background: rgba(10, 8, 16, 0.98);
 }
+textarea { resize: vertical; min-height: 80px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.time-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; }
 
-textarea {
-    resize: vertical;
-    min-height: 90px;
+/* File Upload Box */
+.file-upload-box {
+    border: 2px dashed var(--border); border-radius: 10px; padding: 12px; text-align: center;
+    background: rgba(0,0,0,0.2); cursor: pointer; position: relative;
 }
-
-.form-control:disabled, select:disabled, textarea:disabled, .form-control[readonly] {
-    background: rgba(255, 255, 255, 0.03);
-    color: var(--muted);
-    cursor: not-allowed;
-    border-color: rgba(255, 255, 255, 0.04);
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-.time-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr auto;
-    gap: 8px;
-}
-
-.btn-now {
-    padding: 0 12px;
-}
+.file-upload-box:hover { border-color: var(--accent); background: rgba(255,122,0,0.05); }
+.file-upload-box input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.file-preview-thumb { width: 45px; height: 45px; border-radius: 6px; object-fit: cover; display: none; margin: 4px auto 0; border: 1px solid var(--accent); }
 
 /* =========================================================
-   BUTTONS
+   BUTTONS & TABLES
 ========================================================= */
 .btn {
-    border: 0;
-    border-radius: 10px;
-    padding: 10px 16px;
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 800;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    border: 0; border-radius: 10px; padding: 10px 16px; font-family: inherit; font-size: 12px;
+    font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
 }
-
 .btn:hover { transform: translateY(-2px); filter: brightness(1.15); box-shadow: 0 6px 20px rgba(255, 122, 0, 0.3); }
-.btn:active { transform: translateY(0); }
-
-.btn-primary { background: linear-gradient(135deg, var(--accent) 0%, var(--primary-dark) 100%); color: white; box-shadow: 0 4px 15px rgba(255, 122, 0, 0.3); }
-.btn-success { background: linear-gradient(135deg, var(--success) 0%, #059669 100%); color: #fff; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
+.btn-primary { background: linear-gradient(135deg, var(--accent) 0%, var(--primary-dark) 100%); color: white; }
+.btn-success { background: linear-gradient(135deg, var(--success) 0%, #059669 100%); color: #fff; }
 .btn-danger { background: var(--danger); color: white; }
 .btn-secondary { background: rgba(255, 255, 255, 0.06); color: var(--text); border: 1px solid var(--border); }
-.btn-secondary:hover { background: rgba(255, 255, 255, 0.12); }
 .btn-outline { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
-.btn-outline:hover { background: var(--accent-light); }
-
-.btn-block { width: 100%; }
-.btn-small { padding: 6px 10px; font-size: 11px; }
-
-.form-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 18px;
-}
-
+.form-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
 .hidden { display: none !important; }
 
-/* =========================================================
-   FILTER & TABLE
-========================================================= */
 .filter-bar {
-    padding: 12px 16px;
-    background: rgba(0, 0, 0, 0.3);
-    border-bottom: 1px solid var(--border);
-    display: grid;
-    grid-template-columns: 1fr 130px 130px 140px auto;
-    gap: 10px;
+    padding: 12px 16px; background: rgba(0, 0, 0, 0.3); border-bottom: 1px solid var(--border);
+    display: grid; grid-template-columns: 1fr 130px 130px 140px auto; gap: 10px;
 }
-
 .search-box { position: relative; }
 .search-box input { padding-left: 34px; }
-.search-icon {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--muted);
-    font-size: 13px;
-}
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); }
 
-.table-wrapper { 
-    overflow-x: auto; 
-    -webkit-overflow-scrolling: touch;
-}
-
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 750px;
-}
-
+.table-wrapper { overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; min-width: 800px; }
 .data-table th {
-    background: rgba(255, 122, 0, 0.05);
-    color: var(--accent);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    font-weight: 800;
-    padding: 12px 16px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
+    background: rgba(255, 122, 0, 0.05); color: var(--accent); font-size: 11px;
+    text-transform: uppercase; font-weight: 800; padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border);
 }
-
-.data-table td {
-    padding: 12px 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    font-size: 13px;
-    vertical-align: middle;
-}
-
-.data-table tbody tr {
-    transition: background 0.15s ease;
-}
-
+.data-table td { padding: 12px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.04); font-size: 13px; vertical-align: middle; }
 .data-table tbody tr:hover { background: rgba(255, 122, 0, 0.06); }
 
-.ticket-id {
-    color: var(--accent);
-    font-size: 12px;
-    font-weight: 800;
-    font-family: monospace;
-}
-
-.description {
-    max-width: 250px;
-    line-height: 1.4;
-    word-break: break-word;
-    color: var(--text);
-}
-
-.muted { color: var(--muted); font-size: 12px; }
-
-/* =========================================================
-   BADGES & ACTIONS
-========================================================= */
-.badge {
-    display: inline-flex;
-    align-items: center;
-    border-radius: 20px;
-    padding: 3px 10px;
-    font-size: 10px;
-    font-weight: 800;
-    white-space: nowrap;
-    letter-spacing: 0.3px;
-}
-
+.ticket-id { color: var(--accent); font-size: 12px; font-weight: 800; font-family: monospace; }
+.badge { display: inline-flex; align-items: center; border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 800; }
 .badge-open { color: #60a5fa; background: rgba(96, 165, 250, 0.12); border: 1px solid rgba(96, 165, 250, 0.25); }
 .badge-progress { color: #fbbf24; background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.25); }
 .badge-done { color: #34d399; background: rgba(52, 211, 153, 0.12); border: 1px solid rgba(52, 211, 153, 0.25); }
-
-.badge-high { color: #f87171; background: rgba(248, 113, 113, 0.12); border: 1px solid rgba(248, 113, 113, 0.25); }
-.badge-medium { color: #fbbf24; background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.25); }
-.badge-low { color: #34d399; background: rgba(52, 211, 153, 0.12); border: 1px solid rgba(52, 211, 153, 0.25); }
+.badge-high { color: #f87171; background: rgba(248, 113, 113, 0.12); }
 
 .action-group { display: flex; gap: 6px; }
 .action-btn {
-    width: 30px;
-    height: 30px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.04);
-    color: var(--text);
-    cursor: pointer;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.04); color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center;
 }
+.action-btn:hover { background: rgba(255, 122, 0, 0.2); border-color: var(--accent); }
 
-.action-btn:hover { background: rgba(255, 122, 0, 0.2); transform: scale(1.1); border-color: var(--accent); }
-.action-edit { color: var(--accent); }
-.action-delete { color: #f87171; }
-
-.pagination {
-    padding: 12px 16px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    background: rgba(0, 0, 0, 0.2);
-}
-
-.pagination-info { font-size: 11px; color: var(--muted); font-weight: 500; }
-.pagination-buttons { display: flex; gap: 6px; }
-
-/* =========================================================
-   CUSTOM MODAL DIALOG
-========================================================= */
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(5, 4, 10, 0.88);
-    backdrop-filter: blur(8px);
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-.modal-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    width: 100%;
-    max-width: 420px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
-    padding: 24px;
-}
-
-.modal-header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 14px;
-}
-
-.modal-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: var(--danger-light);
-    color: #f87171;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-}
-
-.modal-header h3 {
-    font-size: 16px;
-    font-weight: 800;
-    color: var(--text);
-}
-
-.modal-body {
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.6;
-    margin-bottom: 24px;
-    background: rgba(0, 0, 0, 0.25);
-    padding: 14px;
-    border-radius: 10px;
-    border: 1px dashed var(--border);
-}
-
-.modal-actions {
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-}
-
-.modal-actions .btn {
-    flex: 1;
-    padding: 11px;
-}
-
-/* =========================================================
-   TOAST & LOADING
-========================================================= */
-.toast-container {
-    position: fixed;
-    top: 86px;
-    right: 20px;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: min(340px, calc(100vw - 32px));
-}
-
-.toast {
-    background: var(--card-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-    border-left: 4px solid var(--accent);
-    border-radius: 10px;
-    padding: 12px 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    font-size: 12px;
-    color: var(--text);
-    font-weight: 600;
-}
-
-.toast.success { border-left-color: var(--success); }
-.toast.error { border-left-color: var(--danger); }
-.toast.warning { border-left-color: var(--accent); }
-
-.loading-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(6, 4, 10, 0.85);
-    backdrop-filter: blur(8px);
-    z-index: 9998;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.loading-box {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    padding: 22px 30px;
-    border-radius: 14px;
-    box-shadow: var(--shadow);
-    text-align: center;
-    font-size: 12px;
-    color: var(--text);
-    font-weight: 600;
-}
-
-.spinner {
-    width: 26px;
-    height: 26px;
-    border: 3px solid rgba(255,255,255,0.1);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin .7s linear infinite;
-    margin: 0 auto 10px;
-}
-
+/* Toast & Modal */
+.toast-container { position: fixed; top: 86px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; width: 320px; }
+.toast { background: var(--card-bg); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 10px; padding: 12px 16px; font-size: 12px; }
+.loading-overlay { position: fixed; inset: 0; background: rgba(6, 4, 10, 0.85); backdrop-filter: blur(8px); z-index: 9998; display: flex; align-items: center; justify-content: center; }
+.loading-box { background: var(--card-bg); border: 1px solid var(--border); padding: 22px 30px; border-radius: 14px; text-align: center; }
+.spinner { width: 26px; height: 26px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 10px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.empty-state {
-    padding: 50px 20px;
-    text-align: center;
-    color: var(--muted);
-}
-
-.empty-icon { font-size: 32px; margin-bottom: 8px; }
-.empty-state strong { display: block; color: var(--text); font-size: 13px; margin-bottom: 4px; }
-
-@media (max-width: 1200px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } .kpi-grid { grid-template-columns: repeat(3, 1fr); } .filter-bar { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 600px) { .topbar { padding: 0 16px; height: 60px; } .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
+@media(max-width: 1200px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } .analytics-grid { grid-template-columns: 1fr; } }
+@media(max-width: 900px) { .main-grid { grid-template-columns: 1fr; } .filter-bar { grid-template-columns: 1fr 1fr; } }
 </style>
 </head>
-
 <body>
 
 <div class="sky-background">
     <div class="clouds-layer-1"></div>
-    <div class="clouds-layer-2"></div>
     <div class="city-skyline"></div>
 </div>
 
@@ -843,59 +309,47 @@ textarea {
     <div class="brand">
         <div class="brand-icon">WR</div>
         <div>
-            <div class="brand-title">Work Request System</div>
-            <div class="brand-subtitle">ENG • Maintenance Command</div>
+            <div class="brand-title">Work Request System PRO</div>
+            <div class="brand-subtitle">PT Kobin Keramik Industri</div>
         </div>
     </div>
-
     <div class="header-right">
         <div id="clock" class="clock">00:00:00</div>
-        <div class="user-box" id="userBox">
+        <div class="user-box">
             <div class="user-avatar" id="userAvatar">U</div>
             <div>
                 <span id="loginInfo" class="login-info">Guest</span>
                 <span id="roleBadge" class="user-role-badge hidden">REQ</span>
             </div>
         </div>
-        <button id="btnLogout" class="btn btn-secondary btn-small" style="display:none;">Keluar</button>
+        <button id="btnLogout" class="btn btn-secondary" style="display:none; padding: 6px 12px; font-size:11px;">Keluar</button>
     </div>
 </header>
 
-<!-- LOGIN PAGE -->
+<!-- LOGIN -->
 <section id="loginPage" class="login-wrapper">
     <div class="login-card">
         <div class="login-logo">WR</div>
-        <h1>Work Request System</h1>
-        <p>Silakan login untuk mengakses sistem.</p>
-
+        <h1>Command Login</h1>
+        <p>Autentikasi Engineering Maintenance</p>
         <form id="loginForm">
             <div class="form-group" id="urlGroup" style="display:none;">
-                <label class="form-label">Apps Script URL <span class="required">*</span></label>
-                <input id="scriptUrlInput" class="form-control" type="url" placeholder="https://script.google.com/macros/s/.../exec">
+                <label class="form-label">Apps Script URL</label>
+                <input id="scriptUrlInput" class="form-control" type="url" placeholder="https://script.google.com/...">
             </div>
-
-            <div class="form-group">
-                <label class="form-label">Username</label>
-                <input id="username" class="form-control" type="text" placeholder="Masukkan username" autocomplete="username" required>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Password</label>
-                <input id="password" class="form-control" type="password" placeholder="Masukkan password" autocomplete="current-password" required>
-            </div>
-
-            <button class="btn btn-primary btn-block" type="submit" id="btnLoginSubmit">Masuk ke Sistem</button>
+            <div class="form-group"><label class="form-label">Username</label><input id="username" class="form-control" type="text" required></div>
+            <div class="form-group"><label class="form-label">Password</label><input id="password" class="form-control" type="password" required></div>
+            <button class="btn btn-primary" style="width:100%;" type="submit">Masuk Sistem</button>
         </form>
     </div>
 </section>
 
 <!-- MAIN APP -->
 <main id="appPage" class="container" style="display:none;">
-
     <div class="page-heading">
         <div class="page-title">
-            <h1>Work Request</h1>
-            <p>Monitoring dan pengelolaan pekerjaan Maintenance Engineering</p>
+            <h1>Engineering Dashboard</h1>
+            <p>Monitoring & Preventive Maintenance Control</p>
         </div>
         <div class="heading-actions">
             <button id="btnExport" class="btn btn-outline">Export CSV</button>
@@ -903,130 +357,84 @@ textarea {
         </div>
     </div>
 
-    <!-- KPI DASHBOARD -->
+    <!-- KPI CARDS -->
     <section class="kpi-grid">
-        <div class="kpi-card kpi-total">
-            <div class="kpi-icon">#</div>
-            <div>
-                <div class="kpi-label">TOTAL TIKET</div>
-                <div id="totalCount" class="kpi-number">0</div>
-            </div>
+        <div class="kpi-card kpi-total"><div class="kpi-icon">#</div><div><div class="kpi-label">TOTAL TIKET</div><div id="totalCount" class="kpi-number">0</div></div></div>
+        <div class="kpi-card kpi-open"><div class="kpi-icon">O</div><div><div class="kpi-label">OPEN</div><div id="openCount" class="kpi-number">0</div></div></div>
+        <div class="kpi-card kpi-progress"><div class="kpi-icon">P</div><div><div class="kpi-label">PROGRESS</div><div id="progressCount" class="kpi-number">0</div></div></div>
+        <div class="kpi-card kpi-done"><div class="kpi-icon">✓</div><div><div class="kpi-label">SELESAI</div><div id="doneCount" class="kpi-number">0</div></div></div>
+        <div class="kpi-card kpi-area"><div class="kpi-icon">📍</div><div><div class="kpi-label">TOTAL AREA</div><div id="areaCount" class="kpi-number">0</div></div></div>
+    </section>
+
+    <!-- ANALYTICS CHARTS -->
+    <section class="analytics-grid">
+        <div class="chart-card">
+            <h3>Statistik Status Tiket</h3>
+            <canvas id="statusChart"></canvas>
         </div>
-        <div class="kpi-card kpi-open">
-            <div class="kpi-icon">O</div>
-            <div>
-                <div class="kpi-label">OPEN</div>
-                <div id="openCount" class="kpi-number">0</div>
-            </div>
-        </div>
-        <div class="kpi-card kpi-progress">
-            <div class="kpi-icon">P</div>
-            <div>
-                <div class="kpi-label">PROGRESS</div>
-                <div id="progressCount" class="kpi-number">0</div>
-            </div>
-        </div>
-        <div class="kpi-card kpi-done">
-            <div class="kpi-icon">✓</div>
-            <div>
-                <div class="kpi-label">SELESAI</div>
-                <div id="doneCount" class="kpi-number">0</div>
-            </div>
-        </div>
-        <div class="kpi-card kpi-area">
-            <div class="kpi-icon">📍</div>
-            <div>
-                <div class="kpi-label">TOTAL AREA</div>
-                <div id="areaCount" class="kpi-number">0</div>
-            </div>
+        <div class="chart-card">
+            <h3>Distribusi Prioritas</h3>
+            <canvas id="priorityChart"></canvas>
         </div>
     </section>
 
-    <!-- MAIN GRID -->
+    <!-- FORM & TABLE -->
     <section class="main-grid">
-
-        <!-- FORM CARD -->
         <div class="card">
             <div class="card-header">
-                <div>
-                    <div id="formTitle" class="card-title">Buat Work Request</div>
-                    <div class="card-subtitle">Isi data pekerjaan yang diperlukan</div>
-                </div>
+                <div id="formTitle" class="card-title">Buat Work Request</div>
+                <div class="card-subtitle">Form pengajuan perbaikan mesin</div>
             </div>
-
             <div class="card-body">
                 <form id="jobForm">
                     <input type="hidden" id="editTicketId" value="">
-
-                    <div class="form-section">
-                        <div class="form-section-title">Informasi Request</div>
-
+                    <div class="form-group">
+                        <label class="form-label">No. Tiket (Auto Backend)</label>
+                        <input id="ticketPreview" class="form-control" type="text" readonly value="Auto Generated by Server">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label class="form-label">Tanggal *</label><input id="tanggal" class="form-control" type="date" required></div>
                         <div class="form-group">
-                            <label class="form-label">No. Tiket (Auto Generated)</label>
-                            <input id="ticketPreview" class="form-control" type="text" readonly placeholder="Pilih tanggal untuk melihat No. Tiket">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Tanggal <span class="required">*</span></label>
-                            <input id="tanggal" class="form-control" type="date" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Jam <span class="required">*</span></label>
+                            <label class="form-label">Jam *</label>
                             <div class="time-row">
                                 <select id="jam" class="form-control" required></select>
                                 <select id="menit" class="form-control" required></select>
-                                <button id="btnNow" type="button" class="btn btn-secondary btn-now">Sekarang</button>
                             </div>
                         </div>
-
+                    </div>
+                    <div class="form-group"><label class="form-label">Requestor *</label><input id="requestor" class="form-control" type="text" required></div>
+                    <div class="form-group"><label class="form-label">Area / Mesin *</label><input id="area" class="form-control" type="text" placeholder="Contoh: Press 01 / Kiln Line 2" required></div>
+                    <div class="form-group"><label class="form-label">Deskripsi Kendala *</label><textarea id="deskripsi" required></textarea></div>
+                    
+                    <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Requestor <span class="required">*</span></label>
-                            <input id="requestor" class="form-control" type="text" placeholder="Nama requestor" required>
+                            <label class="form-label">Prioritas</label>
+                            <select id="priority" class="form-control"><option value="LOW">Low</option><option value="MEDIUM" selected>Medium</option><option value="HIGH">High</option></select>
                         </div>
-
                         <div class="form-group">
-                            <label class="form-label">Area / Lokasi <span class="required">*</span></label>
-                            <input id="area" class="form-control" type="text" placeholder="Contoh: Press 01 / Lini Production 2" required>
+                            <label class="form-label">Status</label>
+                            <select id="status" class="form-control"><option value="OPEN">Open</option><option value="PROGRESS">Progress</option><option value="DONE">Done</option></select>
                         </div>
                     </div>
 
-                    <div class="form-section">
-                        <div class="form-section-title">Detail Pekerjaan</div>
-
-                        <div class="form-group">
-                            <label class="form-label">Deskripsi Pekerjaan <span class="required">*</span></label>
-                            <textarea id="deskripsi" placeholder="Jelaskan kendala atau spesifikasi pekerjaan..." required></textarea>
+                    <!-- FOTO DOKUMENTASI UPLOAD -->
+                    <div class="form-group">
+                        <label class="form-label">Lampiran Foto (Opsional)</label>
+                        <div class="file-upload-box">
+                            <span>📁 Klik / Pilih Foto Kerusakan</span>
+                            <input type="file" id="fotoFile" accept="image/*">
+                            <img id="previewThumb" class="file-preview-thumb">
                         </div>
+                        <input type="hidden" id="fotoBase64" value="">
+                    </div>
 
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Prioritas</label>
-                                <select id="priority" class="form-control">
-                                    <option value="LOW">Low</option>
-                                    <option value="MEDIUM" selected>Medium</option>
-                                    <option value="HIGH">High</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Status</label>
-                                <select id="status" class="form-control">
-                                    <option value="OPEN">Open</option>
-                                    <option value="PROGRESS">Progress</option>
-                                    <option value="DONE">Done</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div id="keteranganGroup" class="form-group">
-                            <label class="form-label">Keterangan / Tindak Lanjut</label>
-                            <textarea id="keterangan" placeholder="Catatan perbaikan teknisi..."></textarea>
-                        </div>
+                    <div id="keteranganGroup" class="form-group">
+                        <label class="form-label">Tindak Lanjut Teknisi</label>
+                        <textarea id="keterangan"></textarea>
                     </div>
 
                     <div class="form-actions">
-                        <button id="submitBtn" type="submit" class="btn btn-primary">Simpan Request</button>
+                        <button id="submitBtn" type="submit" class="btn btn-primary">Kirim Request</button>
                         <button id="updateBtn" type="button" class="btn btn-success hidden">Simpan Perubahan</button>
                         <button id="resetBtn" type="button" class="btn btn-secondary">Reset</button>
                     </div>
@@ -1034,719 +442,347 @@ textarea {
             </div>
         </div>
 
-        <!-- TABLE CARD -->
         <div class="card">
             <div class="card-header">
-                <div>
-                    <div class="card-title">Daftar Work Request</div>
-                    <div class="card-subtitle">Data permintaan pekerjaan terbaru</div>
-                </div>
+                <div class="card-title">Daftar Work Request Aktif</div>
+                <div class="card-subtitle">Real-time database Google Sheets</div>
             </div>
-
             <div class="filter-bar">
-                <div class="search-box">
-                    <span class="search-icon">🔎</span>
-                    <input id="searchInput" class="form-control" type="text" placeholder="Cari tiket, requestor, area...">
-                </div>
-
-                <select id="filterStatus" class="form-control">
-                    <option value="">Semua Status</option>
-                    <option value="OPEN">Open</option>
-                    <option value="PROGRESS">Progress</option>
-                    <option value="DONE">Done</option>
-                </select>
-
-                <select id="filterPriority" class="form-control">
-                    <option value="">Semua Prioritas</option>
-                    <option value="HIGH">High</option>
-                    <option value="MEDIUM">Medium</option>
-                    <option value="LOW">Low</option>
-                </select>
-
-                <input id="filterDate" class="form-control" type="date" title="Filter per Tanggal">
-
+                <div class="search-box"><span class="search-icon">🔍</span><input id="searchInput" class="form-control" type="text" placeholder="Cari tiket, area..."></div>
+                <select id="filterStatus" class="form-control"><option value="">Semua Status</option><option value="OPEN">Open</option><option value="PROGRESS">Progress</option><option value="DONE">Done</option></select>
+                <select id="filterPriority" class="form-control"><option value="">Semua Prioritas</option><option value="HIGH">High</option><option value="MEDIUM">Medium</option><option value="LOW">Low</option></select>
+                <input id="filterDate" class="form-control" type="date">
                 <button id="clearFilter" class="btn btn-secondary" type="button">Reset</button>
             </div>
-
             <div class="table-wrapper">
                 <table class="data-table">
                     <thead>
                         <tr>
                             <th>ID Tiket</th>
-                            <th>Waktu Request</th>
+                            <th>Waktu</th>
                             <th>Requestor</th>
                             <th>Area</th>
-                            <th>Deskripsi</th>
-                            <th>Priority</th>
+                            <th>Deskripsi & Foto</th>
+                            <th>Prioritas</th>
                             <th>Status</th>
-                            <th id="thAksi">Aksi</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="dataTableBody"></tbody>
                 </table>
-
-                <div id="emptyState" class="empty-state" style="display:none;">
-                    <div class="empty-icon">📋</div>
-                    <strong>Belum ada data tiket</strong>
-                    <span>Work Request yang dikirimkan akan muncul di sini.</span>
-                </div>
-            </div>
-
-            <div class="pagination">
-                <div id="paginationInfo" class="pagination-info">Halaman 1</div>
-                <div class="pagination-buttons">
-                    <button id="prevPage" class="btn btn-secondary btn-small" type="button">← Prev</button>
-                    <button id="nextPage" class="btn btn-secondary btn-small" type="button">Next →</button>
-                </div>
             </div>
         </div>
-
     </section>
-
 </main>
 
-<!-- CUSTOM CONFIRM MODAL -->
-<div id="confirmModal" class="modal-overlay" style="display:none;">
-    <div class="modal-card">
-        <div class="modal-header">
-            <div class="modal-icon">⚠️</div>
-            <h3 id="modalTitle">Konfirmasi Hapus</h3>
-        </div>
-        <div class="modal-body" id="modalMessage">
-            Apakah Anda yakin ingin menghapus data ini?
-        </div>
-        <div class="modal-actions">
-            <button id="btnModalCancel" class="btn btn-secondary">Batal</button>
-            <button id="btnModalConfirm" class="btn btn-danger">Hapus Tiket</button>
-        </div>
-    </div>
-</div>
-
 <div id="toastContainer" class="toast-container"></div>
-
-<div id="loadingOverlay" class="loading-overlay" style="display:none;">
-    <div class="loading-box">
-        <div class="spinner"></div>
-        <div id="loadingText">Memproses data...</div>
-    </div>
-</div>
+<div id="loadingOverlay" class="loading-overlay" style="display:none;"><div class="loading-box"><div class="spinner"></div><div id="loadingText">Memproses...</div></div></div>
 
 <script>
-/* KONFIGURASI BACKEND */
 let SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnpj8BPh30Dkpyrmq2wt9S0fFOCEBF6EBq2hqWSvRQybIz5QKZe2EcrHPW3ahlXgGX/exec";
+let statusChartInstance = null;
+let priorityChartInstance = null;
 
-const AppState = {
-    isSubmitting: false,
-    isLoading: false,
-    allData: [],
-    filteredData: [],
-    currentPage: 1,
-    pageSize: 8
-};
-
+const AppState = { allData: [], filteredData: [], isSubmitting: false };
 function $(id) { return document.getElementById(id); }
-function getValue(id) { return $(id)?.value || ""; }
-function setValue(id, value) { if ($(id)) $(id).value = value ?? ""; }
 
-function escapeHTML(str) {
-    return String(str ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-function pad(n) { return String(n).padStart(2, "0"); }
-
-function getLocalDateISO(d = new Date()) {
-    return [d.getFullYear(), pad(d.getMonth() + 1), pad(d.getDate())].join("-");
-}
-
-function parseTanggalToISO(val) {
-    if (!val) return "";
-    const str = String(val).trim();
-    const match = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if (match) return `${match[1]}-${match[2]}-${match[3]}`;
-    const d = new Date(str);
-    return isNaN(d.getTime()) ? str : getLocalDateISO(d);
-}
-
-function formatTanggalClean(val) {
-    if (!val) return "-";
-    const str = String(val).trim();
-    const match = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    return match ? `${match[3]}/${match[2]}/${match[1]}` : str;
-}
-
-function formatJamClean(val) {
-    if (!val) return "-";
-    let str = String(val).trim();
-    if (str.includes("1899") || str.includes("GMT")) {
-        const timeMatch = str.match(/\d{2}:\d{2}/);
-        str = timeMatch ? timeMatch[0] : str;
-    }
-    const match = str.match(/^(\d{1,2}):(\d{1,2})/);
-    return match ? `${pad(match[1])}:${pad(match[2])}` : str;
-}
-
-function triggerShake(elementId) {
-    const el = $(elementId);
-    if (!el) return;
-    el.classList.add("shake-effect");
-    setTimeout(() => {
-        el.classList.remove("shake-effect");
-    }, 400);
-}
-
-function generateNextTicketId(selectedDateISO) {
-    if (!selectedDateISO) return "WR-YYYYMMDD-001";
-    const cleanDate = selectedDateISO.replace(/-/g, ""); 
-    const prefix = `WR-${cleanDate}-`;
-
-    const matchingTickets = AppState.allData.filter(item => {
-        const itemId = String(item.id || "").trim();
-        return itemId.startsWith(prefix);
+// Inisialisasi Chart.js
+function initCharts() {
+    const ctxStatus = $('statusChart').getContext('2d');
+    statusChartInstance = new Chart(ctxStatus, {
+        type: 'doughnut',
+        data: {
+            labels: ['Open', 'Progress', 'Done'],
+            datasets: [{ data: [0, 0, 0], backgroundColor: ['#60a5fa', '#fbbf24', '#34d399'], borderWidth: 0 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 } } } } }
     });
 
-    let maxSeq = 0;
-    matchingTickets.forEach(item => {
-        const idStr = String(item.id).trim();
-        const parts = idStr.split("-");
-        if (parts.length >= 3) {
-            const seq = parseInt(parts[parts.length - 1], 10);
-            if (!isNaN(seq) && seq > maxSeq) {
-                maxSeq = seq;
-            }
-        }
+    const ctxPriority = $('priorityChart').getContext('2d');
+    priorityChartInstance = new Chart(ctxPriority, {
+        type: 'bar',
+        data: {
+            labels: ['High', 'Medium', 'Low'],
+            datasets: [{ data: [0, 0, 0], backgroundColor: ['#f87171', '#fbbf24', '#34d399'], borderRadius: 6 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#94a3b8' } }, y: { ticks: { color: '#94a3b8' } } } }
     });
-
-    const nextSeq = String(maxSeq + 1).padStart(3, "0");
-    return `${prefix}${nextSeq}`;
 }
 
-function updateTicketPreview() {
-    const editId = getValue("editTicketId").trim();
-    if (editId) {
-        setValue("ticketPreview", editId);
-        return;
-    }
-    const tglISO = getValue("tanggal");
-    const nextTicketId = generateNextTicketId(tglISO);
-    setValue("ticketPreview", nextTicketId);
+function updateChartsData(data) {
+    const open = data.filter(x => x.status === 'OPEN').length;
+    const progress = data.filter(x => x.status === 'PROGRESS').length;
+    const done = data.filter(x => x.status === 'DONE').length;
+    statusChartInstance.data.datasets[0].data = [open, progress, done];
+    statusChartInstance.update();
+
+    const high = data.filter(x => x.priority === 'HIGH').length;
+    const med = data.filter(x => x.priority === 'MEDIUM').length;
+    const low = data.filter(x => x.priority === 'LOW').length;
+    priorityChartInstance.data.datasets[0].data = [high, med, low];
+    priorityChartInstance.update();
 }
 
+// Konversi Upload Foto ke Base64
+$('fotoFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(uploadEvent) {
+        const base64String = uploadEvent.target.result;
+        $('fotoBase64').value = base64String;
+        const thumb = $('previewThumb');
+        thumb.src = base64String;
+        thumb.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+});
+
+// Load & Auth Logic
 const Auth = {
-    login(userData) {
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userRole", userData.role || "requestor");
-        localStorage.setItem("userName", userData.name || userData.username || "");
-    },
-    logout() {
-        localStorage.removeItem("isLoggedIn");
-        localStorage.removeItem("userRole");
-        localStorage.removeItem("userName");
-        location.reload();
-    },
-    isLoggedIn() { return localStorage.getItem("isLoggedIn") === "true"; },
-    getRole() { return localStorage.getItem("userRole") || "requestor"; },
-    getName() { return localStorage.getItem("userName") || ""; }
+    login(u) { localStorage.setItem('isLoggedIn', 'true'); localStorage.setItem('userRole', u.role || 'requestor'); localStorage.setItem('userName', u.name || u.username); },
+    logout() { localStorage.clear(); location.reload(); },
+    isLoggedIn() { return localStorage.getItem('isLoggedIn') === 'true'; },
+    getRole() { return localStorage.getItem('userRole') || 'requestor'; },
+    getName() { return localStorage.getItem('userName') || ''; }
 };
 
 function updateAuthUI() {
     const logged = Auth.isLoggedIn();
-    $("loginPage").style.display = logged ? "none" : "flex";
-    $("appPage").style.display = logged ? "block" : "none";
-    $("btnLogout").style.display = logged ? "inline-flex" : "none";
+    $('loginPage').style.display = logged ? 'none' : 'flex';
+    $('appPage').style.display = logged ? 'block' : 'none';
+    $('btnLogout').style.display = logged ? 'inline-flex' : 'none';
+    if (!logged) return;
 
-    if (!logged) {
-        if (!SCRIPT_URL || SCRIPT_URL.includes("PASTE_URL_WEB_APP")) {
-            $("urlGroup").style.display = "block";
-            const savedUrl = localStorage.getItem("customScriptUrl");
-            if (savedUrl) $("scriptUrlInput").value = savedUrl;
-        } else {
-            $("urlGroup").style.display = "none";
-        }
-        return;
-    }
-
-    const name = Auth.getName() || "User";
+    const name = Auth.getName();
     const role = Auth.getRole();
-    
-    $("loginInfo").textContent = name;
-    $("userAvatar").textContent = name.trim().charAt(0).toUpperCase();
-    
-    const roleBadge = $("roleBadge");
-    roleBadge.textContent = role;
-    roleBadge.classList.remove("hidden");
+    $('loginInfo').textContent = name;
+    $('userAvatar').textContent = name.charAt(0).toUpperCase();
+    const badge = $('roleBadge');
+    badge.textContent = role;
+    badge.classList.remove('hidden');
 
-    const isRequestor = role === "requestor";
-    $("keteranganGroup").style.display = isRequestor ? "none" : "block";
-    $("status").disabled = isRequestor;
-
-    if (isRequestor) {
-        setValue("requestor", name);
-        $("requestor").readOnly = true;
-        setValue("status", "OPEN");
-    } else {
-        $("requestor").readOnly = false;
+    if (role === 'requestor') {
+        $('requestor').value = name;
+        $('requestor').readOnly = true;
+        $('status').disabled = true;
+        $('keteranganGroup').style.display = 'none';
     }
-}
-
-function showToast(message, type = "success") {
-    const container = $("toastContainer");
-    const toast = document.createElement("div");
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
-    container.appendChild(toast);
-    setTimeout(() => { toast.remove(); }, 3500);
-}
-
-function setLoading(show, text = "Memproses data...") {
-    $("loadingText").textContent = text;
-    $("loadingOverlay").style.display = show ? "flex" : "none";
-}
-
-function showConfirm({ title, message, confirmText = "Konfirmasi", confirmClass = "btn-danger" }) {
-    return new Promise((resolve) => {
-        const modal = $("confirmModal");
-        const titleEl = $("modalTitle");
-        const msgEl = $("modalMessage");
-        const btnConfirm = $("btnModalConfirm");
-        const btnCancel = $("btnModalCancel");
-
-        titleEl.textContent = title;
-        msgEl.innerHTML = message;
-        btnConfirm.textContent = confirmText;
-        btnConfirm.className = `btn ${confirmClass}`;
-
-        modal.style.display = "flex";
-
-        const cleanup = () => {
-            modal.style.display = "none";
-            btnConfirm.onclick = null;
-            btnCancel.onclick = null;
-        };
-
-        btnConfirm.onclick = () => { cleanup(); resolve(true); };
-        btnCancel.onclick = () => { cleanup(); resolve(false); };
-    });
 }
 
 async function apiPost(payload) {
-    if ($("scriptUrlInput") && $("scriptUrlInput").value.trim()) {
-        SCRIPT_URL = $("scriptUrlInput").value.trim();
-        localStorage.setItem("customScriptUrl", SCRIPT_URL);
-    }
-    if (!SCRIPT_URL || SCRIPT_URL.includes("PASTE_URL_WEB_APP")) {
-        throw new Error("URL Apps Script belum diisi!");
-    }
-    const response = await fetch(SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload)
-    });
-    const text = await response.text();
-    try {
-        return JSON.parse(text);
-    } catch (e) {
-        throw new Error("Gagal mengurai respons server. Lakukan 'New Deployment' di Apps Script.");
-    }
-}
-
-async function apiGet() {
-    if (!SCRIPT_URL || SCRIPT_URL.includes("PASTE_URL_WEB_APP")) {
-        throw new Error("URL Apps Script belum dikonfigurasi.");
-    }
-    const response = await fetch(SCRIPT_URL + "?t=" + Date.now());
-    const text = await response.text();
-    try {
-        return JSON.parse(text);
-    } catch (e) {
-        throw new Error("Format data backend tidak valid.");
-    }
-}
-
-async function handleLogin(e) {
-    e.preventDefault();
-    const username = getValue("username").trim();
-    const password = getValue("password");
-
-    if (!username || !password) {
-        showToast("Username dan password wajib diisi.", "warning");
-        triggerShake("loginForm");
-        return;
-    }
-
-    setLoading(true, "Proses Login...");
-    try {
-        const result = await apiPost({ action: "login", username, password });
-        if (!result.success) throw new Error(result.message || "Login gagal.");
-
-        Auth.login(result.user);
-        updateAuthUI();
-        showToast("Login berhasil.", "success");
-        await loadData();
-    } catch (error) {
-        showToast(error.message, "error");
-        triggerShake("loginForm");
-    } finally {
-        setLoading(false);
-    }
+    const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+    return await res.json();
 }
 
 async function loadData() {
-    if (AppState.isLoading) return;
-    AppState.isLoading = true;
-    setLoading(true, "Memuat data tiket...");
-
+    $('loadingOverlay').style.display = 'flex';
     try {
-        const result = await apiGet();
-        if (!result.success) throw new Error(result.message || "Gagal mengambil data.");
-
-        AppState.allData = Array.isArray(result.data) ? result.data.map(normalizeData) : [];
-        applyFilters();
-        updateDashboard();
-        updateTicketPreview();
-    } catch (error) {
-        showToast(error.message, "error");
+        const res = await fetch(SCRIPT_URL + '?t=' + Date.now());
+        const json = await res.json();
+        if (json.success) {
+            AppState.allData = json.data || [];
+            applyFilters();
+            updateChartsData(AppState.allData);
+        }
+    } catch(err) {
+        showToast('Gagal memuat data dari server.', 'error');
     } finally {
-        AppState.isLoading = false;
-        setLoading(false);
+        $('loadingOverlay').style.display = 'none';
     }
-}
-
-function normalizeData(row) {
-    return {
-        id: String(row.id || ""),
-        tanggal: parseTanggalToISO(row.tanggal),
-        jam: formatJamClean(row.jam),
-        requestor: String(row.requestor || ""),
-        area: String(row.area || ""),
-        deskripsi: String(row.deskripsi || ""),
-        createdAt: String(row.createdat || row.createdAt || ""),
-        status: String(row.status || "OPEN").toUpperCase(),
-        keterangan: String(row.keterangan || ""),
-        priority: String(row.priority || "MEDIUM").toUpperCase()
-    };
 }
 
 function applyFilters() {
-    const search = getValue("searchInput").trim().toLowerCase();
-    const status = getValue("filterStatus").toUpperCase();
-    const priority = getValue("filterPriority").toUpperCase();
-    const date = getValue("filterDate");
+    const search = $('searchInput').value.toLowerCase();
+    const status = $('filterStatus').value;
+    const priority = $('filterPriority').value;
+    const date = $('filterDate').value;
 
     AppState.filteredData = AppState.allData.filter(item => {
-        const searchable = [
-            item.id, item.tanggal, item.jam, item.requestor,
-            item.area, item.deskripsi, item.status, item.priority, item.keterangan
-        ].join(" ").toLowerCase();
-
-        const matchSearch = !search || searchable.includes(search);
+        const matchSearch = !search || [item.id, item.requestor, item.area, item.deskripsi].join(' ').toLowerCase().includes(search);
         const matchStatus = !status || item.status === status;
         const matchPriority = !priority || item.priority === priority;
-        const matchDate = !date || item.tanggal === date;
-
+        const matchDate = !date || (item.tanggal && item.tanggal.startsWith(date));
         return matchSearch && matchStatus && matchPriority && matchDate;
     });
 
-    AppState.currentPage = 1;
     renderTable();
+    updateKPIs();
 }
 
-function updateDashboard() {
+function updateKPIs() {
     const data = AppState.allData;
-    $("totalCount").textContent = data.length;
-    $("openCount").textContent = data.filter(x => x.status === "OPEN").length;
-    $("progressCount").textContent = data.filter(x => x.status === "PROGRESS").length;
-    $("doneCount").textContent = data.filter(x => x.status === "DONE").length;
-
-    const uniqueAreas = new Set(
-        data.map(x => String(x.area || "").trim().toLowerCase()).filter(Boolean)
-    );
-    $("areaCount").textContent = uniqueAreas.size;
-}
-
-function statusBadge(status) {
-    status = String(status).toUpperCase();
-    if (status === "DONE") return `<span class="badge badge-done">SELESAI</span>`;
-    if (status === "PROGRESS") return `<span class="badge badge-progress">PROGRESS</span>`;
-    return `<span class="badge badge-open">OPEN</span>`;
-}
-
-function priorityBadge(priority) {
-    priority = String(priority).toUpperCase();
-    const cls = priority === "HIGH" ? "badge-high" : priority === "LOW" ? "badge-low" : "badge-medium";
-    return `<span class="badge ${cls}">${escapeHTML(priority)}</span>`;
+    $('totalCount').textContent = data.length;
+    $('openCount').textContent = data.filter(x => x.status === 'OPEN').length;
+    $('progressCount').textContent = data.filter(x => x.status === 'PROGRESS').length;
+    $('doneCount').textContent = data.filter(x => x.status === 'DONE').length;
+    $('areaCount').textContent = new Set(data.map(x => x.area)).size;
 }
 
 function renderTable() {
-    const tbody = $("dataTableBody");
-    tbody.innerHTML = "";
-    const data = AppState.filteredData;
-    const isRequestor = Auth.getRole() === "requestor";
+    const tbody = $('dataTableBody');
+    tbody.innerHTML = '';
+    const isReq = Auth.getRole() === 'requestor';
 
-    if (!data.length) {
-        $("emptyState").style.display = "block";
-        $("paginationInfo").textContent = "Tidak ada data";
-        return;
-    }
-
-    $("emptyState").style.display = "none";
-    const totalPages = Math.max(1, Math.ceil(data.length / AppState.pageSize));
-    
-    if (AppState.currentPage > totalPages) AppState.currentPage = totalPages;
-
-    const start = (AppState.currentPage - 1) * AppState.pageSize;
-    const pageData = data.slice(start, start + AppState.pageSize);
-
-    pageData.forEach(item => {
-        const tr = document.createElement("tr");
-
-        let actionCell = `-`;
-        if (!isRequestor) {
-            actionCell = `
-                <div class="action-group">
-                    <button class="action-btn action-edit" title="Edit Tiket" onclick="prepareEdit('${escapeHTML(item.id)}')">✎</button>
-                    <button class="action-btn action-delete" title="Hapus Tiket" onclick="deleteData('${escapeHTML(item.id)}')">×</button>
-                </div>
-            `;
-        }
-
+    AppState.filteredData.forEach(item => {
+        const tr = document.createElement('tr');
+        const fotoHtml = item.foto ? `<br><a href="${item.foto}" target="_blank" style="color:var(--accent); font-size:11px;">[ Lihat Foto Bukti ]</a>` : '';
+        
         tr.innerHTML = `
-            <td><div class="ticket-id">${escapeHTML(item.id)}</div></td>
+            <td><span class="ticket-id">${item.id}</span></td>
+            <td>${item.tanggal || '-'}<br><span style="color:var(--muted);">${item.jam || ''}</span></td>
+            <td>${item.requestor}</td>
+            <td>${item.area}</td>
+            <td>${item.deskripsi}${fotoHtml}</td>
+            <td><span class="badge badge-${item.priority.toLowerCase()}">${item.priority}</span></td>
+            <td><span class="badge badge-${item.status.toLowerCase()}">${item.status}</span></td>
             <td>
-                <div>${formatTanggalClean(item.tanggal)}</div>
-                <div class="muted">${formatJamClean(item.jam)}</div>
+                ${!isReq ? `<div class="action-group"><button class="action-btn" onclick="prepareEdit('${item.id}')">✎</button><button class="action-btn" onclick="deleteTicket('${item.id}')">×</button></div>` : '-'}
             </td>
-            <td>${escapeHTML(item.requestor)}</td>
-            <td>${escapeHTML(item.area)}</td>
-            <td><div class="description">${escapeHTML(item.deskripsi)}</div></td>
-            <td>${priorityBadge(item.priority)}</td>
-            <td>${statusBadge(item.status)}</td>
-            <td>${actionCell}</td>
         `;
         tbody.appendChild(tr);
     });
-
-    $("paginationInfo").textContent = `Halaman ${AppState.currentPage} dari ${totalPages} • ${data.length} tiket`;
-    $("prevPage").disabled = AppState.currentPage <= 1;
-    $("nextPage").disabled = AppState.currentPage >= totalPages;
 }
 
-async function submitForm(e) {
-    if (e) e.preventDefault();
+async function submitJob(e) {
+    e.preventDefault();
     if (AppState.isSubmitting) return;
 
-    const editId = getValue("editTicketId").trim();
-    const isEdit = Boolean(editId);
-    const selectedDate = getValue("tanggal");
-    const finalTicketId = isEdit ? editId : generateNextTicketId(selectedDate);
-
+    const editId = $('editTicketId').value;
     const payload = {
-        action: isEdit ? "update" : "add",
-        id: finalTicketId,
-        tanggal: selectedDate,
-        jam: `${getValue("jam")}:${getValue("menit")}`,
-        priority: getValue("priority").toUpperCase(),
-        requestor: getValue("requestor").trim(),
-        area: getValue("area").trim(),
-        deskripsi: getValue("deskripsi").trim(),
-        status: (getValue("status") || "OPEN").toUpperCase(),
-        keterangan: getValue("keterangan").trim()
+        action: editId ? 'update' : 'add',
+        id: editId || undefined, // Jika add, ID di-generate aman di backend Apps Script
+        tanggal: $('tanggal').value,
+        jam: $('jam').value + ':' + $('menit').value,
+        requestor: $('requestor').value,
+        area: $('area').value,
+        deskripsi: $('deskripsi').value,
+        priority: $('priority').value,
+        status: $('status').value,
+        keterangan: $('keterangan').value,
+        foto: $('fotoBase64').value
     };
 
-    if (!payload.tanggal || !payload.jam || !payload.requestor || !payload.area || !payload.deskripsi) {
-        showToast("Lengkapi data yang wajib diisi.", "warning");
-        triggerShake("jobForm");
-        return;
-    }
-
     AppState.isSubmitting = true;
-    setLoading(true, isEdit ? "Memperbarui data tiket..." : "Menyimpan tiket baru...");
-
+    $('loadingOverlay').style.display = 'flex';
     try {
-        const result = await apiPost(payload);
-        if (!result.success) throw new Error(result.message || "Gagal menyimpan data.");
-
-        showToast(isEdit ? "Tiket berhasil diperbarui!" : `Tiket berhasil dibuat: ${result.id || finalTicketId}`, "success");
-        resetForm();
-        await loadData();
-    } catch (error) {
-        showToast(error.message, "error");
-        triggerShake("jobForm");
+        const res = await apiPost(payload);
+        if (res.success) {
+            showToast(editId ? 'Tiket berhasil diperbarui!' : 'Tiket baru berhasil dibuat!', 'success');
+            resetForm();
+            loadData();
+        } else {
+            showToast(res.message || 'Gagal menyimpan.', 'error');
+        }
+    } catch(err) {
+        showToast('Terjadi kesalahan koneksi.', 'error');
     } finally {
         AppState.isSubmitting = false;
-        setLoading(false);
+        $('loadingOverlay').style.display = 'none';
     }
 }
 
 function prepareEdit(id) {
-    const item = AppState.allData.find(x => String(x.id) === String(id));
-    if (!item) {
-        showToast("Data tiket tidak ditemukan.", "error");
-        return;
-    }
-
-    setValue("editTicketId", item.id);
-    setValue("ticketPreview", item.id);
-    setValue("tanggal", parseTanggalToISO(item.tanggal));
-
-    const time = formatJamClean(item.jam);
-    const parts = time.split(":");
-    setValue("jam", parts[0] || "00");
-    setValue("menit", parts[1] || "00");
-
-    setValue("requestor", item.requestor);
-    setValue("area", item.area);
-    setValue("deskripsi", item.deskripsi);
-    setValue("priority", item.priority);
-    setValue("status", item.status);
-    setValue("keterangan", item.keterangan);
-
-    $("submitBtn").classList.add("hidden");
-    $("updateBtn").classList.remove("hidden");
-    $("formTitle").textContent = "Edit Work Request";
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const item = AppState.allData.find(x => x.id === id);
+    if (!item) return;
+    $('editTicketId').value = item.id;
+    $('ticketPreview').value = item.id;
+    $('tanggal').value = item.tanggal;
+    const tParts = (item.jam || '00:00').split(':');
+    $('jam').value = tParts[0] || '00';
+    $('menit').value = tParts[1] || '00';
+    $('requestor').value = item.requestor;
+    $('area').value = item.area;
+    $('deskripsi').value = item.deskripsi;
+    $('priority').value = item.priority;
+    $('status').value = item.status;
+    $('keterangan').value = item.keterangan || '';
+    
+    $('submitBtn').classList.add('hidden');
+    $('updateBtn').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-async function deleteData(id) {
-    const item = AppState.allData.find(x => String(x.id) === String(id));
-    if (!item) return;
-
-    const confirmed = await showConfirm({
-        title: "Hapus Work Request",
-        message: `Apakah Anda yakin ingin menghapus tiket <b style="color:var(--accent);">${escapeHTML(item.id)}</b>?<br><br><i>"${escapeHTML(item.deskripsi)}"</i>`,
-        confirmText: "Hapus Tiket",
-        confirmClass: "btn-danger"
-    });
-
-    if (!confirmed) return;
-
-    setLoading(true, "Mengeksekusi penghapusan...");
+async function deleteTicket(id) {
+    if (!confirm('Yakin ingin menghapus tiket ' + id + '?')) return;
+    $('loadingOverlay').style.display = 'flex';
     try {
-        const result = await apiPost({ action: "delete", id: item.id });
-        if (!result.success) throw new Error(result.message || "Gagal menghapus tiket.");
-
-        showToast("Tiket berhasil dihapus.", "success");
-        await loadData();
-    } catch (error) {
-        showToast(error.message, "error");
+        const res = await apiPost({ action: 'delete', id: id });
+        if (res.success) {
+            showToast('Tiket dihapus.', 'success');
+            loadData();
+        }
     } finally {
-        setLoading(false);
+        $('loadingOverlay').style.display = 'none';
     }
 }
 
 function resetForm() {
-    setValue("editTicketId", "");
-    $("jobForm").reset();
-
-    $("submitBtn").classList.remove("hidden");
-    $("updateBtn").classList.add("hidden");
-    $("formTitle").textContent = "Buat Work Request";
-
-    setDefaultTime();
-    setValue("priority", "MEDIUM");
-    setValue("status", "OPEN");
-
-    if (Auth.isLoggedIn() && Auth.getRole() === "requestor") {
-        setValue("requestor", Auth.getName());
-        setValue("status", "OPEN");
+    $('jobForm').reset();
+    $('editTicketId').value = '';
+    $('ticketPreview').value = 'Auto Generated by Server';
+    $('submitBtn').classList.remove('hidden');
+    $('updateBtn').classList.add('hidden');
+    $('previewThumb').style.display = 'none';
+    $('fotoBase64').value = '';
+    if (Auth.getRole() === 'requestor') {
+        $('requestor').value = Auth.getName();
     }
-    updateTicketPreview();
 }
 
-function setDefaultTime() {
-    const now = new Date();
-    setValue("tanggal", getLocalDateISO(now));
-    setValue("jam", pad(now.getHours()));
-    setValue("menit", pad(now.getMinutes()));
-    updateTicketPreview();
+function showToast(msg, type='success') {
+    const c = $('toastContainer');
+    const t = document.createElement('div');
+    t.className = `toast`;
+    t.style.borderLeftColor = type === 'success' ? 'var(--success)' : 'var(--danger)';
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
 }
 
-function populateTimeSelects() {
-    const jam = $("jam");
-    const menit = $("menit");
-    jam.innerHTML = "";
-    menit.innerHTML = "";
-
-    for (let i = 0; i < 24; i++) jam.appendChild(new Option(pad(i), pad(i)));
-    for (let i = 0; i < 60; i++) menit.appendChild(new Option(pad(i), pad(i)));
-}
-
-$("prevPage").onclick = () => { if (AppState.currentPage > 1) { AppState.currentPage--; renderTable(); } };
-$("nextPage").onclick = () => {
-    const totalPages = Math.ceil(AppState.filteredData.length / AppState.pageSize);
-    if (AppState.currentPage < totalPages) { AppState.currentPage++; renderTable(); }
-};
-
-function exportToExcel() {
-    const data = AppState.filteredData;
-    if (!data.length) {
-        showToast("Tidak ada data untuk diexport.", "warning");
-        return;
+// Event Listeners
+$('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const u = $('username').value;
+    const p = $('password').value;
+    $('loadingOverlay').style.display = 'flex';
+    try {
+        const res = await apiPost({ action: 'login', username: u, password: p });
+        if (res.success) {
+            Auth.login(res.user);
+            updateAuthUI();
+            showToast('Login Berhasil!', 'success');
+            loadData();
+        } else {
+            showToast(res.message || 'Login Gagal', 'error');
+        }
+    } finally {
+        $('loadingOverlay').style.display = 'none';
     }
-
-    const headers = ["ID Tiket", "Tanggal", "Jam", "Requestor", "Area", "Deskripsi Pekerjaan", "Status", "Priority", "Keterangan"];
-    const rows = data.map(item => [
-        item.id, item.tanggal, item.jam, item.requestor, item.area, item.deskripsi, item.status, item.priority, item.keterangan
-    ]);
-
-    const csv = [headers, ...rows].map(row =>
-        row.map(val => `"${String(val ?? "").replace(/"/g, '""')}"`).join(",")
-    ).join("\n");
-
-    const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `Work_Request_${getLocalDateISO()}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-}
-
-function updateClock() {
-    $("clock").textContent = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-}
-
-$("loginForm").addEventListener("submit", handleLogin);
-$("jobForm").addEventListener("submit", submitForm);
-$("updateBtn").addEventListener("click", submitForm);
-$("btnLogout").addEventListener("click", () => Auth.logout());
-$("resetBtn").addEventListener("click", resetForm);
-$("btnNow").addEventListener("click", setDefaultTime);
-$("btnRefresh").addEventListener("click", loadData);
-$("btnExport").addEventListener("click", exportToExcel);
-
-$("tanggal").addEventListener("change", updateTicketPreview);
-
-$("searchInput").addEventListener("input", applyFilters);
-$("filterStatus").addEventListener("change", applyFilters);
-$("filterPriority").addEventListener("change", applyFilters);
-$("filterDate").addEventListener("change", applyFilters);
-
-$("clearFilter").addEventListener("click", () => {
-    $("searchInput").value = "";
-    $("filterStatus").value = "";
-    $("filterPriority").value = "";
-    $("filterDate").value = "";
-    applyFilters();
 });
 
-document.addEventListener("DOMContentLoaded", async () => {
-    populateTimeSelects();
-    setDefaultTime();
-    updateClock();
-    setInterval(updateClock, 1000);
+$('jobForm').addEventListener('submit', submitJob);
+$('updateBtn').addEventListener('click', submitJob);
+$('btnLogout').addEventListener('click', Auth.logout);
+$('resetBtn').addEventListener('click', resetForm);
+$('btnRefresh').addEventListener('click', loadData);
 
+['searchInput', 'filterStatus', 'filterPriority', 'filterDate'].forEach(id => {
+    $(id).addEventListener('input', applyFilters);
+    $(id).addEventListener('change', applyFilters);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    initCharts();
+    for(let i=0; i<24; i++) $('jam').add(new Option(String(i).padStart(2,'0'), String(i).padStart(2,'0')));
+    for(let i=0; i<60; i++) $('menit').add(new Option(String(i).padStart(2,'0'), String(i).padStart(2,'0')));
+    
     updateAuthUI();
-    if (Auth.isLoggedIn()) {
-        await loadData();
-    }
+    if (Auth.isLoggedIn()) loadData();
+    setInterval(() => {
+        $('clock').textContent = new Date().toLocaleTimeString('id-ID');
+    }, 1000);
 });
 </script>
-
 </body>
 </html>
