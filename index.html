@@ -9,7 +9,7 @@
 /* =========================================================
    RESET & THEME VARIABLES (INDUSTRIAL MARS & COPPER)
 ========================================================= */
-* {
+*, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -72,7 +72,6 @@ body {
     animation: shake 0.4s ease-in-out;
 }
 
-/* Transisi Universal */
 button, input, select, textarea, .card, .kpi-card, .action-btn {
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -136,7 +135,7 @@ button, input, select, textarea, .card, .kpi-card, .action-btn {
 }
 
 /* =========================================================
-   TOP HEADER (BAR ATAS DIPERBARUI)
+   TOP HEADER
 ========================================================= */
 .topbar {
     height: 72px;
@@ -325,7 +324,7 @@ button, input, select, textarea, .card, .kpi-card, .action-btn {
 }
 
 /* =========================================================
-   KPI DASHBOARD (5 COLUMNS)
+   KPI DASHBOARD
 ========================================================= */
 .kpi-grid {
     display: grid;
@@ -385,7 +384,7 @@ button, input, select, textarea, .card, .kpi-card, .action-btn {
 }
 
 /* =========================================================
-   MAIN GRID & FORM TONE (FORM TONE DIUBAH MENJADI LEBIH HARMONIS)
+   MAIN GRID & FORMS
 ========================================================= */
 .main-grid {
     display: grid;
@@ -427,9 +426,6 @@ button, input, select, textarea, .card, .kpi-card, .action-btn {
     padding: 20px;
 }
 
-/* =========================================================
-   FORMS & CONTROLS (WARNA & EFEK FOCUS)
-========================================================= */
 .form-section {
     margin-bottom: 18px;
 }
@@ -1194,7 +1190,6 @@ function formatJamClean(val) {
     return match ? `${pad(match[1])}:${pad(match[2])}` : str;
 }
 
-/* EFEK GETAR (TRIGGER SHAKE) SAAT VALIDASI GAGAL */
 function triggerShake(elementId) {
     const el = $(elementId);
     if (!el) return;
@@ -1204,7 +1199,6 @@ function triggerShake(elementId) {
     }, 400);
 }
 
-/* LOGIKA GENERATE NOMOR TIKET ("WR") */
 function generateNextTicketId(selectedDateISO) {
     if (!selectedDateISO) return "WR-YYYYMMDD-001";
     const cleanDate = selectedDateISO.replace(/-/g, ""); 
@@ -1731,7 +1725,7 @@ $("tanggal").addEventListener("change", updateTicketPreview);
 $("searchInput").addEventListener("input", applyFilters);
 $("filterStatus").addEventListener("change", applyFilters);
 $("filterPriority").addEventListener("change", applyFilters);
-$("filterDate").addEventListener("change", filterDate => applyFilters());
+$("filterDate").addEventListener("change", applyFilters);
 
 $("clearFilter").addEventListener("click", () => {
     $("searchInput").value = "";
