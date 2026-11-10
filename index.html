@@ -520,7 +520,6 @@ function updateChartsData(data) {
     priorityChartInstance.data.datasets[0].data = [high, med, low];
     priorityChartInstance.update();
 
-    // Render Top Area Ranking List
     renderTopAreas(data);
 }
 
@@ -528,16 +527,14 @@ function renderTopAreas(data) {
     const container = $('topAreaList');
     container.innerHTML = '';
 
-    // Hitung frekuensi kemunculan tiap area
     const areaCounts = {};
     data.forEach(item => {
         const areaName = (item.area || 'Lainnya').trim();
-        if (areaName) {
+        if (areaName && areaName !== 'undefined') {
             areaCounts[areaName] = (areaCounts[areaName] || 0) + 1;
         }
     });
 
-    // Urutkan dari jumlah terbanyak
     const sortedAreas = Object.entries(areaCounts).sort((a, b) => b[1] - a[1]);
 
     if (sortedAreas.length === 0) {
@@ -653,7 +650,7 @@ function renderTable() {
             <td><span class="badge badge-${item.priority.toLowerCase()}">${item.priority}</span></td>
             <td><span class="badge badge-${item.status.toLowerCase()}">${item.status}</span></td>
             <td>
-                ${!isReq ? `<div class="action-group"><button class="action-btn" onclick="prepareEdit('${item.id}')">✎</button><button class="action-btn" onclick="deleteTicket('${item.id}')">×</button></div>` : '-'}
+                ${!isReq ? `<div class="action-group"><button class="action-btn" onclick="prepareEdit('${item.id}')" title="Edit">✎</button><button class="action-btn" onclick="deleteTicket('${item.id}')" title="Hapus">×</button></div>` : '-'}
             </td>
         `;
         tbody.appendChild(tr);
@@ -774,11 +771,29 @@ $('loginForm').addEventListener('submit', async (e) => {
     }
 });
 
+// Form submit menangani add dan update secara terpusat melalui event 'submit' pada form
 $('jobForm').addEventListener('submit', submitJob);
-$('updateBtn').addEventListener('click', submitJob);
 $('btnLogout').addEventListener('click', Auth.logout);
 $('resetBtn').addEventListener('click', resetForm);
 $('btnRefresh').addEventListener('click', loadData);
+
+$('btnExport').addEventListener('click', () => {
+    if (AppState.allData.length === 0) {
+        showToast('Tidak ada data untuk diexport', 'error');
+        return;
+    }
+    let csvContent = "data:text/csv;charset=utf-8,ID,Tanggal,Jam,Requestor,Area,Deskripsi,Priority,Status,Keterangan\n";
+    AppState.allData.forEach(row => {
+        csvContent += `"${row.id}","${row.tanggal}","${row.jam}","${row.requestor}","${row.area}","${row.deskripsi}","${row.priority}","${row.status}","${row.keterangan}"\n`;
+    });
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "Work_Request_Data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});
 
 ['searchInput', 'filterStatus', 'filterPriority', 'filterDate'].forEach(id => {
     $(id).addEventListener('input', applyFilters);
